@@ -1,0 +1,421 @@
+[
+  {
+    "kind": "library",
+    "comment": "\nA simple properties file management library.\n",
+    "name": "properties",
+    "children": [
+      {
+        "superclass": {
+          "name": "Object",
+          "refId": "Object"
+        },
+        "kind": "class",
+        "comment": "\nThe Properties class implementing all tools to load key-values from file both by name and\npath.\n",
+        "name": "Properties",
+        "children": [
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nCreate a new properties instance by naming the source file using [name]\nand, optionally, setting the desired [encoding].\n",
+            "name": "Properties",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "name",
+                "id": "name"
+              },
+              {
+                "ref": {
+                  "name": "Encoding",
+                  "refId": "Encoding"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "encoding",
+                "id": "encoding"
+              }
+            ],
+            "id": "Properties2()"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nCreate a new properties instance from file [path]\nand, optionally, setting the desired [encoding].\n",
+            "name": "Properties.fromFile",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "path",
+                "id": "path"
+              },
+              {
+                "ref": {
+                  "name": "Encoding",
+                  "refId": "Encoding"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "encoding",
+                "id": "encoding"
+              }
+            ],
+            "id": "Properties.fromFile2()"
+          },
+          {
+            "returnType": {
+              "name": "void",
+              "refId": "void"
+            },
+            "kind": "method",
+            "name": "_init",
+            "id": "_init0()"
+          },
+          {
+            "returnType": {
+              "name": "List",
+              "refId": "List",
+              "arguments": [
+                {
+                  "name": "String",
+                  "refId": "String"
+                }
+              ]
+            },
+            "kind": "method",
+            "comment": "\nCreate the file object and read its content in lines.\n",
+            "name": "_read",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "path",
+                "id": "path"
+              },
+              {
+                "ref": {
+                  "name": "Encoding",
+                  "refId": "Encoding"
+                },
+                "kind": "param",
+                "name": "encoding",
+                "id": "encoding"
+              }
+            ],
+            "id": "_read2()"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nLoad properties from lines.\n",
+            "name": "_load",
+            "children": [
+              {
+                "ref": {
+                  "name": "List",
+                  "refId": "List",
+                  "arguments": [
+                    {
+                      "name": "String",
+                      "refId": "String"
+                    }
+                  ]
+                },
+                "kind": "param",
+                "name": "lines",
+                "id": "lines"
+              }
+            ],
+            "id": "_load1()"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nDetermine if input line is a property or not.\n",
+            "name": "_isProperty",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "line",
+                "id": "line"
+              }
+            ],
+            "id": "_isProperty1()"
+          },
+          {
+            "returnType": {
+              "name": "File",
+              "refId": "File"
+            },
+            "kind": "method",
+            "comment": "\nGet a file instance from the input string [file].\n",
+            "name": "_getFile",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "file",
+                "id": "file"
+              }
+            ],
+            "id": "_getFile1()"
+          },
+          {
+            "returnType": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "method",
+            "comment": "Loads the value of a property given its [key] ",
+            "name": "get",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "key",
+                "id": "key"
+              }
+            ],
+            "id": "get1()"
+          },
+          {
+            "returnType": {
+              "name": "bool",
+              "refId": "bool"
+            },
+            "kind": "method",
+            "comment": "Check whether the properties contains a property given its [key] ",
+            "name": "contains",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "key",
+                "id": "key"
+              }
+            ],
+            "id": "contains1()"
+          },
+          {
+            "returnType": {
+              "name": "Iterable",
+              "refId": "Iterable",
+              "arguments": [
+                {
+                  "name": "String",
+                  "refId": "String"
+                }
+              ]
+            },
+            "kind": "method",
+            "comment": "Loads the whole set of keys ",
+            "name": "keys",
+            "id": "keys0()"
+          },
+          {
+            "returnType": {
+              "name": "Collection",
+              "refId": "Collection",
+              "arguments": [
+                {
+                  "name": "String",
+                  "refId": "String"
+                }
+              ]
+            },
+            "kind": "method",
+            "comment": "Loads the whole set of values ",
+            "name": "values",
+            "id": "values0()"
+          },
+          {
+            "returnType": {
+              "name": "Map",
+              "refId": "Map",
+              "arguments": [
+                {
+                  "name": "String",
+                  "refId": "String"
+                },
+                {
+                  "name": "String",
+                  "refId": "String"
+                }
+              ]
+            },
+            "kind": "method",
+            "comment": "\nReturns a map containg every property whos key satisify the predicate f. Returns an empty map otherwise.\n",
+            "name": "everyKey",
+            "children": [
+              {
+                "ref": {
+                  "name": "Function",
+                  "refId": "Function"
+                },
+                "kind": "param",
+                "name": "f",
+                "id": "f"
+              }
+            ],
+            "id": "everyKey1()"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nReloads the properties from file.\n",
+            "name": "reload",
+            "id": "reload0()"
+          },
+          {
+            "returnType": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "method",
+            "name": "toString",
+            "id": "toString0()"
+          },
+          {
+            "ref": {
+              "name": "Encoding",
+              "refId": "Encoding"
+            },
+            "kind": "property",
+            "name": "_encoding",
+            "id": "_encoding"
+          },
+          {
+            "ref": {
+              "name": "Map",
+              "refId": "Map",
+              "arguments": [
+                {
+                  "name": "String",
+                  "refId": "String"
+                },
+                {
+                  "name": "String",
+                  "refId": "String"
+                }
+              ]
+            },
+            "kind": "property",
+            "name": "_content",
+            "id": "_content"
+          },
+          {
+            "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "property",
+            "name": "_source",
+            "id": "_source"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "constructor",
+            "comment": "\nCreate a new properties instance by naming the source file using [name]\nand, optionally, setting the desired [encoding].\n",
+            "name": "Properties",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "name",
+                "id": "name"
+              },
+              {
+                "ref": {
+                  "name": "Encoding",
+                  "refId": "Encoding"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "encoding",
+                "id": "encoding"
+              }
+            ],
+            "id": "Properties2()"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "constructor",
+            "comment": "\nCreate a new properties instance from file [path]\nand, optionally, setting the desired [encoding].\n",
+            "name": "Properties.fromFile",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "path",
+                "id": "path"
+              },
+              {
+                "ref": {
+                  "name": "Encoding",
+                  "refId": "Encoding"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "encoding",
+                "id": "encoding"
+              }
+            ],
+            "id": "Properties.fromFile2()"
+          }
+        ],
+        "id": "Properties"
+      }
+    ],
+    "id": "file:///Users/kevin/dart/properties/bin/properties.dart"
+  }
+]

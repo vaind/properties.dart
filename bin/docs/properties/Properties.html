@@ -1,0 +1,337 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>Properties class / properties Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="properties" data-type="Properties">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../properties.html">properties</a> &rsaquo; <a href="../properties/Properties.html">Properties</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+<h2><div class="icon-library"></div><a href="../properties.html">properties</a></h2><ul class="icon">
+<li><div class="icon-class"></div><strong>Properties</strong></li>
+</ul>
+</div>
+<div class="content">
+        <h2><strong>Properties</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<p>The Properties class implementing all tools to load key-values from file both by name and
+path.</p>
+<pre class="source">
+class Properties{
+ 
+ /// The encoding used to read the file
+ Encoding _encoding;
+ 
+ /// The content of the properties file in terms of key - value couples
+ Map&lt;String,String&gt; _content;
+ 
+ /// An internal reference to the source file.
+ String _source;
+ 
+ /**
+  * Create a new properties instance by naming the source file using [name]
+  * and, optionally, setting the desired [encoding].
+  */
+ Properties(String name, [Encoding encoding = Encoding.UTF_8]){
+   
+   this._source = name;
+   this._encoding = encoding;
+   
+   _init();
+   
+ }
+ 
+ /**
+  * Create a new properties instance from file [path]
+  * and, optionally, setting the desired [encoding].
+  */
+ Properties.fromFile(String path, [Encoding encoding = Encoding.UTF_8]){
+   
+   this._source = path;
+   this._encoding = encoding;
+   
+   _init();
+   
+ }
+ 
+ void _init() =&gt; _load(_read(_source, _encoding));
+
+ /**
+  * Create the file object and read its content in lines.
+  */
+ List&lt;String&gt; _read(String path, Encoding encoding) {
+   
+   File f = _getFile(path);
+   
+   if(f == null || !f.existsSync())
+     return null;
+   
+   return f.readAsLinesSync(this._encoding);
+ }
+
+ /**
+  * Load properties from lines.
+  */
+ _load(List&lt;String&gt; lines) {
+   if(lines == null || lines.isEmpty)
+     return null;
+   
+   _content = new Map&lt;String,String&gt;();
+   
+   for(String line in lines){
+     
+     line = line.trim();
+     
+     if(_isProperty(line)){
+       List&lt;String&gt; keyvalue = line.split('=');
+       
+       if(keyvalue.length == 2 &amp;&amp; keyvalue[0] != null)
+         _content[keyvalue[0].trim()] = keyvalue[1].trim();
+     }
+   }
+ }
+
+ /**
+  * Determine if input line is a property or not.
+  */
+ _isProperty(String line) {
+   
+   if(line.isEmpty || line == null)
+     return false;
+   
+   if(line.startsWith('#'))
+     return false;
+   
+   if(line.contains('='))
+     return true;
+     
+   return false;
+ }
+ 
+ /**
+  * Get a file instance from the input string [file].
+  */
+ File _getFile(String file){
+   
+   File result;
+   
+   result = new File(file);
+   
+   if(result.existsSync())
+     return result;
+   
+   result = new File.fromPath(new Path(file));
+   
+   if(result.existsSync())
+     return result;
+   
+   throw new FileIOException('It\'s impossible to load properties from input file ${file}. File does not exist.');
+ }
+ 
+ /** Loads the value of a property given its [key] */
+ String get(String key) =&gt; key != null ? _content != null ? _content[key] : null : null;
+ 
+ /** Check whether the properties contains a property given its [key] */
+ bool contains(String key) =&gt; key != null ? _content != null ? _content.containsKey(key) : null : null;
+ 
+ /** Loads the whole set of keys */
+ Iterable&lt;String&gt; keys() =&gt; _content.keys;
+ 
+ /** Loads the whole set of values */
+ Collection&lt;String&gt; values() =&gt; _content.values;
+ 
+ /**
+  * Returns a map containg every property whos key satisify the predicate f. Returns an empty map otherwise.
+  */
+ Map&lt;String,String&gt; everyKey(bool f(String s)) {
+   Map result = new Map&lt;String,String&gt;();
+   for (String key in _content.keys)
+     if (f(key)) result[key] = get(key);
+     
+   return result;
+ }
+ 
+ /**
+  * Reloads the properties from file.
+  */
+ reload(){
+   _content.clear();
+   _init();
+ }
+ 
+ String toString(){
+   return _content.toString();
+ }
+}
+</pre>
+</div>
+<div>
+<h3>Constructors</h3>
+<div class="method"><h4 id="Properties">
+<button class="show-code">Code</button>
+new <strong>Properties</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> name, [<a href="http://api.dartlang.org/dart_io/Encoding.html">Encoding</a> encoding = Encoding.UTF_8]) <a class="anchor-link" href="#Properties"
+              title="Permalink to Properties.Properties">#</a></h4>
+<div class="doc">
+<p>Create a new properties instance by naming the source file using 
+<span class="param">name</span>
+and, optionally, setting the desired 
+<span class="param">encoding</span>.</p>
+<pre class="source">
+Properties(String name, [Encoding encoding = Encoding.UTF_8]){
+ 
+ this._source = name;
+ this._encoding = encoding;
+ 
+ _init();
+ 
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="Properties.fromFile">
+<button class="show-code">Code</button>
+new <strong>Properties.fromFile</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> path, [<a href="http://api.dartlang.org/dart_io/Encoding.html">Encoding</a> encoding = Encoding.UTF_8]) <a class="anchor-link" href="#Properties.fromFile"
+              title="Permalink to Properties.Properties.fromFile">#</a></h4>
+<div class="doc">
+<p>Create a new properties instance from file 
+<span class="param">path</span>
+and, optionally, setting the desired 
+<span class="param">encoding</span>.</p>
+<pre class="source">
+Properties.fromFile(String path, [Encoding encoding = Encoding.UTF_8]){
+ 
+ this._source = path;
+ this._encoding = encoding;
+ 
+ _init();
+ 
+}
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="contains">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> <strong>contains</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> key) <a class="anchor-link" href="#contains"
+              title="Permalink to Properties.contains">#</a></h4>
+<div class="doc">
+<p>Check whether the properties contains a property given its 
+<span class="param">key</span> </p>
+<pre class="source">
+bool contains(String key) =&gt; key != null ? _content != null ? _content.containsKey(key) : null : null;
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="everyKey">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>, <a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt; <strong>everyKey</strong>(<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> f(<a href="http://api.dartlang.org/dart_core/String.html">String</a> s)) <a class="anchor-link" href="#everyKey"
+              title="Permalink to Properties.everyKey">#</a></h4>
+<div class="doc">
+<p>Returns a map containg every property whos key satisify the predicate f. Returns an empty map otherwise.</p>
+<pre class="source">
+Map&lt;String,String&gt; everyKey(bool f(String s)) {
+ Map result = new Map&lt;String,String&gt;();
+ for (String key in _content.keys)
+   if (f(key)) result[key] = get(key);
+   
+ return result;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="get">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>get</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> key) <a class="anchor-link" href="#get"
+              title="Permalink to Properties.get">#</a></h4>
+<div class="doc">
+<p>Loads the value of a property given its 
+<span class="param">key</span> </p>
+<pre class="source">
+String get(String key) =&gt; key != null ? _content != null ? _content[key] : null : null;
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="keys">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Iterable.html">Iterable</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt; <strong>keys</strong>() <a class="anchor-link" href="#keys"
+              title="Permalink to Properties.keys">#</a></h4>
+<div class="doc">
+<p>Loads the whole set of keys </p>
+<pre class="source">
+Iterable&lt;String&gt; keys() =&gt; _content.keys;
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="reload">
+<button class="show-code">Code</button>
+<strong>reload</strong>() <a class="anchor-link" href="#reload"
+              title="Permalink to Properties.reload">#</a></h4>
+<div class="doc">
+<p>Reloads the properties from file.</p>
+<pre class="source">
+reload(){
+ _content.clear();
+ _init();
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="toString">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>toString</strong>() <a class="anchor-link" href="#toString"
+              title="Permalink to Properties.toString">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>Returns a string representation of this object.</p>
+<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Object.html">Object</a> </div></div>
+<pre class="source">
+String toString(){
+ return _content.toString();
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="values">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Collection.html">Collection</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt; <strong>values</strong>() <a class="anchor-link" href="#values"
+              title="Permalink to Properties.values">#</a></h4>
+<div class="doc">
+<p>Loads the whole set of values </p>
+<pre class="source">
+Collection&lt;String&gt; values() =&gt; _content.values;
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        <div class="footer">
+          <div>This page was generated at 2013-02-16 16:22:59.724</div>
+        </div>
+        <script async src="../client-static.js"></script>
+        </body></html>
+        
