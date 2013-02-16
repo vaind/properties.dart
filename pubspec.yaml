@@ -1,0 +1,8 @@
+name: properties
+description: A sample command-line application
+dependencies:
+  unittest: any
+  logging: any
+
+#dependencies:
+#  unittest: any
