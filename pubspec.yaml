@@ -1,5 +1,8 @@
 name: properties
-description: A sample command-line application
+version: 0.1.0
+author: Lorenzo Cavina <cavina.lorenzo@gmail.com>
+description: A simple library to manage properties file in Dart
+homepage: http://code.google.com/p/dart-properties/
 dependencies:
   unittest: any
   logging: any
