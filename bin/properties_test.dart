@@ -23,6 +23,10 @@ void main(){
     test('Existing key - not null', () => expect(p.get('test.key.1'), isNotNull));
     test('Existing key - equals', () => expect(p.get('test.key.1'), equals('value 1')));
     test('Not existing key', () => expect(p.get('not.existing'), isNull));
+    test('Get keys', (){
+      Iterable<String> i = p.keys;
+      expect(i.length, 3);
+    });
   });
   
   group('Getters - from JSON source', () {
@@ -32,6 +36,10 @@ void main(){
     test('Existing key - equals', () => expect(p.get('key.1'), equals('value 1')));
     test('Existing key - equals', () => expect(p.get('another.key'), equals('another value')));
     test('Not existing key', () => expect(p.get('not.existing'), isNull));
+    test('Get keys', (){
+      Iterable<String> i = p.keys;
+      expect(i.length, 3);
+    });
   });
   
   group('Adding properties', () {

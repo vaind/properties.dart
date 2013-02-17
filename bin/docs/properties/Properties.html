@@ -163,11 +163,54 @@ class Properties{
  /** Check whether the properties contains a property given its [key] */
  bool contains(String key) =&gt; key != null ? _content != null ? _content.containsKey(key) : null : null;
  
- /** Loads the whole set of keys */
- Iterable&lt;String&gt; keys() =&gt; _content.keys;
+ /** Rerturns the whole set of keys */
+ Iterable&lt;String&gt; get keys =&gt; _content.keys;
  
- /** Loads the whole set of values */
- Collection&lt;String&gt; values() =&gt; _content.values;
+ /** Returns the whole set of values */
+ Collection&lt;String&gt; get values =&gt; _content.values;
+ 
+ /**
+  * Add a property to the instance having name [key] and
+  * value [value]. If the property already exists its value
+  * will be replaced. Returns true if the property was
+  * added successfully, false otherwise.
+  */
+ bool add(String key, String value){
+   if(key != null &amp;&amp; value != null){
+     _content[key] = value;
+     return true;
+   }
+   
+   return false;
+ }
+ 
+ /**
+  * Add properties from the input Properties instance to the current instance's properties.
+  * If some properties already exist, its value will be replaced.
+  */
+ void addFromProperties(Properties p){
+   for(String key in p.keys)
+     _content[key] = p.get(key);
+ }
+ 
+ /**
+  * Add properties from the input [map] object to the current instance's properties.
+  * If some properties already exist, its value will be replaced.
+  */
+ void addFromMap(Map&lt;String,String&gt; map){
+   for(String key in map.keys)
+     _content[key] = map[key];
+ }
+ 
+ /**
+  * Add properties from the input JSON map to the current instance's properties.
+  * If some properties already exist, its value will be replaced.
+  */
+ void addFromJSON(String jsonMap){
+   Map parsed = JSON.parse(jsonMap) as Map&lt;String,String&gt;;
+   for(String key in parsed.keys)
+     _content[key] = parsed[key];
+ }
  
  /**
   * Returns a map containg every property whos key satisify the predicate f. Returns an empty map otherwise.
@@ -280,7 +323,106 @@ Properties.fromJSON(String jsonMap){
 </div>
 </div>
 <div>
+<h3>Properties</h3>
+<div class="field"><h4 id="keys">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/Iterable.html">Iterable</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt;         <strong>keys</strong> <a class="anchor-link"
+            href="#keys"
+            title="Permalink to Properties.keys">#</a>
+        </h4>
+        <div class="doc">
+<p>Rerturns the whole set of keys </p>
+<pre class="source">
+Iterable&lt;String&gt; get keys =&gt; _content.keys;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="values">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/Collection.html">Collection</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt;         <strong>values</strong> <a class="anchor-link"
+            href="#values"
+            title="Permalink to Properties.values">#</a>
+        </h4>
+        <div class="doc">
+<p>Returns the whole set of values </p>
+<pre class="source">
+Collection&lt;String&gt; get values =&gt; _content.values;
+</pre>
+</div>
+</div>
+</div>
+<div>
 <h3>Methods</h3>
+<div class="method"><h4 id="add">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> <strong>add</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> key, <a href="http://api.dartlang.org/dart_core/String.html">String</a> value) <a class="anchor-link" href="#add"
+              title="Permalink to Properties.add">#</a></h4>
+<div class="doc">
+<p>Add a property to the instance having name 
+<span class="param">key</span> and
+value 
+<span class="param">value</span>. If the property already exists its value
+will be replaced. Returns true if the property was
+added successfully, false otherwise.</p>
+<pre class="source">
+bool add(String key, String value){
+ if(key != null &amp;&amp; value != null){
+   _content[key] = value;
+   return true;
+ }
+ 
+ return false;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="addFromJSON">
+<button class="show-code">Code</button>
+void <strong>addFromJSON</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> jsonMap) <a class="anchor-link" href="#addFromJSON"
+              title="Permalink to Properties.addFromJSON">#</a></h4>
+<div class="doc">
+<p>Add properties from the input JSON map to the current instance's properties.
+If some properties already exist, its value will be replaced.</p>
+<pre class="source">
+void addFromJSON(String jsonMap){
+ Map parsed = JSON.parse(jsonMap) as Map&lt;String,String&gt;;
+ for(String key in parsed.keys)
+   _content[key] = parsed[key];
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="addFromMap">
+<button class="show-code">Code</button>
+void <strong>addFromMap</strong>(<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>, <a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt; map) <a class="anchor-link" href="#addFromMap"
+              title="Permalink to Properties.addFromMap">#</a></h4>
+<div class="doc">
+<p>Add properties from the input 
+<span class="param">map</span> object to the current instance's properties.
+If some properties already exist, its value will be replaced.</p>
+<pre class="source">
+void addFromMap(Map&lt;String,String&gt; map){
+ for(String key in map.keys)
+   _content[key] = map[key];
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="addFromProperties">
+<button class="show-code">Code</button>
+void <strong>addFromProperties</strong>(<a href="../properties/Properties.html">Properties</a> p) <a class="anchor-link" href="#addFromProperties"
+              title="Permalink to Properties.addFromProperties">#</a></h4>
+<div class="doc">
+<p>Add properties from the input Properties instance to the current instance's properties.
+If some properties already exist, its value will be replaced.</p>
+<pre class="source">
+void addFromProperties(Properties p){
+ for(String key in p.keys)
+   _content[key] = p.get(key);
+}
+</pre>
+</div>
+</div>
 <div class="method"><h4 id="contains">
 <button class="show-code">Code</button>
 <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> <strong>contains</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> key) <a class="anchor-link" href="#contains"
@@ -319,17 +461,6 @@ Map&lt;String,String&gt; everyKey(bool f(String s)) {
 <span class="param">key</span> </p>
 <pre class="source">
 String get(String key) =&gt; key != null ? _content != null ? _content[key] : null : null;
-</pre>
-</div>
-</div>
-<div class="method"><h4 id="keys">
-<button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Iterable.html">Iterable</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt; <strong>keys</strong>() <a class="anchor-link" href="#keys"
-              title="Permalink to Properties.keys">#</a></h4>
-<div class="doc">
-<p>Loads the whole set of keys </p>
-<pre class="source">
-Iterable&lt;String&gt; keys() =&gt; _content.keys;
 </pre>
 </div>
 </div>
@@ -392,23 +523,12 @@ String toString() =&gt; _content.toString();
 </pre>
 </div>
 </div>
-<div class="method"><h4 id="values">
-<button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Collection.html">Collection</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt; <strong>values</strong>() <a class="anchor-link" href="#values"
-              title="Permalink to Properties.values">#</a></h4>
-<div class="doc">
-<p>Loads the whole set of values </p>
-<pre class="source">
-Collection&lt;String&gt; values() =&gt; _content.values;
-</pre>
-</div>
-</div>
 </div>
         </div>
         <div class="clear"></div>
         </div>
         <div class="footer">
-          <div>This page was generated at 2013-02-17 11:30:25.601</div>
+          <div>This page was generated at 2013-02-17 21:04:30.690</div>
         </div>
         <script async src="../client-static.js"></script>
         </body></html>

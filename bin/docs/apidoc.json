@@ -264,7 +264,7 @@
               ]
             },
             "kind": "method",
-            "comment": "Loads the whole set of keys ",
+            "comment": "Rerturns the whole set of keys ",
             "name": "keys",
             "id": "keys0()"
           },
@@ -280,9 +280,112 @@
               ]
             },
             "kind": "method",
-            "comment": "Loads the whole set of values ",
+            "comment": "Returns the whole set of values ",
             "name": "values",
             "id": "values0()"
+          },
+          {
+            "returnType": {
+              "name": "bool",
+              "refId": "bool"
+            },
+            "kind": "method",
+            "comment": "\nAdd a property to the instance having name [key] and\nvalue [value]. If the property already exists its value\nwill be replaced. Returns true if the property was\nadded successfully, false otherwise.\n",
+            "name": "add",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "key",
+                "id": "key"
+              },
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "value",
+                "id": "value"
+              }
+            ],
+            "id": "add2()"
+          },
+          {
+            "returnType": {
+              "name": "void",
+              "refId": "void"
+            },
+            "kind": "method",
+            "comment": "\nAdd properties from the input Properties instance to the current instance's properties.\nIf some properties already exist, its value will be replaced.\n",
+            "name": "addFromProperties",
+            "children": [
+              {
+                "ref": {
+                  "name": "Properties",
+                  "refId": "Properties"
+                },
+                "kind": "param",
+                "name": "p",
+                "id": "p"
+              }
+            ],
+            "id": "addFromProperties1()"
+          },
+          {
+            "returnType": {
+              "name": "void",
+              "refId": "void"
+            },
+            "kind": "method",
+            "comment": "\nAdd properties from the input [map] object to the current instance's properties.\nIf some properties already exist, its value will be replaced.\n",
+            "name": "addFromMap",
+            "children": [
+              {
+                "ref": {
+                  "name": "Map",
+                  "refId": "Map",
+                  "arguments": [
+                    {
+                      "name": "String",
+                      "refId": "String"
+                    },
+                    {
+                      "name": "String",
+                      "refId": "String"
+                    }
+                  ]
+                },
+                "kind": "param",
+                "name": "map",
+                "id": "map"
+              }
+            ],
+            "id": "addFromMap1()"
+          },
+          {
+            "returnType": {
+              "name": "void",
+              "refId": "void"
+            },
+            "kind": "method",
+            "comment": "\nAdd properties from the input JSON map to the current instance's properties.\nIf some properties already exist, its value will be replaced.\n",
+            "name": "addFromJSON",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "jsonMap",
+                "id": "jsonMap"
+              }
+            ],
+            "id": "addFromJSON1()"
           },
           {
             "returnType": {
@@ -366,6 +469,38 @@
             "comment": "\nReturns the whole content as a String.\n",
             "name": "toString",
             "id": "toString0()"
+          },
+          {
+            "ref": {
+              "name": "Iterable",
+              "refId": "Iterable",
+              "arguments": [
+                {
+                  "name": "String",
+                  "refId": "String"
+                }
+              ]
+            },
+            "kind": "property",
+            "comment": "Rerturns the whole set of keys ",
+            "name": "keys",
+            "id": "keys"
+          },
+          {
+            "ref": {
+              "name": "Collection",
+              "refId": "Collection",
+              "arguments": [
+                {
+                  "name": "String",
+                  "refId": "String"
+                }
+              ]
+            },
+            "kind": "property",
+            "comment": "Returns the whole set of values ",
+            "name": "values",
+            "id": "values"
           },
           {
             "ref": {

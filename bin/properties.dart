@@ -135,11 +135,11 @@ class Properties{
   /** Check whether the properties contains a property given its [key] */
   bool contains(String key) => key != null ? _content != null ? _content.containsKey(key) : null : null;
   
-  /** Loads the whole set of keys */
-  Iterable<String> keys() => _content.keys;
+  /** Rerturns the whole set of keys */
+  Iterable<String> get keys => _content.keys;
   
-  /** Loads the whole set of values */
-  Collection<String> values() => _content.values;
+  /** Returns the whole set of values */
+  Collection<String> get values => _content.values;
   
   /**
    * Add a property to the instance having name [key] and
@@ -154,6 +154,15 @@ class Properties{
     }
     
     return false;
+  }
+  
+  /**
+   * Add properties from the input Properties instance to the current instance's properties.
+   * If some properties already exist, its value will be replaced.
+   */
+  void addFromProperties(Properties p){
+    for(String key in p.keys)
+      _content[key] = p.get(key);
   }
   
   /**
