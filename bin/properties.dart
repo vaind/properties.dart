@@ -62,7 +62,7 @@ class Properties{
    */
   List<String> _read(String path, Encoding encoding) {
     
-    File f = _getFile(path);
+    var f = _getFile(path);
     
     if(f == null || !f.existsSync())
       return null;
@@ -114,9 +114,7 @@ class Properties{
    */
   File _getFile(String file){
     
-    File result;
-    
-    result = new File(file);
+    var result = new File(file);
     
     if(result.existsSync())
       return result;
@@ -179,7 +177,7 @@ class Properties{
    * If some properties already exist, its value will be replaced.
    */
   void addFromJSON(String jsonMap){
-    Map parsed = JSON.parse(jsonMap) as Map<String,String>;
+    var parsed = JSON.parse(jsonMap) as Map<String,String>;
     for(String key in parsed.keys)
       _content[key] = parsed[key];
   }
@@ -188,7 +186,7 @@ class Properties{
    * Returns a map containg every property whos key satisify the predicate f. Returns an empty map otherwise.
    */
   Map<String,String> everyKey(bool f(String s)) {
-    Map result = new Map<String,String>();
+    var result = new Map<String,String>();
     for (String key in _content.keys)
       if (f(key)) result[key] = get(key);
       
@@ -215,7 +213,7 @@ class Properties{
    */
   String toJSON({String prefix, String suffix}){
     
-    Map toExport = _content;
+    var toExport = _content;
     
     if(?prefix && ?suffix)
       toExport = everyKey((key) => key.startsWith(prefix) && key.endsWith(suffix));
