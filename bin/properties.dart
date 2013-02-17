@@ -142,6 +142,40 @@ class Properties{
   Collection<String> values() => _content.values;
   
   /**
+   * Add a property to the instance having name [key] and
+   * value [value]. If the property already exists its value
+   * will be replaced. Returns true if the property was
+   * added successfully, false otherwise.
+   */
+  bool add(String key, String value){
+    if(key != null && value != null){
+      _content[key] = value;
+      return true;
+    }
+    
+    return false;
+  }
+  
+  /**
+   * Add properties from the input [map] object to the current instance's properties.
+   * If some properties already exist, its value will be replaced.
+   */
+  void addFromMap(Map<String,String> map){
+    for(String key in map.keys)
+      _content[key] = map[key];
+  }
+  
+  /**
+   * Add properties from the input JSON map to the current instance's properties.
+   * If some properties already exist, its value will be replaced.
+   */
+  void addFromJSON(String jsonMap){
+    Map parsed = JSON.parse(jsonMap) as Map<String,String>;
+    for(String key in parsed.keys)
+      _content[key] = parsed[key];
+  }
+  
+  /**
    * Returns a map containg every property whos key satisify the predicate f. Returns an empty map otherwise.
    */
   Map<String,String> everyKey(bool f(String s)) {
