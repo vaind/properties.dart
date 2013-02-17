@@ -4,6 +4,7 @@
 library properties;
 
 import 'dart:io';
+import 'dart:json' as JSON;
 
 /**
  * The Properties class implementing all tools to load key-values from file both by name and
@@ -18,7 +19,7 @@ class Properties{
   Map<String,String> _content;
   
   /// An internal reference to the source file.
-  String _source;
+  String _sourceFile;
   
   /**
    * Create a new properties instance by naming the source file using [name]
@@ -26,10 +27,10 @@ class Properties{
    */
   Properties(String name, [Encoding encoding = Encoding.UTF_8]){
     
-    this._source = name;
+    this._sourceFile = name;
     this._encoding = encoding;
     
-    _init();
+    _initFromFile();
     
   }
   
@@ -39,14 +40,22 @@ class Properties{
    */
   Properties.fromFile(String path, [Encoding encoding = Encoding.UTF_8]){
     
-    this._source = path;
+    this._sourceFile = path;
     this._encoding = encoding;
     
-    _init();
+    _initFromFile();
     
   }
   
-  void _init() => _load(_read(_source, _encoding));
+  /**
+   * Create a new properties instance using the input [jsonMap]
+   * to load the data from.
+   */
+  Properties.fromJSON(String jsonMap){
+    _content = JSON.parse(jsonMap) as Map<String,String>;
+  }
+  
+  void _initFromFile() => _load(_read(_sourceFile, _encoding));
 
   /**
    * Create the file object and read its content in lines.
@@ -144,14 +153,39 @@ class Properties{
   }
   
   /**
-   * Reloads the properties from file.
+   * Reloads the properties from file. Works for file sources only.
    */
   reload(){
+    if(_sourceFile == null)
+      return;
+    
     _content.clear();
-    _init();
+    _initFromFile();
   }
   
-  String toString(){
-    return _content.toString();
+  /**
+   * Export the content as a JSON map. If no input parameter is set, then the whole set of
+   * properties will be exporte as a JSON map. If the [prefix] parameter is set,
+   * then only the keys starting with [prefix] will be exported. If the [suffix] parameter is set,
+   * then only the keys starting with [suffix] will be exported. If both are set, then only the
+   * keys matching both will be exported.
+   */
+  String toJSON({String prefix, String suffix}){
+    
+    Map toExport = _content;
+    
+    if(?prefix && ?suffix)
+      toExport = everyKey((key) => key.startsWith(prefix) && key.endsWith(suffix));
+    else if(?prefix)
+      toExport = everyKey((key) => key.startsWith(prefix));
+    else if(?suffix)
+      toExport = everyKey((key) => key.endsWith(suffix));
+    
+    return JSON.stringify(toExport);
   }
+  
+  /**
+   * Returns the whole content as a String.
+   */
+  String toString() => _content.toString();
 }

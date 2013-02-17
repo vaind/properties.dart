@@ -47,7 +47,7 @@ class Properties{
  Map&lt;String,String&gt; _content;
  
  /// An internal reference to the source file.
- String _source;
+ String _sourceFile;
  
  /**
   * Create a new properties instance by naming the source file using [name]
@@ -55,10 +55,10 @@ class Properties{
   */
  Properties(String name, [Encoding encoding = Encoding.UTF_8]){
    
-   this._source = name;
+   this._sourceFile = name;
    this._encoding = encoding;
    
-   _init();
+   _initFromFile();
    
  }
  
@@ -68,14 +68,22 @@ class Properties{
   */
  Properties.fromFile(String path, [Encoding encoding = Encoding.UTF_8]){
    
-   this._source = path;
+   this._sourceFile = path;
    this._encoding = encoding;
    
-   _init();
+   _initFromFile();
    
  }
  
- void _init() =&gt; _load(_read(_source, _encoding));
+ /**
+  * Create a new properties instance using the input [jsonMap]
+  * to load the data from.
+  */
+ Properties.fromJSON(String jsonMap){
+   _content = JSON.parse(jsonMap) as Map&lt;String,String&gt;;
+ }
+ 
+ void _initFromFile() =&gt; _load(_read(_sourceFile, _encoding));
 
  /**
   * Create the file object and read its content in lines.
@@ -173,16 +181,41 @@ class Properties{
  }
  
  /**
-  * Reloads the properties from file.
+  * Reloads the properties from file. Works for file sources only.
   */
  reload(){
+   if(_sourceFile == null)
+     return;
+   
    _content.clear();
-   _init();
+   _initFromFile();
  }
  
- String toString(){
-   return _content.toString();
+ /**
+  * Export the content as a JSON map. If no input parameter is set, then the whole set of
+  * properties will be exporte as a JSON map. If the [prefix] parameter is set,
+  * then only the keys starting with [prefix] will be exported. If the [suffix] parameter is set,
+  * then only the keys starting with [suffix] will be exported. If both are set, then only the
+  * keys matching both will be exported.
+  */
+ String toJSON({String prefix, String suffix}){
+   
+   Map toExport = _content;
+   
+   if(?prefix &amp;&amp; ?suffix)
+     toExport = everyKey((key) =&gt; key.startsWith(prefix) &amp;&amp; key.endsWith(suffix));
+   else if(?prefix)
+     toExport = everyKey((key) =&gt; key.startsWith(prefix));
+   else if(?suffix)
+     toExport = everyKey((key) =&gt; key.endsWith(suffix));
+   
+   return JSON.stringify(toExport);
  }
+ 
+ /**
+  * Returns the whole content as a String.
+  */
+ String toString() =&gt; _content.toString();
 }
 </pre>
 </div>
@@ -200,10 +233,10 @@ and, optionally, setting the desired
 <pre class="source">
 Properties(String name, [Encoding encoding = Encoding.UTF_8]){
  
- this._source = name;
+ this._sourceFile = name;
  this._encoding = encoding;
  
- _init();
+ _initFromFile();
  
 }
 </pre>
@@ -221,11 +254,26 @@ and, optionally, setting the desired
 <pre class="source">
 Properties.fromFile(String path, [Encoding encoding = Encoding.UTF_8]){
  
- this._source = path;
+ this._sourceFile = path;
  this._encoding = encoding;
  
- _init();
+ _initFromFile();
  
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="Properties.fromJSON">
+<button class="show-code">Code</button>
+new <strong>Properties.fromJSON</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> jsonMap) <a class="anchor-link" href="#Properties.fromJSON"
+              title="Permalink to Properties.Properties.fromJSON">#</a></h4>
+<div class="doc">
+<p>Create a new properties instance using the input 
+<span class="param">jsonMap</span>
+to load the data from.</p>
+<pre class="source">
+Properties.fromJSON(String jsonMap){
+ _content = JSON.parse(jsonMap) as Map&lt;String,String&gt;;
 }
 </pre>
 </div>
@@ -290,11 +338,45 @@ Iterable&lt;String&gt; keys() =&gt; _content.keys;
 <strong>reload</strong>() <a class="anchor-link" href="#reload"
               title="Permalink to Properties.reload">#</a></h4>
 <div class="doc">
-<p>Reloads the properties from file.</p>
+<p>Reloads the properties from file. Works for file sources only.</p>
 <pre class="source">
 reload(){
+ if(_sourceFile == null)
+   return;
+ 
  _content.clear();
- _init();
+ _initFromFile();
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="toJSON">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>toJSON</strong>({<a href="http://api.dartlang.org/dart_core/String.html">String</a> prefix, <a href="http://api.dartlang.org/dart_core/String.html">String</a> suffix}) <a class="anchor-link" href="#toJSON"
+              title="Permalink to Properties.toJSON">#</a></h4>
+<div class="doc">
+<p>Export the content as a JSON map. If no input parameter is set, then the whole set of
+properties will be exporte as a JSON map. If the 
+<span class="param">prefix</span> parameter is set,
+then only the keys starting with 
+<span class="param">prefix</span> will be exported. If the 
+<span class="param">suffix</span> parameter is set,
+then only the keys starting with 
+<span class="param">suffix</span> will be exported. If both are set, then only the
+keys matching both will be exported.</p>
+<pre class="source">
+String toJSON({String prefix, String suffix}){
+ 
+ Map toExport = _content;
+ 
+ if(?prefix &amp;&amp; ?suffix)
+   toExport = everyKey((key) =&gt; key.startsWith(prefix) &amp;&amp; key.endsWith(suffix));
+ else if(?prefix)
+   toExport = everyKey((key) =&gt; key.startsWith(prefix));
+ else if(?suffix)
+   toExport = everyKey((key) =&gt; key.endsWith(suffix));
+ 
+ return JSON.stringify(toExport);
 }
 </pre>
 </div>
@@ -304,13 +386,9 @@ reload(){
 <a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>toString</strong>() <a class="anchor-link" href="#toString"
               title="Permalink to Properties.toString">#</a></h4>
 <div class="doc">
-<div class="inherited">
-<p>Returns a string representation of this object.</p>
-<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Object.html">Object</a> </div></div>
+<p>Returns the whole content as a String.</p>
 <pre class="source">
-String toString(){
- return _content.toString();
-}
+String toString() =&gt; _content.toString();
 </pre>
 </div>
 </div>
@@ -330,7 +408,7 @@ Collection&lt;String&gt; values() =&gt; _content.values;
         <div class="clear"></div>
         </div>
         <div class="footer">
-          <div>This page was generated at 2013-02-16 16:22:59.724</div>
+          <div>This page was generated at 2013-02-17 11:30:25.601</div>
         </div>
         <script async src="../client-static.js"></script>
         </body></html>

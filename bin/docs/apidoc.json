@@ -77,12 +77,33 @@
           },
           {
             "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nCreate a new properties instance using the input [jsonMap]\nto load the data from.\n",
+            "name": "Properties.fromJSON",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "jsonMap",
+                "id": "jsonMap"
+              }
+            ],
+            "id": "Properties.fromJSON1()"
+          },
+          {
+            "returnType": {
               "name": "void",
               "refId": "void"
             },
             "kind": "method",
-            "name": "_init",
-            "id": "_init0()"
+            "name": "_initFromFile",
+            "id": "_initFromFile0()"
           },
           {
             "returnType": {
@@ -300,7 +321,7 @@
               "refId": "dynamic"
             },
             "kind": "method",
-            "comment": "\nReloads the properties from file.\n",
+            "comment": "\nReloads the properties from file. Works for file sources only.\n",
             "name": "reload",
             "id": "reload0()"
           },
@@ -310,6 +331,39 @@
               "refId": "String"
             },
             "kind": "method",
+            "comment": "\nExport the content as a JSON map. If no input parameter is set, then the whole set of\nproperties will be exporte as a JSON map. If the [prefix] parameter is set,\nthen only the keys starting with [prefix] will be exported. If the [suffix] parameter is set,\nthen only the keys starting with [suffix] will be exported. If both are set, then only the\nkeys matching both will be exported.\n",
+            "name": "toJSON",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "prefix",
+                "id": "prefix"
+              },
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "suffix",
+                "id": "suffix"
+              }
+            ],
+            "id": "toJSON2()"
+          },
+          {
+            "returnType": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "method",
+            "comment": "\nReturns the whole content as a String.\n",
             "name": "toString",
             "id": "toString0()"
           },
@@ -347,8 +401,8 @@
               "refId": "String"
             },
             "kind": "property",
-            "name": "_source",
-            "id": "_source"
+            "name": "_sourceFile",
+            "id": "_sourceFile"
           },
           {
             "returnType": {
@@ -411,11 +465,32 @@
               }
             ],
             "id": "Properties.fromFile2()"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "constructor",
+            "comment": "\nCreate a new properties instance using the input [jsonMap]\nto load the data from.\n",
+            "name": "Properties.fromJSON",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "jsonMap",
+                "id": "jsonMap"
+              }
+            ],
+            "id": "Properties.fromJSON1()"
           }
         ],
         "id": "Properties"
       }
     ],
-    "id": "file:///Users/kevin/dart/properties/bin/properties.dart"
+    "id": "file:///Users/kevin/Documents/workspace/dart-properties/bin/properties.dart"
   }
 ]
