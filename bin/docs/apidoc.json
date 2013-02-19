@@ -10,6 +10,89 @@
           "refId": "Object"
         },
         "kind": "class",
+        "comment": "\nA factory to create simple Properties' related events.\n",
+        "name": "PropertiesEvent",
+        "children": [
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nCreate a new event instance by name the [eventType] only.\n",
+            "name": "PropertiesEvent",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "_eventType",
+                "id": "_eventType"
+              }
+            ],
+            "id": "PropertiesEvent1()"
+          },
+          {
+            "returnType": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "method",
+            "comment": "\nGetter fro the [eventType] of this event.\n",
+            "name": "type",
+            "id": "type0()"
+          },
+          {
+            "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "property",
+            "comment": "\nGetter fro the [eventType] of this event.\n",
+            "name": "type",
+            "id": "type"
+          },
+          {
+            "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "property",
+            "name": "_eventType",
+            "id": "_eventType"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "constructor",
+            "comment": "\nCreate a new event instance by name the [eventType] only.\n",
+            "name": "PropertiesEvent",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "_eventType",
+                "id": "_eventType"
+              }
+            ],
+            "id": "PropertiesEvent1()"
+          }
+        ],
+        "id": "PropertiesEvent"
+      },
+      {
+        "superclass": {
+          "name": "Object",
+          "refId": "Object"
+        },
+        "kind": "class",
         "comment": "\nThe Properties class implementing all tools to load key-values from file both by name and\npath.\n",
         "name": "Properties",
         "children": [
@@ -95,6 +178,16 @@
               }
             ],
             "id": "Properties.fromJSON1()"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nInitialize common internal tools such as event controllers.\n",
+            "name": "_init",
+            "id": "_init0()"
           },
           {
             "returnType": {
@@ -320,8 +413,8 @@
               "refId": "void"
             },
             "kind": "method",
-            "comment": "\nAdd properties from the input Properties instance to the current instance's properties.\nIf some properties already exist, its value will be replaced.\n",
-            "name": "addFromProperties",
+            "comment": "\nMerge input [properties] content with the current instance's properties.\nBy defatult already existing properties will be overwritten. Anyway user\nmay decide how to manage existing thanks to the optional parameter [overwriteExisting].\n",
+            "name": "merge",
             "children": [
               {
                 "ref": {
@@ -329,11 +422,21 @@
                   "refId": "Properties"
                 },
                 "kind": "param",
-                "name": "p",
-                "id": "p"
+                "name": "properties",
+                "id": "properties"
+              },
+              {
+                "ref": {
+                  "name": "bool",
+                  "refId": "bool"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "overwriteExisting",
+                "id": "overwriteExisting"
               }
             ],
-            "id": "addFromProperties1()"
+            "id": "merge2()"
           },
           {
             "returnType": {
@@ -341,8 +444,8 @@
               "refId": "void"
             },
             "kind": "method",
-            "comment": "\nAdd properties from the input [map] object to the current instance's properties.\nIf some properties already exist, its value will be replaced.\n",
-            "name": "addFromMap",
+            "comment": "\nMerge properties from the input [map] with the current instance's properties.\nBy defatult already existing properties will be overwritten. Anyway user\nmay decide how to manage existing thanks to the optional parameter [overwriteExisting].\n",
+            "name": "mergeMap",
             "children": [
               {
                 "ref": {
@@ -362,9 +465,19 @@
                 "kind": "param",
                 "name": "map",
                 "id": "map"
+              },
+              {
+                "ref": {
+                  "name": "bool",
+                  "refId": "bool"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "overwriteExisting",
+                "id": "overwriteExisting"
               }
             ],
-            "id": "addFromMap1()"
+            "id": "mergeMap2()"
           },
           {
             "returnType": {
@@ -372,8 +485,8 @@
               "refId": "void"
             },
             "kind": "method",
-            "comment": "\nAdd properties from the input JSON map to the current instance's properties.\nIf some properties already exist, its value will be replaced.\n",
-            "name": "addFromJSON",
+            "comment": "\nMerge properties from the input [jsonMap] with the current instance's properties.\nBy defatult already existing properties will be overwritten. Anyway user\nmay decide how to manage existing thanks to the optional parameter [overwriteExisting].\n",
+            "name": "mergeJSON",
             "children": [
               {
                 "ref": {
@@ -383,9 +496,19 @@
                 "kind": "param",
                 "name": "jsonMap",
                 "id": "jsonMap"
+              },
+              {
+                "ref": {
+                  "name": "bool",
+                  "refId": "bool"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "overwriteExisting",
+                "id": "overwriteExisting"
               }
             ],
-            "id": "addFromJSON1()"
+            "id": "mergeJSON2()"
           },
           {
             "returnType": {
@@ -471,6 +594,16 @@
             "id": "toString0()"
           },
           {
+            "returnType": {
+              "name": "Stream",
+              "refId": "Stream"
+            },
+            "kind": "method",
+            "comment": "\nGet the stream instance for the \"add property\" event.\n",
+            "name": "onAdd",
+            "id": "onAdd0()"
+          },
+          {
             "ref": {
               "name": "Iterable",
               "refId": "Iterable",
@@ -501,6 +634,16 @@
             "comment": "Returns the whole set of values ",
             "name": "values",
             "id": "values"
+          },
+          {
+            "ref": {
+              "name": "Stream",
+              "refId": "Stream"
+            },
+            "kind": "property",
+            "comment": "\nGet the stream instance for the \"add property\" event.\n",
+            "name": "onAdd",
+            "id": "onAdd"
           },
           {
             "ref": {
@@ -538,6 +681,25 @@
             "kind": "property",
             "name": "_sourceFile",
             "id": "_sourceFile"
+          },
+          {
+            "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "isStatic": true,
+            "kind": "property",
+            "name": "ADD_PROPERTY_EVENTNAME",
+            "id": "ADD_PROPERTY_EVENTNAME"
+          },
+          {
+            "ref": {
+              "name": "StreamController",
+              "refId": "StreamController"
+            },
+            "kind": "property",
+            "name": "addEventController",
+            "id": "addEventController"
           },
           {
             "returnType": {

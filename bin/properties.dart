@@ -5,6 +5,7 @@ library properties;
 
 import 'dart:io';
 import 'dart:json' as JSON;
+import 'dart:async';
 
 /**
  * The Properties class implementing all tools to load key-values from file both by name and
@@ -21,6 +22,9 @@ class Properties{
   /// An internal reference to the source file.
   String _sourceFile;
   
+  static const String ADD_PROPERTY_EVENTNAME = 'add';
+  StreamController addEventController;
+  
   /**
    * Create a new properties instance by naming the source file using [name]
    * and, optionally, setting the desired [encoding].
@@ -29,6 +33,8 @@ class Properties{
     
     this._sourceFile = name;
     this._encoding = encoding;
+    
+    _init();
     
     _initFromFile();
     
@@ -43,6 +49,8 @@ class Properties{
     this._sourceFile = path;
     this._encoding = encoding;
     
+    _init();
+    
     _initFromFile();
     
   }
@@ -52,7 +60,17 @@ class Properties{
    * to load the data from.
    */
   Properties.fromJSON(String jsonMap){
+    
+    _init();
+    
     _content = JSON.parse(jsonMap) as Map<String,String>;
+  }
+
+  /**
+   * Initialize common internal tools such as event controllers.
+   */
+  _init() {
+    addEventController = new StreamController<PropertiesEvent>.broadcast();
   }
   
   void _initFromFile() => _load(_read(_sourceFile, _encoding));
@@ -148,6 +166,7 @@ class Properties{
   bool add(String key, String value){
     if(key != null && value != null){
       _content[key] = value;
+      addEventController.add(new PropertiesEvent(ADD_PROPERTY_EVENTNAME));
       return true;
     }
     
@@ -155,31 +174,45 @@ class Properties{
   }
   
   /**
-   * Add properties from the input Properties instance to the current instance's properties.
-   * If some properties already exist, its value will be replaced.
+   * Merge input [properties] content with the current instance's properties.
+   * By defatult already existing properties will be overwritten. Anyway user
+   * may decide how to manage existing thanks to the optional parameter [overwriteExisting].
    */
-  void addFromProperties(Properties p){
-    for(String key in p.keys)
-      _content[key] = p.get(key);
+  void merge(Properties properties, [bool overwriteExisting = true]){
+    for(String key in properties.keys){
+      if(overwriteExisting || _content[key] == null){
+        _content[key] = properties.get(key);
+      }
+    }
   }
   
   /**
-   * Add properties from the input [map] object to the current instance's properties.
-   * If some properties already exist, its value will be replaced.
+   * Merge properties from the input [map] with the current instance's properties.
+   * By defatult already existing properties will be overwritten. Anyway user
+   * may decide how to manage existing thanks to the optional parameter [overwriteExisting].
    */
-  void addFromMap(Map<String,String> map){
-    for(String key in map.keys)
-      _content[key] = map[key];
+  void mergeMap(Map<String,String> map, [bool overwriteExisting = true]){
+    for(String key in map.keys){
+      if(overwriteExisting || _content[key] == null){
+        _content[key] = map[key];
+      }
+    }
   }
   
   /**
-   * Add properties from the input JSON map to the current instance's properties.
-   * If some properties already exist, its value will be replaced.
+   * Merge properties from the input [jsonMap] with the current instance's properties.
+   * By defatult already existing properties will be overwritten. Anyway user
+   * may decide how to manage existing thanks to the optional parameter [overwriteExisting].
    */
-  void addFromJSON(String jsonMap){
+  void mergeJSON(String jsonMap, [bool overwriteExisting = true]){
+    
     var parsed = JSON.parse(jsonMap) as Map<String,String>;
-    for(String key in parsed.keys)
-      _content[key] = parsed[key];
+    
+    for(String key in parsed.keys){
+      if(overwriteExisting || _content[key] == null){
+        _content[key] = parsed[key];
+      }
+    }
   }
   
   /**
@@ -229,4 +262,26 @@ class Properties{
    * Returns the whole content as a String.
    */
   String toString() => _content.toString();
+  
+  /**
+   * Get the stream instance for the "add property" event.
+   */
+  Stream get onAdd => addEventController.stream;
+}
+
+/**
+ * A factory to create simple Properties' related events.
+ */
+class PropertiesEvent<T extends Event> {
+  final String _eventType;
+
+  /**
+   * Create a new event instance by name the [eventType] only.
+   */
+  const PropertiesEvent(this._eventType);
+  
+  /**
+   * Getter fro the [eventType] of this event.
+   */
+  String get type => _eventType;
 }

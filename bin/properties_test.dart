@@ -59,15 +59,32 @@ void main(){
         'second' : 'turtledoves',
         'fifth'  : 'golden rings'
       };
-      p.addFromMap(map);
+      p.mergeMap(map);
       expect(p.get('second'), equals('turtledoves'));
       expect(p.get('test.key.1'), equals('value 1'));
     });
     
     test('Add a property from JSON', () {
-      p.addFromJSON('{"test.key.3":"value 3","test.key.4":"value 4"}');
+      p.mergeJSON('{"test.key.3":"value 3","test.key.4":"value 4"}');
       expect(p.get('test.key.4'), equals('value 4'));
       expect(p.get('test.key.1'), equals('value 1'));
+    });
+  });
+  
+  group('Events', () {
+    
+    Properties p;
+    setUp(() {p = new Properties.fromFile(path);});
+    
+    test('Add a property and listen to the event', () {
+      
+      String eventType = "";
+      p.onAdd.listen((PropertiesEvent e) => eventType = e.type);
+      var singleAdd = p.add('test.key.3', 'value 3');
+      
+      expect(singleAdd, isTrue);
+      expect(p.get('test.key.3'), equals('value 3'));
+      expect(eventType, equals(Properties.ADD_PROPERTY_EVENTNAME));
     });
   });
   
