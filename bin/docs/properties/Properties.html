@@ -25,6 +25,7 @@
         <div class="nav">
         
 <h2><div class="icon-library"></div><a href="../properties.html">properties</a></h2><ul class="icon">
+<li><a href="../properties/AddEvent.html"><div class="icon-class"></div>AddEvent</a></li>
 <li><div class="icon-class"></div><strong>Properties</strong></li>
 <li><a href="../properties/PropertiesEvent.html"><div class="icon-class"></div>PropertiesEvent&lt;T&gt;</a></li>
 </ul>
@@ -190,11 +191,17 @@ class Properties{
   * value [value]. If the property already exists its value
   * will be replaced. Returns true if the property was
   * added successfully, false otherwise.
+  * 
+  * If and only if a new property is added an ADD event is
+  * triggered.
   */
- bool add(String key, String value){
-   if(key != null &amp;&amp; value != null){
+ bool add(String key, String value, [bool overwriteExisting = true]){
+   if(key == null || value == null)
+     return false;
+   
+   if(overwriteExisting || _content[key] == null){
      _content[key] = value;
-     addEventController.add(new PropertiesEvent(ADD_PROPERTY_EVENTNAME));
+     addEventController.add(new AddEvent(key, value));
      return true;
    }
    
@@ -244,12 +251,16 @@ class Properties{
  }
  
  /**
-  * Returns a map containg every property whos key satisify the predicate f. Returns an empty map otherwise.
+  * Returns a map containg every property whos key satisifies the predicate [k] on the property key, and 
+  * optionally the predicate [v] on the corresponding value. Returns an empty map otherwise.
   */
- Map&lt;String,String&gt; everyKey(bool f(String s)) {
+ Map&lt;String,String&gt; every(bool k(String str), [bool v(String val)]) {
+   
+   if(v == null) v = (String s) =&gt; true;
+   
    var result = new Map&lt;String,String&gt;();
    for (String key in _content.keys)
-     if (f(key)) result[key] = get(key);
+     if (k(key) &amp;&amp; v(get(key))) result[key] = get(key);
      
    return result;
  }
@@ -277,11 +288,11 @@ class Properties{
    var toExport = _content;
    
    if(?prefix &amp;&amp; ?suffix)
-     toExport = everyKey((key) =&gt; key.startsWith(prefix) &amp;&amp; key.endsWith(suffix));
+     toExport = every((key) =&gt; key.startsWith(prefix) &amp;&amp; key.endsWith(suffix));
    else if(?prefix)
-     toExport = everyKey((key) =&gt; key.startsWith(prefix));
+     toExport = every((key) =&gt; key.startsWith(prefix));
    else if(?suffix)
-     toExport = everyKey((key) =&gt; key.endsWith(suffix));
+     toExport = every((key) =&gt; key.endsWith(suffix));
    
    return JSON.stringify(toExport);
  }
@@ -438,7 +449,7 @@ Collection&lt;String&gt; get values =&gt; _content.values;
 <h3>Methods</h3>
 <div class="method"><h4 id="add">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> <strong>add</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> key, <a href="http://api.dartlang.org/dart_core/String.html">String</a> value) <a class="anchor-link" href="#add"
+<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> <strong>add</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> key, <a href="http://api.dartlang.org/dart_core/String.html">String</a> value, [<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> overwriteExisting = true]) <a class="anchor-link" href="#add"
               title="Permalink to Properties.add">#</a></h4>
 <div class="doc">
 <p>Add a property to the instance having name 
@@ -447,11 +458,16 @@ value
 <span class="param">value</span>. If the property already exists its value
 will be replaced. Returns true if the property was
 added successfully, false otherwise.</p>
+<p>If and only if a new property is added an ADD event is
+triggered.</p>
 <pre class="source">
-bool add(String key, String value){
- if(key != null &amp;&amp; value != null){
+bool add(String key, String value, [bool overwriteExisting = true]){
+ if(key == null || value == null)
+   return false;
+ 
+ if(overwriteExisting || _content[key] == null){
    _content[key] = value;
-   addEventController.add(new PropertiesEvent(ADD_PROPERTY_EVENTNAME));
+   addEventController.add(new AddEvent(key, value));
    return true;
  }
  
@@ -472,17 +488,23 @@ bool contains(String key) =&gt; key != null ? _content != null ? _content.contai
 </pre>
 </div>
 </div>
-<div class="method"><h4 id="everyKey">
+<div class="method"><h4 id="every">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>, <a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt; <strong>everyKey</strong>(<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> f(<a href="http://api.dartlang.org/dart_core/String.html">String</a> s)) <a class="anchor-link" href="#everyKey"
-              title="Permalink to Properties.everyKey">#</a></h4>
+<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>, <a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt; <strong>every</strong>(<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> k(<a href="http://api.dartlang.org/dart_core/String.html">String</a> str), [<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> v(<a href="http://api.dartlang.org/dart_core/String.html">String</a> val)]) <a class="anchor-link" href="#every"
+              title="Permalink to Properties.every">#</a></h4>
 <div class="doc">
-<p>Returns a map containg every property whos key satisify the predicate f. Returns an empty map otherwise.</p>
+<p>Returns a map containg every property whos key satisifies the predicate 
+<span class="param">k</span> on the property key, and 
+optionally the predicate 
+<span class="param">v</span> on the corresponding value. Returns an empty map otherwise.</p>
 <pre class="source">
-Map&lt;String,String&gt; everyKey(bool f(String s)) {
+Map&lt;String,String&gt; every(bool k(String str), [bool v(String val)]) {
+ 
+ if(v == null) v = (String s) =&gt; true;
+ 
  var result = new Map&lt;String,String&gt;();
  for (String key in _content.keys)
-   if (f(key)) result[key] = get(key);
+   if (k(key) &amp;&amp; v(get(key))) result[key] = get(key);
    
  return result;
 }
@@ -604,11 +626,11 @@ String toJSON({String prefix, String suffix}){
  var toExport = _content;
  
  if(?prefix &amp;&amp; ?suffix)
-   toExport = everyKey((key) =&gt; key.startsWith(prefix) &amp;&amp; key.endsWith(suffix));
+   toExport = every((key) =&gt; key.startsWith(prefix) &amp;&amp; key.endsWith(suffix));
  else if(?prefix)
-   toExport = everyKey((key) =&gt; key.startsWith(prefix));
+   toExport = every((key) =&gt; key.startsWith(prefix));
  else if(?suffix)
-   toExport = everyKey((key) =&gt; key.endsWith(suffix));
+   toExport = every((key) =&gt; key.endsWith(suffix));
  
  return JSON.stringify(toExport);
 }
@@ -631,7 +653,7 @@ String toString() =&gt; _content.toString();
         <div class="clear"></div>
         </div>
         <div class="footer">
-          <div>This page was generated at 2013-02-19 23:58:50.971</div>
+          <div>This page was generated at 2013-02-27 22:18:53.233</div>
         </div>
         <script async src="../client-static.js"></script>
         </body></html>

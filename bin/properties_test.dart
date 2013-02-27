@@ -46,10 +46,35 @@ void main(){
     Properties p;
     setUp(() {p = new Properties.fromFile(path);});
     
-    test('Add a property - valid', (){
+    test('Add a property - not valid', (){
+      var singleAdd = p.add(null, 'value 3');
+      expect(singleAdd, isFalse);
+    });
+    
+    test('Add a property - valid, not existing', (){
       var singleAdd = p.add('test.key.3', 'value 3');
       expect(singleAdd, isTrue);
       expect(p.get('test.key.3'), equals('value 3'));
+      expect(p.get('test.key.1'), equals('value 1'));
+    });
+    
+    test('Add a property - valid, existing, overwrite', (){
+      
+      expect(p.get('test.key.1'), equals('value 1'));
+      
+      var singleAdd = p.add('test.key.1', 'value 1 new');
+      
+      expect(singleAdd, isTrue);
+      expect(p.get('test.key.1'), equals('value 1 new'));
+    });
+    
+    test('Add a property - valid, existing, do not overwrite', (){
+      
+      expect(p.get('test.key.1'), equals('value 1'));
+      
+      var singleAdd = p.add('test.key.1', 'value 1 new', false);
+      
+      expect(singleAdd, isFalse);
       expect(p.get('test.key.1'), equals('value 1'));
     });
     
@@ -79,12 +104,22 @@ void main(){
     test('Add a property and listen to the event', () {
       
       String eventType = "";
-      p.onAdd.listen((PropertiesEvent e) => eventType = e.type);
+      String key = "";
+      String value = "";
+      
+      p.onAdd.listen((AddEvent e) {
+        eventType = e.type;
+        key = e.key;
+        value = e.value;
+      });
+      
       var singleAdd = p.add('test.key.3', 'value 3');
       
       expect(singleAdd, isTrue);
       expect(p.get('test.key.3'), equals('value 3'));
       expect(eventType, equals(Properties.ADD_PROPERTY_EVENTNAME));
+      expect(key, "test.key.3");
+      expect(value, "value 3");
     });
   });
   
@@ -102,8 +137,15 @@ void main(){
     setUp(() {p = new Properties.fromFile(path);});
     test('Contains - matching', () => expect(p.contains('test.key.2'), isTrue));
     test('Contains - not matching', () => expect(p.contains('test.key.3'), isFalse));
-    test('Every key - matching', () => expect(p.everyKey((s) => s.startsWith('test')), isNotNull));
-    test('Every key - matching', () => expect(p.everyKey((s) => s.startsWith('test')), isNot(isEmpty)));
-    test('Every key - not matching', () => expect(p.everyKey((s) => s.startsWith('toast')), isEmpty));
+    test('Every key - matching', () => expect(p.every((s) => s.startsWith('test')), isNotNull));
+    test('Every key - matching', () => expect(p.every((s) => s.startsWith('test')), isNot(isEmpty)));
+    test('Every key - not matching', () => expect(p.every((s) => s.startsWith('toast')), isEmpty));
+    test('Every key & value - matching', () { 
+      
+      Map<String,String> m = p.every((s) => s.startsWith('test'), (v) => v == "value 1");
+      
+      expect(m, isNot(isEmpty));
+      expect(m.length, equals(1));
+    });
   });
 }

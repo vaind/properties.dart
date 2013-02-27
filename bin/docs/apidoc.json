@@ -6,6 +6,136 @@
     "children": [
       {
         "superclass": {
+          "name": "PropertiesEvent",
+          "refId": "PropertiesEvent"
+        },
+        "kind": "class",
+        "comment": "\nA factory to create simple property added event.\n",
+        "name": "AddEvent",
+        "children": [
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nCreate a new property added event instance by name the [eventType] and the property's [key] and [value].\n",
+            "name": "AddEvent",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "_key",
+                "id": "_key"
+              },
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "_value",
+                "id": "_value"
+              }
+            ],
+            "id": "AddEvent2()"
+          },
+          {
+            "returnType": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "method",
+            "comment": "\nGetter for the added [key].\n",
+            "name": "key",
+            "id": "key0()"
+          },
+          {
+            "returnType": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "method",
+            "comment": "\nGetter for the added [value].\n",
+            "name": "value",
+            "id": "value0()"
+          },
+          {
+            "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "property",
+            "comment": "\nGetter for the added [key].\n",
+            "name": "key",
+            "id": "key"
+          },
+          {
+            "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "property",
+            "comment": "\nGetter for the added [value].\n",
+            "name": "value",
+            "id": "value"
+          },
+          {
+            "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "property",
+            "name": "_key",
+            "id": "_key"
+          },
+          {
+            "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "property",
+            "name": "_value",
+            "id": "_value"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "constructor",
+            "comment": "\nCreate a new property added event instance by name the [eventType] and the property's [key] and [value].\n",
+            "name": "AddEvent",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "_key",
+                "id": "_key"
+              },
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "_value",
+                "id": "_value"
+              }
+            ],
+            "id": "AddEvent2()"
+          }
+        ],
+        "id": "AddEvent"
+      },
+      {
+        "superclass": {
           "name": "Object",
           "refId": "Object"
         },
@@ -383,7 +513,7 @@
               "refId": "bool"
             },
             "kind": "method",
-            "comment": "\nAdd a property to the instance having name [key] and\nvalue [value]. If the property already exists its value\nwill be replaced. Returns true if the property was\nadded successfully, false otherwise.\n",
+            "comment": "\nAdd a property to the instance having name [key] and\nvalue [value]. If the property already exists its value\nwill be replaced. Returns true if the property was\nadded successfully, false otherwise.\n\nIf and only if a new property is added an ADD event is\ntriggered.\n",
             "name": "add",
             "children": [
               {
@@ -403,9 +533,19 @@
                 "kind": "param",
                 "name": "value",
                 "id": "value"
+              },
+              {
+                "ref": {
+                  "name": "bool",
+                  "refId": "bool"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "overwriteExisting",
+                "id": "overwriteExisting"
               }
             ],
-            "id": "add2()"
+            "id": "add3()"
           },
           {
             "returnType": {
@@ -526,8 +666,8 @@
               ]
             },
             "kind": "method",
-            "comment": "\nReturns a map containg every property whos key satisify the predicate f. Returns an empty map otherwise.\n",
-            "name": "everyKey",
+            "comment": "\nReturns a map containg every property whos key satisifies the predicate [k] on the property key, and \noptionally the predicate [v] on the corresponding value. Returns an empty map otherwise.\n",
+            "name": "every",
             "children": [
               {
                 "ref": {
@@ -535,11 +675,21 @@
                   "refId": "Function"
                 },
                 "kind": "param",
-                "name": "f",
-                "id": "f"
+                "name": "k",
+                "id": "k"
+              },
+              {
+                "ref": {
+                  "name": "Function",
+                  "refId": "Function"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "v",
+                "id": "v"
               }
             ],
-            "id": "everyKey1()"
+            "id": "every2()"
           },
           {
             "returnType": {

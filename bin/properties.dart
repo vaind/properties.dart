@@ -162,11 +162,17 @@ class Properties{
    * value [value]. If the property already exists its value
    * will be replaced. Returns true if the property was
    * added successfully, false otherwise.
+   * 
+   * If and only if a new property is added an ADD event is
+   * triggered.
    */
-  bool add(String key, String value){
-    if(key != null && value != null){
+  bool add(String key, String value, [bool overwriteExisting = true]){
+    if(key == null || value == null)
+      return false;
+    
+    if(overwriteExisting || _content[key] == null){
       _content[key] = value;
-      addEventController.add(new PropertiesEvent(ADD_PROPERTY_EVENTNAME));
+      addEventController.add(new AddEvent(key, value));
       return true;
     }
     
@@ -216,12 +222,16 @@ class Properties{
   }
   
   /**
-   * Returns a map containg every property whos key satisify the predicate f. Returns an empty map otherwise.
+   * Returns a map containg every property whos key satisifies the predicate [k] on the property key, and 
+   * optionally the predicate [v] on the corresponding value. Returns an empty map otherwise.
    */
-  Map<String,String> everyKey(bool f(String s)) {
+  Map<String,String> every(bool k(String str), [bool v(String val)]) {
+    
+    if(v == null) v = (String s) => true;
+    
     var result = new Map<String,String>();
     for (String key in _content.keys)
-      if (f(key)) result[key] = get(key);
+      if (k(key) && v(get(key))) result[key] = get(key);
       
     return result;
   }
@@ -249,11 +259,11 @@ class Properties{
     var toExport = _content;
     
     if(?prefix && ?suffix)
-      toExport = everyKey((key) => key.startsWith(prefix) && key.endsWith(suffix));
+      toExport = every((key) => key.startsWith(prefix) && key.endsWith(suffix));
     else if(?prefix)
-      toExport = everyKey((key) => key.startsWith(prefix));
+      toExport = every((key) => key.startsWith(prefix));
     else if(?suffix)
-      toExport = everyKey((key) => key.endsWith(suffix));
+      toExport = every((key) => key.endsWith(suffix));
     
     return JSON.stringify(toExport);
   }
@@ -284,4 +294,28 @@ class PropertiesEvent<T extends Event> {
    * Getter fro the [eventType] of this event.
    */
   String get type => _eventType;
+}
+
+/**
+ * A factory to create simple property added event.
+ */
+class AddEvent extends PropertiesEvent {
+
+  final String _key;
+  final String _value;
+  
+  /**
+   * Create a new property added event instance by name the [eventType] and the property's [key] and [value].
+   */
+  const AddEvent(this._key, this._value):super(Properties.ADD_PROPERTY_EVENTNAME);
+  
+  /**
+   * Getter for the added [key].
+   */
+  String get key => _key;
+  
+  /**
+   * Getter for the added [value].
+   */
+  String get value => _value;
 }
