@@ -186,6 +186,9 @@ class Properties{
  /** Returns the whole set of values */
  Collection&lt;String&gt; get values =&gt; _content.values;
  
+ /** Returns the current number of properties */
+ int get size =&gt; _content.length;
+ 
  /**
   * Add a property to the instance having name [key] and
   * value [value]. If the property already exists its value
@@ -431,6 +434,19 @@ Stream get onAdd =&gt; addEventController.stream;
 </pre>
 </div>
 </div>
+<div class="field"><h4 id="size">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>size</strong> <a class="anchor-link"
+            href="#size"
+            title="Permalink to Properties.size">#</a>
+        </h4>
+        <div class="doc">
+<p>Returns the current number of properties </p>
+<pre class="source">
+int get size =&gt; _content.length;
+</pre>
+</div>
+</div>
 <div class="field"><h4 id="values">
 <button class="show-code">Code</button>
 final <a href="http://api.dartlang.org/dart_core/Collection.html">Collection</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt;         <strong>values</strong> <a class="anchor-link"
@@ -653,7 +669,7 @@ String toString() =&gt; _content.toString();
         <div class="clear"></div>
         </div>
         <div class="footer">
-          <div>This page was generated at 2013-02-27 22:18:53.233</div>
+          <div>This page was generated at 2013-02-27 22:27:51.847</div>
         </div>
         <script async src="../client-static.js"></script>
         </body></html>

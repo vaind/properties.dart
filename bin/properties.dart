@@ -157,6 +157,9 @@ class Properties{
   /** Returns the whole set of values */
   Collection<String> get values => _content.values;
   
+  /** Returns the current number of properties */
+  int get size => _content.length;
+  
   /**
    * Add a property to the instance having name [key] and
    * value [value]. If the property already exists its value

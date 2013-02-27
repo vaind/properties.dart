@@ -509,6 +509,16 @@
           },
           {
             "returnType": {
+              "name": "int",
+              "refId": "int"
+            },
+            "kind": "method",
+            "comment": "Returns the current number of properties ",
+            "name": "size",
+            "id": "size0()"
+          },
+          {
+            "returnType": {
               "name": "bool",
               "refId": "bool"
             },
@@ -784,6 +794,16 @@
             "comment": "Returns the whole set of values ",
             "name": "values",
             "id": "values"
+          },
+          {
+            "ref": {
+              "name": "int",
+              "refId": "int"
+            },
+            "kind": "property",
+            "comment": "Returns the current number of properties ",
+            "name": "size",
+            "id": "size"
           },
           {
             "ref": {
