@@ -3,7 +3,8 @@ import '../packages/unittest/unittest.dart';
 
 void main(){
   
-  String path = '/Users/kevin/dart/properties/resources/sample.properties';
+  String path = '/Users/kevin/Documents/workspace/properties/resources/sample.properties';
+  String path2 = '/Users/kevin/Documents/workspace/properties/resources/sample-conversion.properties';
   String jsonSource = '{"key.1" : "value 1", "key.2" : "value 2", "another.key" : "another value"}';
   
   group('Creation - from properties file', () {
@@ -27,6 +28,16 @@ void main(){
       Iterable<String> i = p.keys;
       expect(i.length, 3);
     });
+  });
+  
+  group('Getters - conversion', () {
+    Properties p;
+    setUp(() {p = new Properties.fromFile(path2);});
+    test('Existing key - not null', () => expect(p.get('test.key.integer'), isNotNull));
+    test('Existing key - not null', () => expect(p.getInt('test.key.integer'), isNotNull));
+    test('Existing key - not null', () => expect(p.getInt('test.key.integer'), equals(1)));
+    
+    test('Existing key - not integer', () => expect(p.getInt('test.key.notinteger'), isNull));
   });
   
   group('Getters - from JSON source', () {

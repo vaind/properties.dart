@@ -148,6 +148,48 @@ class Properties{
   /** Loads the value of a property given its [key] */
   String get(String key) => key != null ? _content != null ? _content[key] : null : null;
   
+  /** Loads the value of a property as an integer given its [key] */
+  int getInt(String key, [bool throwException = false]){
+    if(key == null)
+      return null;
+    
+    if(_content == null)
+      return null;
+    
+    String value = get(key);
+    if(value == null)
+      return null;
+    
+    try {
+      return int.parse(value);
+    } on FormatException catch (e) {
+      if(throwException)
+        throw e;
+      return null;
+    }
+  }
+  
+  /** Loads the value of a property as a double given its [key] */
+  double getDouble(String key, [bool throwException = false]){
+    if(key == null)
+      return null;
+    
+    if(_content == null)
+      return null;
+    
+    String value = get(key);
+    if(value == null)
+      return null;
+    
+    try {
+      return double.parse(value);
+    } on FormatException catch (e) {
+      if(throwException)
+        throw e;
+      return null;
+    }
+  }
+  
   /** Check whether the properties contains a property given its [key] */
   bool contains(String key) => key != null ? _content != null ? _content.containsKey(key) : null : null;
   

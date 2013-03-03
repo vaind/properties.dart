@@ -1,9 +1,20 @@
+0.4.2 - 03-03-2013
+Minor fixes.
+Added two new methods to get integer and double out of a property.
+
+
+0.4.1 - 02-03-2013
+Project structure refactoring in order to be published with PUB.
+
+
 0.4.0 - 27-02-2013
 
 - the method everyKey() is now every() and may optionally filter on property's value too;
 - added AddEvent? class, extending PropertiesEvent?, having key and value properties set to the corresponding values of the newly added property;
 - add key has now an additional optional parameter to decide whether to overwrite existing property, if any;
 - improved doc and tests.
+
+
 0.3.0 - 20-02-2013
 
 - addFromXXX methods have been renamed into mergeXXX, giving the user the capability to choose whether to overwrite or keep existing matching properties:
