@@ -1,5 +1,5 @@
 name: properties
-version: 0.4.1
+version: 0.4.2
 author: Lorenzo Cavina <cavina.lorenzo@gmail.com>
 description: A simple library to manage properties file (and something more) in Dart
 homepage: http://code.google.com/p/dart-properties/
