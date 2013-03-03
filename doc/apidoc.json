@@ -456,6 +456,68 @@
           },
           {
             "returnType": {
+              "name": "int",
+              "refId": "int"
+            },
+            "kind": "method",
+            "comment": "Loads the value of a property as an integer given its [key] ",
+            "name": "getInt",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "key",
+                "id": "key"
+              },
+              {
+                "ref": {
+                  "name": "bool",
+                  "refId": "bool"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "throwException",
+                "id": "throwException"
+              }
+            ],
+            "id": "getInt2()"
+          },
+          {
+            "returnType": {
+              "name": "double",
+              "refId": "double"
+            },
+            "kind": "method",
+            "comment": "Loads the value of a property as a double given its [key] ",
+            "name": "getDouble",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "key",
+                "id": "key"
+              },
+              {
+                "ref": {
+                  "name": "bool",
+                  "refId": "bool"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "throwException",
+                "id": "throwException"
+              }
+            ],
+            "id": "getDouble2()"
+          },
+          {
+            "returnType": {
               "name": "bool",
               "refId": "bool"
             },
@@ -958,6 +1020,6 @@
         "id": "Properties"
       }
     ],
-    "id": "file:///Users/kevin/Documents/workspace/dart-properties/bin/properties.dart"
+    "id": "file:///Users/kevin/Documents/workspace/properties/lib/properties.dart"
   }
 ]
