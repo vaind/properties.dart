@@ -13,29 +13,50 @@ a look at the unit tests provided along with the source code.
 
 Anyway you can go on reading this quick intro.
 
-Add the dart-properties package to your pubspec.yaml file, selecting a version range
-that works with your version of the SDK. For example:
+Create a new properties instance from file
 
-```yaml
-dependencies:
-  dart-properties: ">=0.1.0 <0.4.0"
+```dart
+Properties p = new Properties.fromFile(filepath);
+```
+
+get a property out of it
+
+```dart
+String value = p.get('test.key.1');
+```
+
+then add a brand new property, choosing whether to overwrite the entry or not
+
+```dart
+bool added = p.add('test.key.3', 'value 3', true);
+```
+
+listen to "property added" events
+
+```dart
+p.onAdd.listen((AddEvent e) {
+        eventType = e.type;
+        key = e.key;
+        value = e.value;
+});
+```
+
+export the content as a JSON sting, optionally choosing to export key having a
+given prefix and/or suffix
+
+```dart
+String jsonexport = p.toJSON([prefix, suffix]);
+```
+
+filter and extract property entries that matches custom conditions
+
+```dart
+Map<String,String> filtered = p.every((s) => s.startsWith('test'));
 ```
 
 To know something more about the released version have a look at the
-[changelog][changelog] to find the version that works best for you.
-
-If you continually update your SDK, you can use the latest version of dart-properties:
-
-```yaml
-dependencies:
-  dart-properties: any
-```
+CHANGELOG to find the version that works best for you.
 
 Running Tests
 -------------
-
-Dependencies are installed using the [Pub Package Manager][pub].
-```bash
-pub install
-
 To run the tests just run the test/properties_test.dart file.

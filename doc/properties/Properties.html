@@ -1,0 +1,676 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>Properties class / properties Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="properties" data-type="Properties">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../properties.html">properties</a> &rsaquo; <a href="../properties/Properties.html">Properties</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+<h2><div class="icon-library"></div><a href="../properties.html">properties</a></h2><ul class="icon">
+<li><a href="../properties/AddEvent.html"><div class="icon-class"></div>AddEvent</a></li>
+<li><div class="icon-class"></div><strong>Properties</strong></li>
+<li><a href="../properties/PropertiesEvent.html"><div class="icon-class"></div>PropertiesEvent&lt;T&gt;</a></li>
+</ul>
+</div>
+<div class="content">
+        <h2><strong>Properties</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<p>The Properties class implementing all tools to load key-values from file both by name and
+path.</p>
+<pre class="source">
+class Properties{
+ 
+ /// The encoding used to read the file
+ Encoding _encoding;
+ 
+ /// The content of the properties file in terms of key - value couples
+ Map&lt;String,String&gt; _content;
+ 
+ /// An internal reference to the source file.
+ String _sourceFile;
+ 
+ static const String ADD_PROPERTY_EVENTNAME = 'add';
+ StreamController addEventController;
+ 
+ /**
+  * Create a new properties instance by naming the source file using [name]
+  * and, optionally, setting the desired [encoding].
+  */
+ Properties(String name, [Encoding encoding = Encoding.UTF_8]){
+   
+   this._sourceFile = name;
+   this._encoding = encoding;
+   
+   _init();
+   
+   _initFromFile();
+   
+ }
+ 
+ /**
+  * Create a new properties instance from file [path]
+  * and, optionally, setting the desired [encoding].
+  */
+ Properties.fromFile(String path, [Encoding encoding = Encoding.UTF_8]){
+   
+   this._sourceFile = path;
+   this._encoding = encoding;
+   
+   _init();
+   
+   _initFromFile();
+   
+ }
+ 
+ /**
+  * Create a new properties instance using the input [jsonMap]
+  * to load the data from.
+  */
+ Properties.fromJSON(String jsonMap){
+   
+   _init();
+   
+   _content = JSON.parse(jsonMap) as Map&lt;String,String&gt;;
+ }
+
+ /**
+  * Initialize common internal tools such as event controllers.
+  */
+ _init() {
+   addEventController = new StreamController&lt;PropertiesEvent&gt;.broadcast();
+ }
+ 
+ void _initFromFile() =&gt; _load(_read(_sourceFile, _encoding));
+
+ /**
+  * Create the file object and read its content in lines.
+  */
+ List&lt;String&gt; _read(String path, Encoding encoding) {
+   
+   var f = _getFile(path);
+   
+   if(f == null || !f.existsSync())
+     return null;
+   
+   return f.readAsLinesSync(this._encoding);
+ }
+
+ /**
+  * Load properties from lines.
+  */
+ _load(List&lt;String&gt; lines) {
+   if(lines == null || lines.isEmpty)
+     return null;
+   
+   _content = new Map&lt;String,String&gt;();
+   
+   for(String line in lines){
+     
+     line = line.trim();
+     
+     if(_isProperty(line)){
+       List&lt;String&gt; keyvalue = line.split('=');
+       
+       if(keyvalue.length == 2 &amp;&amp; keyvalue[0] != null)
+         _content[keyvalue[0].trim()] = keyvalue[1].trim();
+     }
+   }
+ }
+
+ /**
+  * Determine if input line is a property or not.
+  */
+ _isProperty(String line) {
+   
+   if(line.isEmpty || line == null)
+     return false;
+   
+   if(line.startsWith('#'))
+     return false;
+   
+   if(line.contains('='))
+     return true;
+     
+   return false;
+ }
+ 
+ /**
+  * Get a file instance from the input string [file].
+  */
+ File _getFile(String file){
+   
+   var result = new File(file);
+   
+   if(result.existsSync())
+     return result;
+   
+   result = new File.fromPath(new Path(file));
+   
+   if(result.existsSync())
+     return result;
+   
+   throw new FileIOException('It\'s impossible to load properties from input file ${file}. File does not exist.');
+ }
+ 
+ /** Loads the value of a property given its [key] */
+ String get(String key) =&gt; key != null ? _content != null ? _content[key] : null : null;
+ 
+ /** Check whether the properties contains a property given its [key] */
+ bool contains(String key) =&gt; key != null ? _content != null ? _content.containsKey(key) : null : null;
+ 
+ /** Rerturns the whole set of keys */
+ Iterable&lt;String&gt; get keys =&gt; _content.keys;
+ 
+ /** Returns the whole set of values */
+ Collection&lt;String&gt; get values =&gt; _content.values;
+ 
+ /** Returns the current number of properties */
+ int get size =&gt; _content.length;
+ 
+ /**
+  * Add a property to the instance having name [key] and
+  * value [value]. If the property already exists its value
+  * will be replaced. Returns true if the property was
+  * added successfully, false otherwise.
+  * 
+  * If and only if a new property is added an ADD event is
+  * triggered.
+  */
+ bool add(String key, String value, [bool overwriteExisting = true]){
+   if(key == null || value == null)
+     return false;
+   
+   if(overwriteExisting || _content[key] == null){
+     _content[key] = value;
+     addEventController.add(new AddEvent(key, value));
+     return true;
+   }
+   
+   return false;
+ }
+ 
+ /**
+  * Merge input [properties] content with the current instance's properties.
+  * By defatult already existing properties will be overwritten. Anyway user
+  * may decide how to manage existing thanks to the optional parameter [overwriteExisting].
+  */
+ void merge(Properties properties, [bool overwriteExisting = true]){
+   for(String key in properties.keys){
+     if(overwriteExisting || _content[key] == null){
+       _content[key] = properties.get(key);
+     }
+   }
+ }
+ 
+ /**
+  * Merge properties from the input [map] with the current instance's properties.
+  * By defatult already existing properties will be overwritten. Anyway user
+  * may decide how to manage existing thanks to the optional parameter [overwriteExisting].
+  */
+ void mergeMap(Map&lt;String,String&gt; map, [bool overwriteExisting = true]){
+   for(String key in map.keys){
+     if(overwriteExisting || _content[key] == null){
+       _content[key] = map[key];
+     }
+   }
+ }
+ 
+ /**
+  * Merge properties from the input [jsonMap] with the current instance's properties.
+  * By defatult already existing properties will be overwritten. Anyway user
+  * may decide how to manage existing thanks to the optional parameter [overwriteExisting].
+  */
+ void mergeJSON(String jsonMap, [bool overwriteExisting = true]){
+   
+   var parsed = JSON.parse(jsonMap) as Map&lt;String,String&gt;;
+   
+   for(String key in parsed.keys){
+     if(overwriteExisting || _content[key] == null){
+       _content[key] = parsed[key];
+     }
+   }
+ }
+ 
+ /**
+  * Returns a map containg every property whos key satisifies the predicate [k] on the property key, and 
+  * optionally the predicate [v] on the corresponding value. Returns an empty map otherwise.
+  */
+ Map&lt;String,String&gt; every(bool k(String str), [bool v(String val)]) {
+   
+   if(v == null) v = (String s) =&gt; true;
+   
+   var result = new Map&lt;String,String&gt;();
+   for (String key in _content.keys)
+     if (k(key) &amp;&amp; v(get(key))) result[key] = get(key);
+     
+   return result;
+ }
+ 
+ /**
+  * Reloads the properties from file. Works for file sources only.
+  */
+ reload(){
+   if(_sourceFile == null)
+     return;
+   
+   _content.clear();
+   _initFromFile();
+ }
+ 
+ /**
+  * Export the content as a JSON map. If no input parameter is set, then the whole set of
+  * properties will be exporte as a JSON map. If the [prefix] parameter is set,
+  * then only the keys starting with [prefix] will be exported. If the [suffix] parameter is set,
+  * then only the keys starting with [suffix] will be exported. If both are set, then only the
+  * keys matching both will be exported.
+  */
+ String toJSON({String prefix, String suffix}){
+   
+   var toExport = _content;
+   
+   if(?prefix &amp;&amp; ?suffix)
+     toExport = every((key) =&gt; key.startsWith(prefix) &amp;&amp; key.endsWith(suffix));
+   else if(?prefix)
+     toExport = every((key) =&gt; key.startsWith(prefix));
+   else if(?suffix)
+     toExport = every((key) =&gt; key.endsWith(suffix));
+   
+   return JSON.stringify(toExport);
+ }
+ 
+ /**
+  * Returns the whole content as a String.
+  */
+ String toString() =&gt; _content.toString();
+ 
+ /**
+  * Get the stream instance for the "add property" event.
+  */
+ Stream get onAdd =&gt; addEventController.stream;
+}
+</pre>
+</div>
+<div>
+<h3>Static Properties</h3>
+<div class="field"><h4 id="ADD_PROPERTY_EVENTNAME">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/String.html">String</a>         <strong>ADD_PROPERTY_EVENTNAME</strong> <a class="anchor-link"
+            href="#ADD_PROPERTY_EVENTNAME"
+            title="Permalink to Properties.ADD_PROPERTY_EVENTNAME">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+ADD_PROPERTY_EVENTNAME = 'add'
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Constructors</h3>
+<div class="method"><h4 id="Properties">
+<button class="show-code">Code</button>
+new <strong>Properties</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> name, [<a href="http://api.dartlang.org/dart_io/Encoding.html">Encoding</a> encoding = Encoding.UTF_8]) <a class="anchor-link" href="#Properties"
+              title="Permalink to Properties.Properties">#</a></h4>
+<div class="doc">
+<p>Create a new properties instance by naming the source file using 
+<span class="param">name</span>
+and, optionally, setting the desired 
+<span class="param">encoding</span>.</p>
+<pre class="source">
+Properties(String name, [Encoding encoding = Encoding.UTF_8]){
+ 
+ this._sourceFile = name;
+ this._encoding = encoding;
+ 
+ _init();
+ 
+ _initFromFile();
+ 
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="Properties.fromFile">
+<button class="show-code">Code</button>
+new <strong>Properties.fromFile</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> path, [<a href="http://api.dartlang.org/dart_io/Encoding.html">Encoding</a> encoding = Encoding.UTF_8]) <a class="anchor-link" href="#Properties.fromFile"
+              title="Permalink to Properties.Properties.fromFile">#</a></h4>
+<div class="doc">
+<p>Create a new properties instance from file 
+<span class="param">path</span>
+and, optionally, setting the desired 
+<span class="param">encoding</span>.</p>
+<pre class="source">
+Properties.fromFile(String path, [Encoding encoding = Encoding.UTF_8]){
+ 
+ this._sourceFile = path;
+ this._encoding = encoding;
+ 
+ _init();
+ 
+ _initFromFile();
+ 
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="Properties.fromJSON">
+<button class="show-code">Code</button>
+new <strong>Properties.fromJSON</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> jsonMap) <a class="anchor-link" href="#Properties.fromJSON"
+              title="Permalink to Properties.Properties.fromJSON">#</a></h4>
+<div class="doc">
+<p>Create a new properties instance using the input 
+<span class="param">jsonMap</span>
+to load the data from.</p>
+<pre class="source">
+Properties.fromJSON(String jsonMap){
+ 
+ _init();
+ 
+ _content = JSON.parse(jsonMap) as Map&lt;String,String&gt;;
+}
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Properties</h3>
+<div class="field"><h4 id="addEventController">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/StreamController.html">StreamController</a>         <strong>addEventController</strong> <a class="anchor-link"
+            href="#addEventController"
+            title="Permalink to Properties.addEventController">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+addEventController
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="keys">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/Iterable.html">Iterable</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt;         <strong>keys</strong> <a class="anchor-link"
+            href="#keys"
+            title="Permalink to Properties.keys">#</a>
+        </h4>
+        <div class="doc">
+<p>Rerturns the whole set of keys </p>
+<pre class="source">
+Iterable&lt;String&gt; get keys =&gt; _content.keys;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="onAdd">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_async/Stream.html">Stream</a>         <strong>onAdd</strong> <a class="anchor-link"
+            href="#onAdd"
+            title="Permalink to Properties.onAdd">#</a>
+        </h4>
+        <div class="doc">
+<p>Get the stream instance for the "add property" event.</p>
+<pre class="source">
+Stream get onAdd =&gt; addEventController.stream;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="size">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>size</strong> <a class="anchor-link"
+            href="#size"
+            title="Permalink to Properties.size">#</a>
+        </h4>
+        <div class="doc">
+<p>Returns the current number of properties </p>
+<pre class="source">
+int get size =&gt; _content.length;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="values">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/Collection.html">Collection</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt;         <strong>values</strong> <a class="anchor-link"
+            href="#values"
+            title="Permalink to Properties.values">#</a>
+        </h4>
+        <div class="doc">
+<p>Returns the whole set of values </p>
+<pre class="source">
+Collection&lt;String&gt; get values =&gt; _content.values;
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="add">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> <strong>add</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> key, <a href="http://api.dartlang.org/dart_core/String.html">String</a> value, [<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> overwriteExisting = true]) <a class="anchor-link" href="#add"
+              title="Permalink to Properties.add">#</a></h4>
+<div class="doc">
+<p>Add a property to the instance having name 
+<span class="param">key</span> and
+value 
+<span class="param">value</span>. If the property already exists its value
+will be replaced. Returns true if the property was
+added successfully, false otherwise.</p>
+<p>If and only if a new property is added an ADD event is
+triggered.</p>
+<pre class="source">
+bool add(String key, String value, [bool overwriteExisting = true]){
+ if(key == null || value == null)
+   return false;
+ 
+ if(overwriteExisting || _content[key] == null){
+   _content[key] = value;
+   addEventController.add(new AddEvent(key, value));
+   return true;
+ }
+ 
+ return false;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="contains">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> <strong>contains</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> key) <a class="anchor-link" href="#contains"
+              title="Permalink to Properties.contains">#</a></h4>
+<div class="doc">
+<p>Check whether the properties contains a property given its 
+<span class="param">key</span> </p>
+<pre class="source">
+bool contains(String key) =&gt; key != null ? _content != null ? _content.containsKey(key) : null : null;
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="every">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>, <a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt; <strong>every</strong>(<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> k(<a href="http://api.dartlang.org/dart_core/String.html">String</a> str), [<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> v(<a href="http://api.dartlang.org/dart_core/String.html">String</a> val)]) <a class="anchor-link" href="#every"
+              title="Permalink to Properties.every">#</a></h4>
+<div class="doc">
+<p>Returns a map containg every property whos key satisifies the predicate 
+<span class="param">k</span> on the property key, and 
+optionally the predicate 
+<span class="param">v</span> on the corresponding value. Returns an empty map otherwise.</p>
+<pre class="source">
+Map&lt;String,String&gt; every(bool k(String str), [bool v(String val)]) {
+ 
+ if(v == null) v = (String s) =&gt; true;
+ 
+ var result = new Map&lt;String,String&gt;();
+ for (String key in _content.keys)
+   if (k(key) &amp;&amp; v(get(key))) result[key] = get(key);
+   
+ return result;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="get">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>get</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> key) <a class="anchor-link" href="#get"
+              title="Permalink to Properties.get">#</a></h4>
+<div class="doc">
+<p>Loads the value of a property given its 
+<span class="param">key</span> </p>
+<pre class="source">
+String get(String key) =&gt; key != null ? _content != null ? _content[key] : null : null;
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="merge">
+<button class="show-code">Code</button>
+void <strong>merge</strong>(<a href="../properties/Properties.html">Properties</a> properties, [<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> overwriteExisting = true]) <a class="anchor-link" href="#merge"
+              title="Permalink to Properties.merge">#</a></h4>
+<div class="doc">
+<p>Merge input 
+<span class="param">properties</span> content with the current instance's properties.
+By defatult already existing properties will be overwritten. Anyway user
+may decide how to manage existing thanks to the optional parameter 
+<span class="param">overwriteExisting</span>.</p>
+<pre class="source">
+void merge(Properties properties, [bool overwriteExisting = true]){
+ for(String key in properties.keys){
+   if(overwriteExisting || _content[key] == null){
+     _content[key] = properties.get(key);
+   }
+ }
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="mergeJSON">
+<button class="show-code">Code</button>
+void <strong>mergeJSON</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> jsonMap, [<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> overwriteExisting = true]) <a class="anchor-link" href="#mergeJSON"
+              title="Permalink to Properties.mergeJSON">#</a></h4>
+<div class="doc">
+<p>Merge properties from the input 
+<span class="param">jsonMap</span> with the current instance's properties.
+By defatult already existing properties will be overwritten. Anyway user
+may decide how to manage existing thanks to the optional parameter 
+<span class="param">overwriteExisting</span>.</p>
+<pre class="source">
+void mergeJSON(String jsonMap, [bool overwriteExisting = true]){
+ 
+ var parsed = JSON.parse(jsonMap) as Map&lt;String,String&gt;;
+ 
+ for(String key in parsed.keys){
+   if(overwriteExisting || _content[key] == null){
+     _content[key] = parsed[key];
+   }
+ }
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="mergeMap">
+<button class="show-code">Code</button>
+void <strong>mergeMap</strong>(<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>, <a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt; map, [<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> overwriteExisting = true]) <a class="anchor-link" href="#mergeMap"
+              title="Permalink to Properties.mergeMap">#</a></h4>
+<div class="doc">
+<p>Merge properties from the input 
+<span class="param">map</span> with the current instance's properties.
+By defatult already existing properties will be overwritten. Anyway user
+may decide how to manage existing thanks to the optional parameter 
+<span class="param">overwriteExisting</span>.</p>
+<pre class="source">
+void mergeMap(Map&lt;String,String&gt; map, [bool overwriteExisting = true]){
+ for(String key in map.keys){
+   if(overwriteExisting || _content[key] == null){
+     _content[key] = map[key];
+   }
+ }
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="reload">
+<button class="show-code">Code</button>
+<strong>reload</strong>() <a class="anchor-link" href="#reload"
+              title="Permalink to Properties.reload">#</a></h4>
+<div class="doc">
+<p>Reloads the properties from file. Works for file sources only.</p>
+<pre class="source">
+reload(){
+ if(_sourceFile == null)
+   return;
+ 
+ _content.clear();
+ _initFromFile();
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="toJSON">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>toJSON</strong>({<a href="http://api.dartlang.org/dart_core/String.html">String</a> prefix, <a href="http://api.dartlang.org/dart_core/String.html">String</a> suffix}) <a class="anchor-link" href="#toJSON"
+              title="Permalink to Properties.toJSON">#</a></h4>
+<div class="doc">
+<p>Export the content as a JSON map. If no input parameter is set, then the whole set of
+properties will be exporte as a JSON map. If the 
+<span class="param">prefix</span> parameter is set,
+then only the keys starting with 
+<span class="param">prefix</span> will be exported. If the 
+<span class="param">suffix</span> parameter is set,
+then only the keys starting with 
+<span class="param">suffix</span> will be exported. If both are set, then only the
+keys matching both will be exported.</p>
+<pre class="source">
+String toJSON({String prefix, String suffix}){
+ 
+ var toExport = _content;
+ 
+ if(?prefix &amp;&amp; ?suffix)
+   toExport = every((key) =&gt; key.startsWith(prefix) &amp;&amp; key.endsWith(suffix));
+ else if(?prefix)
+   toExport = every((key) =&gt; key.startsWith(prefix));
+ else if(?suffix)
+   toExport = every((key) =&gt; key.endsWith(suffix));
+ 
+ return JSON.stringify(toExport);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="toString">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>toString</strong>() <a class="anchor-link" href="#toString"
+              title="Permalink to Properties.toString">#</a></h4>
+<div class="doc">
+<p>Returns the whole content as a String.</p>
+<pre class="source">
+String toString() =&gt; _content.toString();
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        <div class="footer">
+          <div>This page was generated at 2013-02-27 22:27:51.847</div>
+        </div>
+        <script async src="../client-static.js"></script>
+        </body></html>
+        

@@ -1,0 +1,40 @@
+0.4.0 - 27-02-2013
+
+- the method everyKey() is now every() and may optionally filter on property's value too;
+- added AddEvent? class, extending PropertiesEvent?, having key and value properties set to the corresponding values of the newly added property;
+- add key has now an additional optional parameter to decide whether to overwrite existing property, if any;
+- improved doc and tests.
+0.3.0 - 20-02-2013
+
+- addFromXXX methods have been renamed into mergeXXX, giving the user the capability to choose whether to overwrite or keep existing matching properties:
+
+// dinamically merge properties from input Properties object into the 
+// current instance's properties, without overwriting eventually existing properties
+p.merge(anotherPropertiesInstance, false);
+
+// dinamically merge properties from input JSON object into the 
+// current instance's properties, overwriting existing ones
+p.mergeJSON('{"test.key.3":"value 3","test.key.4":"value 4"}', true);
+
+- added very simple event management: now one may listen to "add property" events triggered when a new property is added at runtime
+
+p.onAdd.listen((PropertiesEvent e) => print("Received: " + e.type));
+
+
+0.2.0 - 17-02-2013
+
+Added some tools to work with JSON objects too
+
+// create a new instance from a JSON map
+Properties p = new Properties.fromJSON(jsonMap);
+
+// export the (whole) content as a JSON map
+p.toJSON(prefix:"keyprefix", suffix:"keysuffix");
+
+// dinamically add new properties to the current instance from JSON
+p.addFromJSON('{"test.key.3":"value 3","test.key.4":"value 4"}');
+
+
+0.1.0 - 16-02-2013
+
+First release: basic tools, support for plain old properties files. 

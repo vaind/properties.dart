@@ -1,0 +1,963 @@
+[
+  {
+    "kind": "library",
+    "comment": "\nA simple properties file management library.\n",
+    "name": "properties",
+    "children": [
+      {
+        "superclass": {
+          "name": "PropertiesEvent",
+          "refId": "PropertiesEvent"
+        },
+        "kind": "class",
+        "comment": "\nA factory to create simple property added event.\n",
+        "name": "AddEvent",
+        "children": [
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nCreate a new property added event instance by name the [eventType] and the property's [key] and [value].\n",
+            "name": "AddEvent",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "_key",
+                "id": "_key"
+              },
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "_value",
+                "id": "_value"
+              }
+            ],
+            "id": "AddEvent2()"
+          },
+          {
+            "returnType": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "method",
+            "comment": "\nGetter for the added [key].\n",
+            "name": "key",
+            "id": "key0()"
+          },
+          {
+            "returnType": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "method",
+            "comment": "\nGetter for the added [value].\n",
+            "name": "value",
+            "id": "value0()"
+          },
+          {
+            "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "property",
+            "comment": "\nGetter for the added [key].\n",
+            "name": "key",
+            "id": "key"
+          },
+          {
+            "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "property",
+            "comment": "\nGetter for the added [value].\n",
+            "name": "value",
+            "id": "value"
+          },
+          {
+            "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "property",
+            "name": "_key",
+            "id": "_key"
+          },
+          {
+            "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "property",
+            "name": "_value",
+            "id": "_value"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "constructor",
+            "comment": "\nCreate a new property added event instance by name the [eventType] and the property's [key] and [value].\n",
+            "name": "AddEvent",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "_key",
+                "id": "_key"
+              },
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "_value",
+                "id": "_value"
+              }
+            ],
+            "id": "AddEvent2()"
+          }
+        ],
+        "id": "AddEvent"
+      },
+      {
+        "superclass": {
+          "name": "Object",
+          "refId": "Object"
+        },
+        "kind": "class",
+        "comment": "\nA factory to create simple Properties' related events.\n",
+        "name": "PropertiesEvent",
+        "children": [
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nCreate a new event instance by name the [eventType] only.\n",
+            "name": "PropertiesEvent",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "_eventType",
+                "id": "_eventType"
+              }
+            ],
+            "id": "PropertiesEvent1()"
+          },
+          {
+            "returnType": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "method",
+            "comment": "\nGetter fro the [eventType] of this event.\n",
+            "name": "type",
+            "id": "type0()"
+          },
+          {
+            "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "property",
+            "comment": "\nGetter fro the [eventType] of this event.\n",
+            "name": "type",
+            "id": "type"
+          },
+          {
+            "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "property",
+            "name": "_eventType",
+            "id": "_eventType"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "constructor",
+            "comment": "\nCreate a new event instance by name the [eventType] only.\n",
+            "name": "PropertiesEvent",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "_eventType",
+                "id": "_eventType"
+              }
+            ],
+            "id": "PropertiesEvent1()"
+          }
+        ],
+        "id": "PropertiesEvent"
+      },
+      {
+        "superclass": {
+          "name": "Object",
+          "refId": "Object"
+        },
+        "kind": "class",
+        "comment": "\nThe Properties class implementing all tools to load key-values from file both by name and\npath.\n",
+        "name": "Properties",
+        "children": [
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nCreate a new properties instance by naming the source file using [name]\nand, optionally, setting the desired [encoding].\n",
+            "name": "Properties",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "name",
+                "id": "name"
+              },
+              {
+                "ref": {
+                  "name": "Encoding",
+                  "refId": "Encoding"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "encoding",
+                "id": "encoding"
+              }
+            ],
+            "id": "Properties2()"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nCreate a new properties instance from file [path]\nand, optionally, setting the desired [encoding].\n",
+            "name": "Properties.fromFile",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "path",
+                "id": "path"
+              },
+              {
+                "ref": {
+                  "name": "Encoding",
+                  "refId": "Encoding"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "encoding",
+                "id": "encoding"
+              }
+            ],
+            "id": "Properties.fromFile2()"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nCreate a new properties instance using the input [jsonMap]\nto load the data from.\n",
+            "name": "Properties.fromJSON",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "jsonMap",
+                "id": "jsonMap"
+              }
+            ],
+            "id": "Properties.fromJSON1()"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nInitialize common internal tools such as event controllers.\n",
+            "name": "_init",
+            "id": "_init0()"
+          },
+          {
+            "returnType": {
+              "name": "void",
+              "refId": "void"
+            },
+            "kind": "method",
+            "name": "_initFromFile",
+            "id": "_initFromFile0()"
+          },
+          {
+            "returnType": {
+              "name": "List",
+              "refId": "List",
+              "arguments": [
+                {
+                  "name": "String",
+                  "refId": "String"
+                }
+              ]
+            },
+            "kind": "method",
+            "comment": "\nCreate the file object and read its content in lines.\n",
+            "name": "_read",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "path",
+                "id": "path"
+              },
+              {
+                "ref": {
+                  "name": "Encoding",
+                  "refId": "Encoding"
+                },
+                "kind": "param",
+                "name": "encoding",
+                "id": "encoding"
+              }
+            ],
+            "id": "_read2()"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nLoad properties from lines.\n",
+            "name": "_load",
+            "children": [
+              {
+                "ref": {
+                  "name": "List",
+                  "refId": "List",
+                  "arguments": [
+                    {
+                      "name": "String",
+                      "refId": "String"
+                    }
+                  ]
+                },
+                "kind": "param",
+                "name": "lines",
+                "id": "lines"
+              }
+            ],
+            "id": "_load1()"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nDetermine if input line is a property or not.\n",
+            "name": "_isProperty",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "line",
+                "id": "line"
+              }
+            ],
+            "id": "_isProperty1()"
+          },
+          {
+            "returnType": {
+              "name": "File",
+              "refId": "File"
+            },
+            "kind": "method",
+            "comment": "\nGet a file instance from the input string [file].\n",
+            "name": "_getFile",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "file",
+                "id": "file"
+              }
+            ],
+            "id": "_getFile1()"
+          },
+          {
+            "returnType": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "method",
+            "comment": "Loads the value of a property given its [key] ",
+            "name": "get",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "key",
+                "id": "key"
+              }
+            ],
+            "id": "get1()"
+          },
+          {
+            "returnType": {
+              "name": "bool",
+              "refId": "bool"
+            },
+            "kind": "method",
+            "comment": "Check whether the properties contains a property given its [key] ",
+            "name": "contains",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "key",
+                "id": "key"
+              }
+            ],
+            "id": "contains1()"
+          },
+          {
+            "returnType": {
+              "name": "Iterable",
+              "refId": "Iterable",
+              "arguments": [
+                {
+                  "name": "String",
+                  "refId": "String"
+                }
+              ]
+            },
+            "kind": "method",
+            "comment": "Rerturns the whole set of keys ",
+            "name": "keys",
+            "id": "keys0()"
+          },
+          {
+            "returnType": {
+              "name": "Collection",
+              "refId": "Collection",
+              "arguments": [
+                {
+                  "name": "String",
+                  "refId": "String"
+                }
+              ]
+            },
+            "kind": "method",
+            "comment": "Returns the whole set of values ",
+            "name": "values",
+            "id": "values0()"
+          },
+          {
+            "returnType": {
+              "name": "int",
+              "refId": "int"
+            },
+            "kind": "method",
+            "comment": "Returns the current number of properties ",
+            "name": "size",
+            "id": "size0()"
+          },
+          {
+            "returnType": {
+              "name": "bool",
+              "refId": "bool"
+            },
+            "kind": "method",
+            "comment": "\nAdd a property to the instance having name [key] and\nvalue [value]. If the property already exists its value\nwill be replaced. Returns true if the property was\nadded successfully, false otherwise.\n\nIf and only if a new property is added an ADD event is\ntriggered.\n",
+            "name": "add",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "key",
+                "id": "key"
+              },
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "value",
+                "id": "value"
+              },
+              {
+                "ref": {
+                  "name": "bool",
+                  "refId": "bool"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "overwriteExisting",
+                "id": "overwriteExisting"
+              }
+            ],
+            "id": "add3()"
+          },
+          {
+            "returnType": {
+              "name": "void",
+              "refId": "void"
+            },
+            "kind": "method",
+            "comment": "\nMerge input [properties] content with the current instance's properties.\nBy defatult already existing properties will be overwritten. Anyway user\nmay decide how to manage existing thanks to the optional parameter [overwriteExisting].\n",
+            "name": "merge",
+            "children": [
+              {
+                "ref": {
+                  "name": "Properties",
+                  "refId": "Properties"
+                },
+                "kind": "param",
+                "name": "properties",
+                "id": "properties"
+              },
+              {
+                "ref": {
+                  "name": "bool",
+                  "refId": "bool"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "overwriteExisting",
+                "id": "overwriteExisting"
+              }
+            ],
+            "id": "merge2()"
+          },
+          {
+            "returnType": {
+              "name": "void",
+              "refId": "void"
+            },
+            "kind": "method",
+            "comment": "\nMerge properties from the input [map] with the current instance's properties.\nBy defatult already existing properties will be overwritten. Anyway user\nmay decide how to manage existing thanks to the optional parameter [overwriteExisting].\n",
+            "name": "mergeMap",
+            "children": [
+              {
+                "ref": {
+                  "name": "Map",
+                  "refId": "Map",
+                  "arguments": [
+                    {
+                      "name": "String",
+                      "refId": "String"
+                    },
+                    {
+                      "name": "String",
+                      "refId": "String"
+                    }
+                  ]
+                },
+                "kind": "param",
+                "name": "map",
+                "id": "map"
+              },
+              {
+                "ref": {
+                  "name": "bool",
+                  "refId": "bool"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "overwriteExisting",
+                "id": "overwriteExisting"
+              }
+            ],
+            "id": "mergeMap2()"
+          },
+          {
+            "returnType": {
+              "name": "void",
+              "refId": "void"
+            },
+            "kind": "method",
+            "comment": "\nMerge properties from the input [jsonMap] with the current instance's properties.\nBy defatult already existing properties will be overwritten. Anyway user\nmay decide how to manage existing thanks to the optional parameter [overwriteExisting].\n",
+            "name": "mergeJSON",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "jsonMap",
+                "id": "jsonMap"
+              },
+              {
+                "ref": {
+                  "name": "bool",
+                  "refId": "bool"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "overwriteExisting",
+                "id": "overwriteExisting"
+              }
+            ],
+            "id": "mergeJSON2()"
+          },
+          {
+            "returnType": {
+              "name": "Map",
+              "refId": "Map",
+              "arguments": [
+                {
+                  "name": "String",
+                  "refId": "String"
+                },
+                {
+                  "name": "String",
+                  "refId": "String"
+                }
+              ]
+            },
+            "kind": "method",
+            "comment": "\nReturns a map containg every property whos key satisifies the predicate [k] on the property key, and \noptionally the predicate [v] on the corresponding value. Returns an empty map otherwise.\n",
+            "name": "every",
+            "children": [
+              {
+                "ref": {
+                  "name": "Function",
+                  "refId": "Function"
+                },
+                "kind": "param",
+                "name": "k",
+                "id": "k"
+              },
+              {
+                "ref": {
+                  "name": "Function",
+                  "refId": "Function"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "v",
+                "id": "v"
+              }
+            ],
+            "id": "every2()"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nReloads the properties from file. Works for file sources only.\n",
+            "name": "reload",
+            "id": "reload0()"
+          },
+          {
+            "returnType": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "method",
+            "comment": "\nExport the content as a JSON map. If no input parameter is set, then the whole set of\nproperties will be exporte as a JSON map. If the [prefix] parameter is set,\nthen only the keys starting with [prefix] will be exported. If the [suffix] parameter is set,\nthen only the keys starting with [suffix] will be exported. If both are set, then only the\nkeys matching both will be exported.\n",
+            "name": "toJSON",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "prefix",
+                "id": "prefix"
+              },
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "suffix",
+                "id": "suffix"
+              }
+            ],
+            "id": "toJSON2()"
+          },
+          {
+            "returnType": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "method",
+            "comment": "\nReturns the whole content as a String.\n",
+            "name": "toString",
+            "id": "toString0()"
+          },
+          {
+            "returnType": {
+              "name": "Stream",
+              "refId": "Stream"
+            },
+            "kind": "method",
+            "comment": "\nGet the stream instance for the \"add property\" event.\n",
+            "name": "onAdd",
+            "id": "onAdd0()"
+          },
+          {
+            "ref": {
+              "name": "Iterable",
+              "refId": "Iterable",
+              "arguments": [
+                {
+                  "name": "String",
+                  "refId": "String"
+                }
+              ]
+            },
+            "kind": "property",
+            "comment": "Rerturns the whole set of keys ",
+            "name": "keys",
+            "id": "keys"
+          },
+          {
+            "ref": {
+              "name": "Collection",
+              "refId": "Collection",
+              "arguments": [
+                {
+                  "name": "String",
+                  "refId": "String"
+                }
+              ]
+            },
+            "kind": "property",
+            "comment": "Returns the whole set of values ",
+            "name": "values",
+            "id": "values"
+          },
+          {
+            "ref": {
+              "name": "int",
+              "refId": "int"
+            },
+            "kind": "property",
+            "comment": "Returns the current number of properties ",
+            "name": "size",
+            "id": "size"
+          },
+          {
+            "ref": {
+              "name": "Stream",
+              "refId": "Stream"
+            },
+            "kind": "property",
+            "comment": "\nGet the stream instance for the \"add property\" event.\n",
+            "name": "onAdd",
+            "id": "onAdd"
+          },
+          {
+            "ref": {
+              "name": "Encoding",
+              "refId": "Encoding"
+            },
+            "kind": "property",
+            "name": "_encoding",
+            "id": "_encoding"
+          },
+          {
+            "ref": {
+              "name": "Map",
+              "refId": "Map",
+              "arguments": [
+                {
+                  "name": "String",
+                  "refId": "String"
+                },
+                {
+                  "name": "String",
+                  "refId": "String"
+                }
+              ]
+            },
+            "kind": "property",
+            "name": "_content",
+            "id": "_content"
+          },
+          {
+            "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "property",
+            "name": "_sourceFile",
+            "id": "_sourceFile"
+          },
+          {
+            "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "isStatic": true,
+            "kind": "property",
+            "name": "ADD_PROPERTY_EVENTNAME",
+            "id": "ADD_PROPERTY_EVENTNAME"
+          },
+          {
+            "ref": {
+              "name": "StreamController",
+              "refId": "StreamController"
+            },
+            "kind": "property",
+            "name": "addEventController",
+            "id": "addEventController"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "constructor",
+            "comment": "\nCreate a new properties instance by naming the source file using [name]\nand, optionally, setting the desired [encoding].\n",
+            "name": "Properties",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "name",
+                "id": "name"
+              },
+              {
+                "ref": {
+                  "name": "Encoding",
+                  "refId": "Encoding"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "encoding",
+                "id": "encoding"
+              }
+            ],
+            "id": "Properties2()"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "constructor",
+            "comment": "\nCreate a new properties instance from file [path]\nand, optionally, setting the desired [encoding].\n",
+            "name": "Properties.fromFile",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "path",
+                "id": "path"
+              },
+              {
+                "ref": {
+                  "name": "Encoding",
+                  "refId": "Encoding"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "encoding",
+                "id": "encoding"
+              }
+            ],
+            "id": "Properties.fromFile2()"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "constructor",
+            "comment": "\nCreate a new properties instance using the input [jsonMap]\nto load the data from.\n",
+            "name": "Properties.fromJSON",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "jsonMap",
+                "id": "jsonMap"
+              }
+            ],
+            "id": "Properties.fromJSON1()"
+          }
+        ],
+        "id": "Properties"
+      }
+    ],
+    "id": "file:///Users/kevin/Documents/workspace/dart-properties/bin/properties.dart"
+  }
+]
