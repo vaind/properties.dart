@@ -1,3 +1,10 @@
+0.4.3 - 
+Added support for defaults (value and key) on getter methods.
+Added property updated event support.
+Now events may be enabled/disabled.
+Some minor, implementation fixes.
+
+
 0.4.2 - 03-03-2013
 Minor fixes.
 Added two new methods to get integer and double out of a property.

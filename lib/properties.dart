@@ -22,8 +22,16 @@ class Properties{
   /// An internal reference to the source file.
   String _sourceFile;
   
+  /// Events are enabled by default
+  bool _enableEvents = true;
+  
+  /// The property added event name
   static const String ADD_PROPERTY_EVENTNAME = 'add';
-  StreamController addEventController;
+  static const String UPDATE_PROPERTY_EVENTNAME = 'update';
+  
+  StreamController eventController;
+  
+  
   
   /**
    * Create a new properties instance by naming the source file using [name]
@@ -70,7 +78,7 @@ class Properties{
    * Initialize common internal tools such as event controllers.
    */
   _init() {
-    addEventController = new StreamController<PropertiesEvent>.broadcast();
+    eventController = new StreamController<PropertiesEvent>.broadcast();
   }
   
   void _initFromFile() => _load(_read(_sourceFile, _encoding));
@@ -146,17 +154,36 @@ class Properties{
   }
   
   /** Loads the value of a property given its [key] */
-  String get(String key) => key != null ? _content != null ? _content[key] : null : null;
-  
-  /** Loads the value of a property as an integer given its [key] */
-  int getInt(String key, [bool throwException = false]){
-    if(key == null)
+  String get(String key, {Object defval, String defkey}) {
+    if(!?key)
       return null;
     
     if(_content == null)
       return null;
     
-    String value = get(key);
+    if(defval == null && defkey == null)
+      return _content[key];
+    
+    if(_content[key] == null){
+      if(defval != null)
+        return defval.toString();
+      
+      if(defkey != null)
+        return _content[defkey];
+    }
+    
+    return _content[key];
+  }
+  
+  /** Loads the value of a property as an integer given its [key] */
+  int getInt(String key, {bool throwException:false, int defval, String defkey}) {
+    if(!?key)
+      return null;
+    
+    if(_content == null)
+      return null;
+    
+    var value = get(key, defval:defval, defkey:defkey);
     if(value == null)
       return null;
     
@@ -170,14 +197,14 @@ class Properties{
   }
   
   /** Loads the value of a property as a double given its [key] */
-  double getDouble(String key, [bool throwException = false]){
-    if(key == null)
+  double getDouble(String key, {bool throwException:false, double defval, String defkey}) {
+    if(!?key)
       return null;
     
     if(_content == null)
       return null;
     
-    String value = get(key);
+    String value = get(key, defval:defval, defkey:defkey);
     if(value == null)
       return null;
     
@@ -215,13 +242,43 @@ class Properties{
     if(key == null || value == null)
       return false;
     
-    if(overwriteExisting || _content[key] == null){
-      _content[key] = value;
-      addEventController.add(new AddEvent(key, value));
+    if(contains(key) && overwriteExisting){
+      _update(key, value);
+      return true;
+    }
+    
+    
+    if(!contains(key)){
+      _add(key,value);
       return true;
     }
     
     return false;
+  }
+
+  /**
+   * Internal add implementation, managing property storage and
+   * event triggering.
+   */
+  _add(String key, String value) {
+    _content[key] = value;
+    
+    if(this._enableEvents)
+      eventController.add(new AddEvent(key, value));
+  }
+
+  /**
+   * Internal update implementation, managing property storage and
+   * event triggering.
+   */
+  _update(String key, String newvalue) {
+    
+    String oldvalue = _content[key];
+    
+    _content[key] = newvalue;
+    
+    if(this._enableEvents)
+      eventController.add(new UpdateEvent(key, newvalue, oldvalue));
   }
   
   /**
@@ -319,9 +376,24 @@ class Properties{
   String toString() => _content.toString();
   
   /**
-   * Get the stream instance for the "add property" event.
+   * Getter for [enableEvents] flag.
    */
-  Stream get onAdd => addEventController.stream;
+  bool get enableEvents => this._enableEvents;
+  
+  /**
+   * Enable / disable events triggering on this instance.
+   */
+  set enableEvents(bool enable) => this._enableEvents = enable;
+  
+  /**
+   * Get the stream instance for the "property added" event.
+   */
+  Stream get onAdd => eventController.stream;
+  
+  /**
+   * Get the stream instance for the "property updated" event.
+   */
+  Stream get onUpdate => eventController.stream;
 }
 
 /**
@@ -363,4 +435,34 @@ class AddEvent extends PropertiesEvent {
    * Getter for the added [value].
    */
   String get value => _value;
+}
+
+/**
+ * A factory to create simple property added event.
+ */
+class UpdateEvent extends PropertiesEvent {
+
+  final String _key;
+  final String _oldvalue;
+  final String _newvalue;
+  
+  /**
+   * Create a new property updated event instance by name the [eventType] and the property's [key] and [value].
+   */
+  const UpdateEvent(this._key, this._newvalue, this._oldvalue):super(Properties.UPDATE_PROPERTY_EVENTNAME);
+  
+  /**
+   * Getter for the updated [key].
+   */
+  String get key => _key;
+  
+  /**
+   * Getter for the updated [oldValue].
+   */
+  String get oldValue => _oldvalue;
+  
+  /**
+   * Getter for the updated [newValue].
+   */
+  String get newValue => _newvalue;
 }

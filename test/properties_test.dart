@@ -30,14 +30,18 @@ void main(){
     });
   });
   
-  group('Getters - conversion', () {
+  group('Getters - with default', () {
     Properties p;
-    setUp(() {p = new Properties.fromFile(path2);});
-    test('Existing key - not null', () => expect(p.get('test.key.integer'), isNotNull));
-    test('Existing key - not null', () => expect(p.getInt('test.key.integer'), isNotNull));
-    test('Existing key - not null', () => expect(p.getInt('test.key.integer'), equals(1)));
+    setUp(() {p = new Properties.fromFile(path);});
     
-    test('Existing key - not integer', () => expect(p.getInt('test.key.notinteger'), isNull));
+    test('Not existing key - default value', () => expect(p.get('test.key.X', defval:'value X'), isNotNull));
+    test('Not existing key - default value', () => expect(p.get('test.key.X', defval:'value X'), equals('value X')));
+    
+    test('Not existing key - default key', () => expect(p.get('test.key.X', defkey:'test.key.1'), isNotNull));
+    test('Not existing key - default key', () => expect(p.get('test.key.X', defkey:'test.key.1'), equals('value 1')));
+    test('Not existing key - default key, not existing', () => expect(p.get('test.key.X', defkey:'test.key.Y'), isNull));
+    
+    test('Not existing key - default value & key', () => expect(p.get('test.key.X', defval:'value X', defkey:'test.key.1'), equals('value X')));
   });
   
   group('Getters - from JSON source', () {
@@ -51,6 +55,19 @@ void main(){
       Iterable<String> i = p.keys;
       expect(i.length, 3);
     });
+  });
+  
+  group('Getters - conversion', () {
+    Properties p;
+    setUp(() {p = new Properties.fromFile(path2);});
+    test('Existing key - not null', () => expect(p.get('test.key.integer'), isNotNull));
+    test('Existing key - not null', () => expect(p.getInt('test.key.integer'), isNotNull));
+    test('Existing key - not null', () => expect(p.getInt('test.key.integer'), equals(1)));
+    
+    test('Existing key - not integer', () => expect(p.getInt('test.key.notinteger'), isNull));
+    
+    test('Existing key - not null - default value', () => expect(p.getInt('test.key.integer.X', defval:1), equals(1)));
+    test('Existing key - not null - default key', () => expect(p.getInt('test.key.integer.X', defkey:'test.key.integer'), equals(1)));
   });
   
   group('Adding properties', () {
@@ -129,8 +146,55 @@ void main(){
       expect(singleAdd, isTrue);
       expect(p.get('test.key.3'), equals('value 3'));
       expect(eventType, equals(Properties.ADD_PROPERTY_EVENTNAME));
-      expect(key, "test.key.3");
-      expect(value, "value 3");
+      expect(key, equals("test.key.3"));
+      expect(value, equals("value 3"));
+    });
+    
+    test('Update a property and listen to the event', () {
+      
+      String eventType = "";
+      String key = "";
+      String oldvalue = "";
+      String newvalue = "";
+      
+      p.onUpdate.listen((UpdateEvent e) {
+        eventType = e.type;
+        key = e.key;
+        oldvalue = e.oldValue;
+        newvalue = e.newValue;
+      });
+      
+      var singleUpdate = p.add('test.key.1', 'value new 1');
+      
+      expect(singleUpdate, isTrue);
+      expect(p.get('test.key.1'), equals('value new 1'));
+      expect(eventType, equals(Properties.UPDATE_PROPERTY_EVENTNAME));
+      expect(key, equals("test.key.1"));
+      expect(oldvalue, equals("value 1"));
+      expect(newvalue, equals("value new 1"));
+    });
+    
+    test('Events disabled', () {
+      
+      p.enableEvents = false;
+      
+      String eventType;
+      String key;
+      String value;
+      
+      p.onAdd.listen((AddEvent e) {
+        eventType = e.type;
+        key = e.key;
+        value = e.value;
+      });
+      
+      var singleAdd = p.add('test.key.3', 'value 3');
+      
+      expect(singleAdd, isTrue);
+      expect(p.get('test.key.3'), equals('value 3'));
+      expect(eventType, isNull);
+      expect(key, isNull);
+      expect(value, isNull);
     });
   });
   
