@@ -11,6 +11,183 @@
         },
         "kind": "class",
         "comment": "\nA factory to create simple property added event.\n",
+        "name": "UpdateEvent",
+        "children": [
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nCreate a new property updated event instance by name the [eventType] and the property's [key] and [value].\n",
+            "name": "UpdateEvent",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "_key",
+                "id": "_key"
+              },
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "_newvalue",
+                "id": "_newvalue"
+              },
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "_oldvalue",
+                "id": "_oldvalue"
+              }
+            ],
+            "id": "UpdateEvent3()"
+          },
+          {
+            "returnType": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "method",
+            "comment": "\nGetter for the updated [key].\n",
+            "name": "key",
+            "id": "key0()"
+          },
+          {
+            "returnType": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "method",
+            "comment": "\nGetter for the updated [oldValue].\n",
+            "name": "oldValue",
+            "id": "oldValue0()"
+          },
+          {
+            "returnType": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "method",
+            "comment": "\nGetter for the updated [newValue].\n",
+            "name": "newValue",
+            "id": "newValue0()"
+          },
+          {
+            "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "property",
+            "comment": "\nGetter for the updated [key].\n",
+            "name": "key",
+            "id": "key"
+          },
+          {
+            "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "property",
+            "comment": "\nGetter for the updated [oldValue].\n",
+            "name": "oldValue",
+            "id": "oldValue"
+          },
+          {
+            "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "property",
+            "comment": "\nGetter for the updated [newValue].\n",
+            "name": "newValue",
+            "id": "newValue"
+          },
+          {
+            "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "property",
+            "name": "_key",
+            "id": "_key"
+          },
+          {
+            "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "property",
+            "name": "_oldvalue",
+            "id": "_oldvalue"
+          },
+          {
+            "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "property",
+            "name": "_newvalue",
+            "id": "_newvalue"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "constructor",
+            "comment": "\nCreate a new property updated event instance by name the [eventType] and the property's [key] and [value].\n",
+            "name": "UpdateEvent",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "_key",
+                "id": "_key"
+              },
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "_newvalue",
+                "id": "_newvalue"
+              },
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "_oldvalue",
+                "id": "_oldvalue"
+              }
+            ],
+            "id": "UpdateEvent3()"
+          }
+        ],
+        "id": "UpdateEvent"
+      },
+      {
+        "superclass": {
+          "name": "PropertiesEvent",
+          "refId": "PropertiesEvent"
+        },
+        "kind": "class",
+        "comment": "\nA factory to create simple property added event.\n",
         "name": "AddEvent",
         "children": [
           {
@@ -450,9 +627,29 @@
                 "kind": "param",
                 "name": "key",
                 "id": "key"
+              },
+              {
+                "ref": {
+                  "name": "Object",
+                  "refId": "Object"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "defval",
+                "id": "defval"
+              },
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "defkey",
+                "id": "defkey"
               }
             ],
-            "id": "get1()"
+            "id": "get3()"
           },
           {
             "returnType": {
@@ -481,9 +678,29 @@
                 "kind": "param",
                 "name": "throwException",
                 "id": "throwException"
+              },
+              {
+                "ref": {
+                  "name": "int",
+                  "refId": "int"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "defval",
+                "id": "defval"
+              },
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "defkey",
+                "id": "defkey"
               }
             ],
-            "id": "getInt2()"
+            "id": "getInt4()"
           },
           {
             "returnType": {
@@ -512,9 +729,29 @@
                 "kind": "param",
                 "name": "throwException",
                 "id": "throwException"
+              },
+              {
+                "ref": {
+                  "name": "double",
+                  "refId": "double"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "defval",
+                "id": "defval"
+              },
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "defkey",
+                "id": "defkey"
               }
             ],
-            "id": "getDouble2()"
+            "id": "getDouble4()"
           },
           {
             "returnType": {
@@ -618,6 +855,66 @@
               }
             ],
             "id": "add3()"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nInternal add implementation, managing property storage and\nevent triggering.\n",
+            "name": "_add",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "key",
+                "id": "key"
+              },
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "value",
+                "id": "value"
+              }
+            ],
+            "id": "_add2()"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nInternal update implementation, managing property storage and\nevent triggering.\n",
+            "name": "_update",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "key",
+                "id": "key"
+              },
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "newvalue",
+                "id": "newvalue"
+              }
+            ],
+            "id": "_update2()"
           },
           {
             "returnType": {
@@ -817,13 +1114,55 @@
           },
           {
             "returnType": {
+              "name": "bool",
+              "refId": "bool"
+            },
+            "kind": "method",
+            "comment": "\nGetter for [enableEvents] flag.\n",
+            "name": "enableEvents",
+            "id": "enableEvents0()"
+          },
+          {
+            "isSetter": true,
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nEnable / disable events triggering on this instance.\n",
+            "name": "enableEvents=",
+            "children": [
+              {
+                "ref": {
+                  "name": "bool",
+                  "refId": "bool"
+                },
+                "kind": "param",
+                "name": "enable",
+                "id": "enable"
+              }
+            ],
+            "id": "enableEvents=1()"
+          },
+          {
+            "returnType": {
               "name": "Stream",
               "refId": "Stream"
             },
             "kind": "method",
-            "comment": "\nGet the stream instance for the \"add property\" event.\n",
+            "comment": "\nGet the stream instance for the \"property added\" event.\n",
             "name": "onAdd",
             "id": "onAdd0()"
+          },
+          {
+            "returnType": {
+              "name": "Stream",
+              "refId": "Stream"
+            },
+            "kind": "method",
+            "comment": "\nGet the stream instance for the \"property updated\" event.\n",
+            "name": "onUpdate",
+            "id": "onUpdate0()"
           },
           {
             "ref": {
@@ -869,13 +1208,33 @@
           },
           {
             "ref": {
+              "name": "bool",
+              "refId": "bool"
+            },
+            "kind": "property",
+            "comment": "\nGetter for [enableEvents] flag.\n",
+            "name": "enableEvents",
+            "id": "enableEvents"
+          },
+          {
+            "ref": {
               "name": "Stream",
               "refId": "Stream"
             },
             "kind": "property",
-            "comment": "\nGet the stream instance for the \"add property\" event.\n",
+            "comment": "\nGet the stream instance for the \"property added\" event.\n",
             "name": "onAdd",
             "id": "onAdd"
+          },
+          {
+            "ref": {
+              "name": "Stream",
+              "refId": "Stream"
+            },
+            "kind": "property",
+            "comment": "\nGet the stream instance for the \"property updated\" event.\n",
+            "name": "onUpdate",
+            "id": "onUpdate"
           },
           {
             "ref": {
@@ -916,6 +1275,15 @@
           },
           {
             "ref": {
+              "name": "bool",
+              "refId": "bool"
+            },
+            "kind": "property",
+            "name": "_enableEvents",
+            "id": "_enableEvents"
+          },
+          {
+            "ref": {
               "name": "String",
               "refId": "String"
             },
@@ -926,12 +1294,22 @@
           },
           {
             "ref": {
+              "name": "String",
+              "refId": "String"
+            },
+            "isStatic": true,
+            "kind": "property",
+            "name": "UPDATE_PROPERTY_EVENTNAME",
+            "id": "UPDATE_PROPERTY_EVENTNAME"
+          },
+          {
+            "ref": {
               "name": "StreamController",
               "refId": "StreamController"
             },
             "kind": "property",
-            "name": "addEventController",
-            "id": "addEventController"
+            "name": "eventController",
+            "id": "eventController"
           },
           {
             "returnType": {

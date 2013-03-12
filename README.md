@@ -25,13 +25,31 @@ get a property out of it
 String value = p.get('test.key.1');
 ```
 
-then add a brand new property, choosing whether to overwrite the entry or not
+optionally providing a default value
+
+```dart
+p.get('test.key.X', defval:'value X')
+```
+
+or a default key
+
+```dart
+p.get('test.key.X', defkey:'test.key.1')
+```
+
+or get an int or a double
+
+```dart
+p.getInt('test.key.integer')
+```
+
+You can also add a brand new property, choosing whether to overwrite an existing entry or not
 
 ```dart
 bool added = p.add('test.key.3', 'value 3', true);
 ```
 
-listen to "property added" events
+listen to "property added" or "property updated" events
 
 ```dart
 p.onAdd.listen((AddEvent e) {
@@ -60,3 +78,8 @@ CHANGELOG to find the version that works best for you.
 Running Tests
 -------------
 To run the tests just run the test/properties_test.dart file.
+
+Some limits
+-------------
+Multiline not supported for property values.
+Equal is not supported into property values.
