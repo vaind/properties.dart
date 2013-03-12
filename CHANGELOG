@@ -1,4 +1,4 @@
-0.4.3 - 
+0.4.3 - 12-03-2013
 Added support for defaults (value and key) on getter methods.
 Added property updated event support.
 Now events may be enabled/disabled.
