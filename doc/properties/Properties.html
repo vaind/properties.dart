@@ -28,6 +28,7 @@
 <li><a href="../properties/AddEvent.html"><div class="icon-class"></div>AddEvent</a></li>
 <li><div class="icon-class"></div><strong>Properties</strong></li>
 <li><a href="../properties/PropertiesEvent.html"><div class="icon-class"></div>PropertiesEvent&lt;T&gt;</a></li>
+<li><a href="../properties/UpdateEvent.html"><div class="icon-class"></div>UpdateEvent</a></li>
 </ul>
 </div>
 <div class="content">
@@ -51,8 +52,16 @@ class Properties{
  /// An internal reference to the source file.
  String _sourceFile;
  
+ /// Events are enabled by default
+ bool _enableEvents = true;
+ 
+ /// The property added event name
  static const String ADD_PROPERTY_EVENTNAME = 'add';
- StreamController addEventController;
+ static const String UPDATE_PROPERTY_EVENTNAME = 'update';
+ 
+ StreamController eventController;
+ 
+ 
  
  /**
   * Create a new properties instance by naming the source file using [name]
@@ -99,7 +108,7 @@ class Properties{
   * Initialize common internal tools such as event controllers.
   */
  _init() {
-   addEventController = new StreamController&lt;PropertiesEvent&gt;.broadcast();
+   eventController = new StreamController&lt;PropertiesEvent&gt;.broadcast();
  }
  
  void _initFromFile() =&gt; _load(_read(_sourceFile, _encoding));
@@ -175,17 +184,36 @@ class Properties{
  }
  
  /** Loads the value of a property given its [key] */
- String get(String key) =&gt; key != null ? _content != null ? _content[key] : null : null;
- 
- /** Loads the value of a property as an integer given its [key] */
- int getInt(String key, [bool throwException = false]){
-   if(key == null)
+ String get(String key, {Object defval, String defkey}) {
+   if(!?key)
      return null;
    
    if(_content == null)
      return null;
    
-   String value = get(key);
+   if(defval == null &amp;&amp; defkey == null)
+     return _content[key];
+   
+   if(_content[key] == null){
+     if(defval != null)
+       return defval.toString();
+     
+     if(defkey != null)
+       return _content[defkey];
+   }
+   
+   return _content[key];
+ }
+ 
+ /** Loads the value of a property as an integer given its [key] */
+ int getInt(String key, {bool throwException:false, int defval, String defkey}) {
+   if(!?key)
+     return null;
+   
+   if(_content == null)
+     return null;
+   
+   var value = get(key, defval:defval, defkey:defkey);
    if(value == null)
      return null;
    
@@ -199,14 +227,14 @@ class Properties{
  }
  
  /** Loads the value of a property as a double given its [key] */
- double getDouble(String key, [bool throwException = false]){
-   if(key == null)
+ double getDouble(String key, {bool throwException:false, double defval, String defkey}) {
+   if(!?key)
      return null;
    
    if(_content == null)
      return null;
    
-   String value = get(key);
+   String value = get(key, defval:defval, defkey:defkey);
    if(value == null)
      return null;
    
@@ -244,13 +272,43 @@ class Properties{
    if(key == null || value == null)
      return false;
    
-   if(overwriteExisting || _content[key] == null){
-     _content[key] = value;
-     addEventController.add(new AddEvent(key, value));
+   if(contains(key) &amp;&amp; overwriteExisting){
+     _update(key, value);
+     return true;
+   }
+   
+   
+   if(!contains(key)){
+     _add(key,value);
      return true;
    }
    
    return false;
+ }
+
+ /**
+  * Internal add implementation, managing property storage and
+  * event triggering.
+  */
+ _add(String key, String value) {
+   _content[key] = value;
+   
+   if(this._enableEvents)
+     eventController.add(new AddEvent(key, value));
+ }
+
+ /**
+  * Internal update implementation, managing property storage and
+  * event triggering.
+  */
+ _update(String key, String newvalue) {
+   
+   String oldvalue = _content[key];
+   
+   _content[key] = newvalue;
+   
+   if(this._enableEvents)
+     eventController.add(new UpdateEvent(key, newvalue, oldvalue));
  }
  
  /**
@@ -348,9 +406,24 @@ class Properties{
  String toString() =&gt; _content.toString();
  
  /**
-  * Get the stream instance for the "add property" event.
+  * Getter for [enableEvents] flag.
   */
- Stream get onAdd =&gt; addEventController.stream;
+ bool get enableEvents =&gt; this._enableEvents;
+ 
+ /**
+  * Enable / disable events triggering on this instance.
+  */
+ set enableEvents(bool enable) =&gt; this._enableEvents = enable;
+ 
+ /**
+  * Get the stream instance for the "property added" event.
+  */
+ Stream get onAdd =&gt; eventController.stream;
+ 
+ /**
+  * Get the stream instance for the "property updated" event.
+  */
+ Stream get onUpdate =&gt; eventController.stream;
 }
 </pre>
 </div>
@@ -365,6 +438,18 @@ const <a href="http://api.dartlang.org/dart_core/String.html">String</a>        
         <div class="doc">
 <pre class="source">
 ADD_PROPERTY_EVENTNAME = 'add'
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="UPDATE_PROPERTY_EVENTNAME">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/String.html">String</a>         <strong>UPDATE_PROPERTY_EVENTNAME</strong> <a class="anchor-link"
+            href="#UPDATE_PROPERTY_EVENTNAME"
+            title="Permalink to Properties.UPDATE_PROPERTY_EVENTNAME">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+UPDATE_PROPERTY_EVENTNAME = 'update'
 </pre>
 </div>
 </div>
@@ -438,15 +523,37 @@ Properties.fromJSON(String jsonMap){
 </div>
 <div>
 <h3>Properties</h3>
-<div class="field"><h4 id="addEventController">
+<div class="method"><h4 id="enableEvents">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_async/StreamController.html">StreamController</a>         <strong>addEventController</strong> <a class="anchor-link"
-            href="#addEventController"
-            title="Permalink to Properties.addEventController">#</a>
+<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> <strong>get enableEvents</strong> <a class="anchor-link" href="#enableEvents"
+              title="Permalink to Properties.get enableEvents">#</a></h4>
+<div class="doc">
+<p>Getter for <a class="crossref" href="../properties/Properties.html#enableEvents">enableEvents</a> flag.</p>
+<pre class="source">
+bool get enableEvents =&gt; this._enableEvents;
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="enableEvents=">
+<button class="show-code">Code</button>
+<strong>set enableEvents</strong>(<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> enable) <a class="anchor-link" href="#enableEvents="
+              title="Permalink to Properties.set enableEvents">#</a></h4>
+<div class="doc">
+<p>Enable / disable events triggering on this instance.</p>
+<pre class="source">
+set enableEvents(bool enable) =&gt; this._enableEvents = enable;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="eventController">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/StreamController.html">StreamController</a>         <strong>eventController</strong> <a class="anchor-link"
+            href="#eventController"
+            title="Permalink to Properties.eventController">#</a>
         </h4>
         <div class="doc">
 <pre class="source">
-addEventController
+eventController
 </pre>
 </div>
 </div>
@@ -470,9 +577,22 @@ final <a href="http://api.dartlang.org/dart_async/Stream.html">Stream</a>       
             title="Permalink to Properties.onAdd">#</a>
         </h4>
         <div class="doc">
-<p>Get the stream instance for the "add property" event.</p>
+<p>Get the stream instance for the "property added" event.</p>
 <pre class="source">
-Stream get onAdd =&gt; addEventController.stream;
+Stream get onAdd =&gt; eventController.stream;
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="onUpdate">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_async/Stream.html">Stream</a>         <strong>onUpdate</strong> <a class="anchor-link"
+            href="#onUpdate"
+            title="Permalink to Properties.onUpdate">#</a>
+        </h4>
+        <div class="doc">
+<p>Get the stream instance for the "property updated" event.</p>
+<pre class="source">
+Stream get onUpdate =&gt; eventController.stream;
 </pre>
 </div>
 </div>
@@ -523,9 +643,14 @@ bool add(String key, String value, [bool overwriteExisting = true]){
  if(key == null || value == null)
    return false;
  
- if(overwriteExisting || _content[key] == null){
-   _content[key] = value;
-   addEventController.add(new AddEvent(key, value));
+ if(contains(key) &amp;&amp; overwriteExisting){
+   _update(key, value);
+   return true;
+ }
+ 
+ 
+ if(!contains(key)){
+   _add(key,value);
    return true;
  }
  
@@ -571,32 +696,51 @@ Map&lt;String,String&gt; every(bool k(String str), [bool v(String val)]) {
 </div>
 <div class="method"><h4 id="get">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>get</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> key) <a class="anchor-link" href="#get"
+<a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>get</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> key, {<a href="http://api.dartlang.org/dart_core/Object.html">Object</a> defval, <a href="http://api.dartlang.org/dart_core/String.html">String</a> defkey}) <a class="anchor-link" href="#get"
               title="Permalink to Properties.get">#</a></h4>
 <div class="doc">
 <p>Loads the value of a property given its 
 <span class="param">key</span> </p>
 <pre class="source">
-String get(String key) =&gt; key != null ? _content != null ? _content[key] : null : null;
-</pre>
-</div>
-</div>
-<div class="method"><h4 id="getDouble">
-<button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/double.html">double</a> <strong>getDouble</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> key, [<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> throwException = false]) <a class="anchor-link" href="#getDouble"
-              title="Permalink to Properties.getDouble">#</a></h4>
-<div class="doc">
-<p>Loads the value of a property as a double given its 
-<span class="param">key</span> </p>
-<pre class="source">
-double getDouble(String key, [bool throwException = false]){
- if(key == null)
+String get(String key, {Object defval, String defkey}) {
+ if(!?key)
    return null;
  
  if(_content == null)
    return null;
  
- String value = get(key);
+ if(defval == null &amp;&amp; defkey == null)
+   return _content[key];
+ 
+ if(_content[key] == null){
+   if(defval != null)
+     return defval.toString();
+   
+   if(defkey != null)
+     return _content[defkey];
+ }
+ 
+ return _content[key];
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="getDouble">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/double.html">double</a> <strong>getDouble</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> key, {<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> throwException: false, <a href="http://api.dartlang.org/dart_core/double.html">double</a> defval, <a href="http://api.dartlang.org/dart_core/String.html">String</a> defkey}) <a class="anchor-link" href="#getDouble"
+              title="Permalink to Properties.getDouble">#</a></h4>
+<div class="doc">
+<p>Loads the value of a property as a double given its 
+<span class="param">key</span> </p>
+<pre class="source">
+double getDouble(String key, {bool throwException:false, double defval, String defkey}) {
+ if(!?key)
+   return null;
+ 
+ if(_content == null)
+   return null;
+ 
+ String value = get(key, defval:defval, defkey:defkey);
  if(value == null)
    return null;
  
@@ -613,20 +757,20 @@ double getDouble(String key, [bool throwException = false]){
 </div>
 <div class="method"><h4 id="getInt">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>getInt</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> key, [<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> throwException = false]) <a class="anchor-link" href="#getInt"
+<a href="http://api.dartlang.org/dart_core/int.html">int</a> <strong>getInt</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> key, {<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> throwException: false, <a href="http://api.dartlang.org/dart_core/int.html">int</a> defval, <a href="http://api.dartlang.org/dart_core/String.html">String</a> defkey}) <a class="anchor-link" href="#getInt"
               title="Permalink to Properties.getInt">#</a></h4>
 <div class="doc">
 <p>Loads the value of a property as an integer given its 
 <span class="param">key</span> </p>
 <pre class="source">
-int getInt(String key, [bool throwException = false]){
- if(key == null)
+int getInt(String key, {bool throwException:false, int defval, String defkey}) {
+ if(!?key)
    return null;
  
  if(_content == null)
    return null;
  
- String value = get(key);
+ var value = get(key, defval:defval, defkey:defkey);
  if(value == null)
    return null;
  
@@ -771,7 +915,7 @@ String toString() =&gt; _content.toString();
         <div class="clear"></div>
         </div>
         <div class="footer">
-          <div>This page was generated at 2013-03-03 20:52:06.765</div>
+          <div>This page was generated at 2013-03-12 22:30:24.176</div>
         </div>
         <script async src="../client-static.js"></script>
         </body></html>
