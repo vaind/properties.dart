@@ -94,6 +94,15 @@ class Properties{
  }
  
  /**
+  * Create a new properties instance from the input [map].
+  */
+ Properties.fromMap(Map&lt;String,String&gt; map){
+   
+   this._content = map;
+   
+ }
+ 
+ /**
   * Create a new properties instance using the input [jsonMap]
   * to load the data from.
   */
@@ -147,6 +156,21 @@ class Properties{
      }
    }
  }
+ 
+ /**
+  * Determine if input line is a comment line.
+  */
+ _isComment(String line){
+   // comment
+   if(line.startsWith('#'))
+     return true;
+   
+   // comment
+   if(line.startsWith('!'))
+     return true;
+   
+   return false;
+ }
 
  /**
   * Determine if input line is a property or not.
@@ -156,7 +180,7 @@ class Properties{
    if(line.isEmpty || line == null)
      return false;
    
-   if(line.startsWith('#'))
+   if(_isComment(line))
      return false;
    
    if(line.contains('='))
@@ -183,7 +207,11 @@ class Properties{
    throw new FileIOException('It\'s impossible to load properties from input file ${file}. File does not exist.');
  }
  
- /** Loads the value of a property given its [key] */
+ /** 
+  * Loads the value of a property given its [key].
+  * Use [defval] to set a default value in case of missing property.
+  * Use [defkey] to set a default key in case of missing property.
+  */
  String get(String key, {Object defval, String defkey}) {
    if(!?key)
      return null;
@@ -205,13 +233,12 @@ class Properties{
    return _content[key];
  }
  
- /** Loads the value of a property as an integer given its [key] */
+ /** 
+  * Loads the value of a property as an integer given its [key].
+  * Use [defval] to set a default value in case of missing property.
+  * Use [defkey] to set a default key in case of missing property.
+  */
  int getInt(String key, {bool throwException:false, int defval, String defkey}) {
-   if(!?key)
-     return null;
-   
-   if(_content == null)
-     return null;
    
    var value = get(key, defval:defval, defkey:defkey);
    if(value == null)
@@ -226,13 +253,12 @@ class Properties{
    }
  }
  
- /** Loads the value of a property as a double given its [key] */
+ /** 
+  * Loads the value of a property as a double given its [key].
+  * Use [defval] to set a default value in case of missing property.
+  * Use [defkey] to set a default key in case of missing property.
+  */
  double getDouble(String key, {bool throwException:false, double defval, String defkey}) {
-   if(!?key)
-     return null;
-   
-   if(_content == null)
-     return null;
    
    String value = get(key, defval:defval, defkey:defkey);
    if(value == null)
@@ -245,6 +271,18 @@ class Properties{
        throw e;
      return null;
    }
+ }
+ 
+ /**
+  * Loads a list of strings for the input [key]. List elements must be
+  * comma separated.
+  */
+ List&lt;String&gt; getList(String key){
+   String value = get(key);
+   if(value == null)
+     return null;
+   
+   return value.split(",");
  }
  
  /** Check whether the properties contains a property given its [key] */
@@ -354,10 +392,20 @@ class Properties{
  }
  
  /**
-  * Returns a map containg every property whos key satisifies the predicate [k] on the property key, and 
-  * optionally the predicate [v] on the corresponding value. Returns an empty map otherwise.
+  * Returns a Properties instance containg every property whos key satisifies the predicate [k] on the property key, and 
+  * optionally the predicate [v] on the corresponding value. Returns null otherwise.
   */
- Map&lt;String,String&gt; every(bool k(String str), [bool v(String val)]) {
+ Properties every(bool k(String str), [bool v(String val)]) {
+   
+   Map&lt;String,String&gt; result = _every(k, v);
+     
+   if(result.isEmpty)
+     return null;
+   
+   return new Properties.fromMap(result);
+ }
+ 
+ Map&lt;String,String&gt; _every(bool k(String str), [bool v(String val)]) {
    
    if(v == null) v = (String s) =&gt; true;
    
@@ -367,6 +415,7 @@ class Properties{
      
    return result;
  }
+
  
  /**
   * Reloads the properties from file. Works for file sources only.
@@ -391,11 +440,11 @@ class Properties{
    var toExport = _content;
    
    if(?prefix &amp;&amp; ?suffix)
-     toExport = every((key) =&gt; key.startsWith(prefix) &amp;&amp; key.endsWith(suffix));
+     toExport = _every((key) =&gt; key.startsWith(prefix) &amp;&amp; key.endsWith(suffix));
    else if(?prefix)
-     toExport = every((key) =&gt; key.startsWith(prefix));
+     toExport = _every((key) =&gt; key.startsWith(prefix));
    else if(?suffix)
-     toExport = every((key) =&gt; key.endsWith(suffix));
+     toExport = _every((key) =&gt; key.endsWith(suffix));
    
    return JSON.stringify(toExport);
  }
@@ -516,6 +565,22 @@ Properties.fromJSON(String jsonMap){
  _init();
  
  _content = JSON.parse(jsonMap) as Map&lt;String,String&gt;;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="Properties.fromMap">
+<button class="show-code">Code</button>
+new <strong>Properties.fromMap</strong>(<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>, <a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt; map) <a class="anchor-link" href="#Properties.fromMap"
+              title="Permalink to Properties.Properties.fromMap">#</a></h4>
+<div class="doc">
+<p>Create a new properties instance from the input 
+<span class="param">map</span>.</p>
+<pre class="source">
+Properties.fromMap(Map&lt;String,String&gt; map){
+ 
+ this._content = map;
+ 
 }
 </pre>
 </div>
@@ -673,23 +738,22 @@ bool contains(String key) =&gt; key != null ? _content != null ? _content.contai
 </div>
 <div class="method"><h4 id="every">
 <button class="show-code">Code</button>
-<a href="http://api.dartlang.org/dart_core/Map.html">Map</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>, <a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt; <strong>every</strong>(<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> k(<a href="http://api.dartlang.org/dart_core/String.html">String</a> str), [<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> v(<a href="http://api.dartlang.org/dart_core/String.html">String</a> val)]) <a class="anchor-link" href="#every"
+<a href="../properties/Properties.html">Properties</a> <strong>every</strong>(<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> k(<a href="http://api.dartlang.org/dart_core/String.html">String</a> str), [<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> v(<a href="http://api.dartlang.org/dart_core/String.html">String</a> val)]) <a class="anchor-link" href="#every"
               title="Permalink to Properties.every">#</a></h4>
 <div class="doc">
-<p>Returns a map containg every property whos key satisifies the predicate 
+<p>Returns a Properties instance containg every property whos key satisifies the predicate 
 <span class="param">k</span> on the property key, and 
 optionally the predicate 
-<span class="param">v</span> on the corresponding value. Returns an empty map otherwise.</p>
+<span class="param">v</span> on the corresponding value. Returns null otherwise.</p>
 <pre class="source">
-Map&lt;String,String&gt; every(bool k(String str), [bool v(String val)]) {
+Properties every(bool k(String str), [bool v(String val)]) {
  
- if(v == null) v = (String s) =&gt; true;
- 
- var result = new Map&lt;String,String&gt;();
- for (String key in _content.keys)
-   if (k(key) &amp;&amp; v(get(key))) result[key] = get(key);
+ Map&lt;String,String&gt; result = _every(k, v);
    
- return result;
+ if(result.isEmpty)
+   return null;
+ 
+ return new Properties.fromMap(result);
 }
 </pre>
 </div>
@@ -700,7 +764,11 @@ Map&lt;String,String&gt; every(bool k(String str), [bool v(String val)]) {
               title="Permalink to Properties.get">#</a></h4>
 <div class="doc">
 <p>Loads the value of a property given its 
-<span class="param">key</span> </p>
+<span class="param">key</span>.
+Use 
+<span class="param">defval</span> to set a default value in case of missing property.
+Use 
+<span class="param">defkey</span> to set a default key in case of missing property.</p>
 <pre class="source">
 String get(String key, {Object defval, String defkey}) {
  if(!?key)
@@ -731,14 +799,13 @@ String get(String key, {Object defval, String defkey}) {
               title="Permalink to Properties.getDouble">#</a></h4>
 <div class="doc">
 <p>Loads the value of a property as a double given its 
-<span class="param">key</span> </p>
+<span class="param">key</span>.
+Use 
+<span class="param">defval</span> to set a default value in case of missing property.
+Use 
+<span class="param">defkey</span> to set a default key in case of missing property.</p>
 <pre class="source">
 double getDouble(String key, {bool throwException:false, double defval, String defkey}) {
- if(!?key)
-   return null;
- 
- if(_content == null)
-   return null;
  
  String value = get(key, defval:defval, defkey:defkey);
  if(value == null)
@@ -761,14 +828,13 @@ double getDouble(String key, {bool throwException:false, double defval, String d
               title="Permalink to Properties.getInt">#</a></h4>
 <div class="doc">
 <p>Loads the value of a property as an integer given its 
-<span class="param">key</span> </p>
+<span class="param">key</span>.
+Use 
+<span class="param">defval</span> to set a default value in case of missing property.
+Use 
+<span class="param">defkey</span> to set a default key in case of missing property.</p>
 <pre class="source">
 int getInt(String key, {bool throwException:false, int defval, String defkey}) {
- if(!?key)
-   return null;
- 
- if(_content == null)
-   return null;
  
  var value = get(key, defval:defval, defkey:defkey);
  if(value == null)
@@ -781,6 +847,25 @@ int getInt(String key, {bool throwException:false, int defval, String defkey}) {
      throw e;
    return null;
  }
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="getList">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/List.html">List</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt; <strong>getList</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> key) <a class="anchor-link" href="#getList"
+              title="Permalink to Properties.getList">#</a></h4>
+<div class="doc">
+<p>Loads a list of strings for the input 
+<span class="param">key</span>. List elements must be
+comma separated.</p>
+<pre class="source">
+List&lt;String&gt; getList(String key){
+ String value = get(key);
+ if(value == null)
+   return null;
+ 
+ return value.split(",");
 }
 </pre>
 </div>
@@ -888,11 +973,11 @@ String toJSON({String prefix, String suffix}){
  var toExport = _content;
  
  if(?prefix &amp;&amp; ?suffix)
-   toExport = every((key) =&gt; key.startsWith(prefix) &amp;&amp; key.endsWith(suffix));
+   toExport = _every((key) =&gt; key.startsWith(prefix) &amp;&amp; key.endsWith(suffix));
  else if(?prefix)
-   toExport = every((key) =&gt; key.startsWith(prefix));
+   toExport = _every((key) =&gt; key.startsWith(prefix));
  else if(?suffix)
-   toExport = every((key) =&gt; key.endsWith(suffix));
+   toExport = _every((key) =&gt; key.endsWith(suffix));
  
  return JSON.stringify(toExport);
 }
@@ -915,7 +1000,7 @@ String toString() =&gt; _content.toString();
         <div class="clear"></div>
         </div>
         <div class="footer">
-          <div>This page was generated at 2013-03-12 22:30:24.176</div>
+          <div>This page was generated at 2013-03-16 12:34:22.005</div>
         </div>
         <script async src="../client-static.js"></script>
         </body></html>

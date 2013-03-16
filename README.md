@@ -13,7 +13,9 @@ a look at the unit tests provided along with the source code.
 
 Anyway you can go on reading this quick intro.
 
-Create a new properties instance from file
+Using Properties you can:
+
+create a new properties instance from file
 
 ```dart
 Properties p = new Properties.fromFile(filepath);
@@ -28,28 +30,34 @@ String value = p.get('test.key.1');
 optionally providing a default value
 
 ```dart
-p.get('test.key.X', defval:'value X')
+String defval = p.get('test.key.X', defval:'value X');
 ```
 
 or a default key
 
 ```dart
-p.get('test.key.X', defkey:'test.key.1')
+String defkey = p.get('test.key.X', defkey:'test.key.1');
 ```
 
-or get an int or a double
+get an int or a double
 
 ```dart
-p.getInt('test.key.integer')
+int anInt = p.getInt('test.key.integer');
 ```
 
-You can also add a brand new property, choosing whether to overwrite an existing entry or not
+get a list
+
+```dart
+List<String> list = p.getList('test.key.listofvalues');
+```
+
+or add a brand new property, choosing whether to overwrite an existing entry or not
 
 ```dart
 bool added = p.add('test.key.3', 'value 3', true);
 ```
 
-listen to "property added" or "property updated" events
+then listen to "property added" or "property updated" events
 
 ```dart
 p.onAdd.listen((AddEvent e) {

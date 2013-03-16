@@ -3,6 +3,7 @@ import '../packages/unittest/unittest.dart';
 
 void main(){
   
+  // ATTENTION: change paths
   String path = '/Users/kevin/Documents/workspace/properties/resources/sample.properties';
   String path2 = '/Users/kevin/Documents/workspace/properties/resources/sample-conversion.properties';
   String jsonSource = '{"key.1" : "value 1", "key.2" : "value 2", "another.key" : "another value"}';
@@ -68,6 +69,9 @@ void main(){
     
     test('Existing key - not null - default value', () => expect(p.getInt('test.key.integer.X', defval:1), equals(1)));
     test('Existing key - not null - default key', () => expect(p.getInt('test.key.integer.X', defkey:'test.key.integer'), equals(1)));
+    
+    test('Existing key - list', () => expect(p.getList('test.key.list'), isNotNull));
+    test('Existing key - list', () => expect(p.getList('test.key.list').length, equals(4)));
   });
   
   group('Adding properties', () {
@@ -214,13 +218,16 @@ void main(){
     test('Contains - not matching', () => expect(p.contains('test.key.3'), isFalse));
     test('Every key - matching', () => expect(p.every((s) => s.startsWith('test')), isNotNull));
     test('Every key - matching', () => expect(p.every((s) => s.startsWith('test')), isNot(isEmpty)));
-    test('Every key - not matching', () => expect(p.every((s) => s.startsWith('toast')), isEmpty));
+    test('Every key - not matching', () {
+      Properties result = p.every((s) => s.startsWith('toast'));
+      expect(result, isNull);
+    });
     test('Every key & value - matching', () { 
       
-      Map<String,String> m = p.every((s) => s.startsWith('test'), (v) => v == "value 1");
+     Properties m = p.every((s) => s.startsWith('test'), (v) => v == "value 1");
       
       expect(m, isNot(isEmpty));
-      expect(m.length, equals(1));
+      expect(m.size, equals(1));
     });
   });
 }

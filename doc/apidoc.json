@@ -83,6 +83,15 @@
             "id": "newValue0()"
           },
           {
+            "returnType": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "method",
+            "name": "toString",
+            "id": "toString0()"
+          },
+          {
             "ref": {
               "name": "String",
               "refId": "String"
@@ -239,6 +248,15 @@
             "comment": "\nGetter for the added [value].\n",
             "name": "value",
             "id": "value0()"
+          },
+          {
+            "returnType": {
+              "name": "String",
+              "refId": "String"
+            },
+            "kind": "method",
+            "name": "toString",
+            "id": "toString0()"
           },
           {
             "ref": {
@@ -471,6 +489,37 @@
               "refId": "dynamic"
             },
             "kind": "method",
+            "comment": "\nCreate a new properties instance from the input [map].\n",
+            "name": "Properties.fromMap",
+            "children": [
+              {
+                "ref": {
+                  "name": "Map",
+                  "refId": "Map",
+                  "arguments": [
+                    {
+                      "name": "String",
+                      "refId": "String"
+                    },
+                    {
+                      "name": "String",
+                      "refId": "String"
+                    }
+                  ]
+                },
+                "kind": "param",
+                "name": "map",
+                "id": "map"
+              }
+            ],
+            "id": "Properties.fromMap1()"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
             "comment": "\nCreate a new properties instance using the input [jsonMap]\nto load the data from.\n",
             "name": "Properties.fromJSON",
             "children": [
@@ -574,6 +623,27 @@
               "refId": "dynamic"
             },
             "kind": "method",
+            "comment": "\nDetermine if input line is a comment line.\n",
+            "name": "_isComment",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "line",
+                "id": "line"
+              }
+            ],
+            "id": "_isComment1()"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
             "comment": "\nDetermine if input line is a property or not.\n",
             "name": "_isProperty",
             "children": [
@@ -616,7 +686,7 @@
               "refId": "String"
             },
             "kind": "method",
-            "comment": "Loads the value of a property given its [key] ",
+            "comment": "\nLoads the value of a property given its [key].\nUse [defval] to set a default value in case of missing property.\nUse [defkey] to set a default key in case of missing property.\n",
             "name": "get",
             "children": [
               {
@@ -657,7 +727,7 @@
               "refId": "int"
             },
             "kind": "method",
-            "comment": "Loads the value of a property as an integer given its [key] ",
+            "comment": "\nLoads the value of a property as an integer given its [key].\nUse [defval] to set a default value in case of missing property.\nUse [defkey] to set a default key in case of missing property.\n",
             "name": "getInt",
             "children": [
               {
@@ -708,7 +778,7 @@
               "refId": "double"
             },
             "kind": "method",
-            "comment": "Loads the value of a property as a double given its [key] ",
+            "comment": "\nLoads the value of a property as a double given its [key].\nUse [defval] to set a default value in case of missing property.\nUse [defkey] to set a default key in case of missing property.\n",
             "name": "getDouble",
             "children": [
               {
@@ -752,6 +822,33 @@
               }
             ],
             "id": "getDouble4()"
+          },
+          {
+            "returnType": {
+              "name": "List",
+              "refId": "List",
+              "arguments": [
+                {
+                  "name": "String",
+                  "refId": "String"
+                }
+              ]
+            },
+            "kind": "method",
+            "comment": "\nLoads a list of strings for the input [key]. List elements must be\ncomma separated.\n",
+            "name": "getList",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "key",
+                "id": "key"
+              }
+            ],
+            "id": "getList1()"
           },
           {
             "returnType": {
@@ -1021,21 +1118,11 @@
           },
           {
             "returnType": {
-              "name": "Map",
-              "refId": "Map",
-              "arguments": [
-                {
-                  "name": "String",
-                  "refId": "String"
-                },
-                {
-                  "name": "String",
-                  "refId": "String"
-                }
-              ]
+              "name": "Properties",
+              "refId": "Properties"
             },
             "kind": "method",
-            "comment": "\nReturns a map containg every property whos key satisifies the predicate [k] on the property key, and \noptionally the predicate [v] on the corresponding value. Returns an empty map otherwise.\n",
+            "comment": "\nReturns a Properties instance containg every property whos key satisifies the predicate [k] on the property key, and \noptionally the predicate [v] on the corresponding value. Returns null otherwise.\n",
             "name": "every",
             "children": [
               {
@@ -1059,6 +1146,46 @@
               }
             ],
             "id": "every2()"
+          },
+          {
+            "returnType": {
+              "name": "Map",
+              "refId": "Map",
+              "arguments": [
+                {
+                  "name": "String",
+                  "refId": "String"
+                },
+                {
+                  "name": "String",
+                  "refId": "String"
+                }
+              ]
+            },
+            "kind": "method",
+            "name": "_every",
+            "children": [
+              {
+                "ref": {
+                  "name": "Function",
+                  "refId": "Function"
+                },
+                "kind": "param",
+                "name": "k",
+                "id": "k"
+              },
+              {
+                "ref": {
+                  "name": "Function",
+                  "refId": "Function"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "v",
+                "id": "v"
+              }
+            ],
+            "id": "_every2()"
           },
           {
             "returnType": {
@@ -1372,6 +1499,37 @@
               }
             ],
             "id": "Properties.fromFile2()"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "constructor",
+            "comment": "\nCreate a new properties instance from the input [map].\n",
+            "name": "Properties.fromMap",
+            "children": [
+              {
+                "ref": {
+                  "name": "Map",
+                  "refId": "Map",
+                  "arguments": [
+                    {
+                      "name": "String",
+                      "refId": "String"
+                    },
+                    {
+                      "name": "String",
+                      "refId": "String"
+                    }
+                  ]
+                },
+                "kind": "param",
+                "name": "map",
+                "id": "map"
+              }
+            ],
+            "id": "Properties.fromMap1()"
           },
           {
             "returnType": {

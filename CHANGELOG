@@ -1,3 +1,10 @@
+0.4.4 - 16-03-2013
+Added new named constructor fromMap.
+Added getList method to get a list out of a property's value.
+Now every method returns a Properties instance instead of a Map.
+Minor code improvements.
+Minor doc improvements.
+
 0.4.3 - 12-03-2013
 Added support for defaults (value and key) on getter methods.
 Added property updated event support.

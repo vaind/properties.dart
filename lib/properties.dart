@@ -64,6 +64,15 @@ class Properties{
   }
   
   /**
+   * Create a new properties instance from the input [map].
+   */
+  Properties.fromMap(Map<String,String> map){
+    
+    this._content = map;
+    
+  }
+  
+  /**
    * Create a new properties instance using the input [jsonMap]
    * to load the data from.
    */
@@ -117,6 +126,21 @@ class Properties{
       }
     }
   }
+  
+  /**
+   * Determine if input line is a comment line.
+   */
+  _isComment(String line){
+    // comment
+    if(line.startsWith('#'))
+      return true;
+    
+    // comment
+    if(line.startsWith('!'))
+      return true;
+    
+    return false;
+  }
 
   /**
    * Determine if input line is a property or not.
@@ -126,7 +150,7 @@ class Properties{
     if(line.isEmpty || line == null)
       return false;
     
-    if(line.startsWith('#'))
+    if(_isComment(line))
       return false;
     
     if(line.contains('='))
@@ -153,7 +177,11 @@ class Properties{
     throw new FileIOException('It\'s impossible to load properties from input file ${file}. File does not exist.');
   }
   
-  /** Loads the value of a property given its [key] */
+  /** 
+   * Loads the value of a property given its [key].
+   * Use [defval] to set a default value in case of missing property.
+   * Use [defkey] to set a default key in case of missing property.
+   */
   String get(String key, {Object defval, String defkey}) {
     if(!?key)
       return null;
@@ -175,13 +203,12 @@ class Properties{
     return _content[key];
   }
   
-  /** Loads the value of a property as an integer given its [key] */
+  /** 
+   * Loads the value of a property as an integer given its [key].
+   * Use [defval] to set a default value in case of missing property.
+   * Use [defkey] to set a default key in case of missing property.
+   */
   int getInt(String key, {bool throwException:false, int defval, String defkey}) {
-    if(!?key)
-      return null;
-    
-    if(_content == null)
-      return null;
     
     var value = get(key, defval:defval, defkey:defkey);
     if(value == null)
@@ -196,13 +223,12 @@ class Properties{
     }
   }
   
-  /** Loads the value of a property as a double given its [key] */
+  /** 
+   * Loads the value of a property as a double given its [key].
+   * Use [defval] to set a default value in case of missing property.
+   * Use [defkey] to set a default key in case of missing property.
+   */
   double getDouble(String key, {bool throwException:false, double defval, String defkey}) {
-    if(!?key)
-      return null;
-    
-    if(_content == null)
-      return null;
     
     String value = get(key, defval:defval, defkey:defkey);
     if(value == null)
@@ -215,6 +241,18 @@ class Properties{
         throw e;
       return null;
     }
+  }
+  
+  /**
+   * Loads a list of strings for the input [key]. List elements must be
+   * comma separated.
+   */
+  List<String> getList(String key){
+    String value = get(key);
+    if(value == null)
+      return null;
+    
+    return value.split(",");
   }
   
   /** Check whether the properties contains a property given its [key] */
@@ -324,10 +362,20 @@ class Properties{
   }
   
   /**
-   * Returns a map containg every property whos key satisifies the predicate [k] on the property key, and 
-   * optionally the predicate [v] on the corresponding value. Returns an empty map otherwise.
+   * Returns a Properties instance containg every property whos key satisifies the predicate [k] on the property key, and 
+   * optionally the predicate [v] on the corresponding value. Returns null otherwise.
    */
-  Map<String,String> every(bool k(String str), [bool v(String val)]) {
+  Properties every(bool k(String str), [bool v(String val)]) {
+    
+    Map<String,String> result = _every(k, v);
+      
+    if(result.isEmpty)
+      return null;
+    
+    return new Properties.fromMap(result);
+  }
+  
+  Map<String,String> _every(bool k(String str), [bool v(String val)]) {
     
     if(v == null) v = (String s) => true;
     
@@ -337,6 +385,7 @@ class Properties{
       
     return result;
   }
+
   
   /**
    * Reloads the properties from file. Works for file sources only.
@@ -361,11 +410,11 @@ class Properties{
     var toExport = _content;
     
     if(?prefix && ?suffix)
-      toExport = every((key) => key.startsWith(prefix) && key.endsWith(suffix));
+      toExport = _every((key) => key.startsWith(prefix) && key.endsWith(suffix));
     else if(?prefix)
-      toExport = every((key) => key.startsWith(prefix));
+      toExport = _every((key) => key.startsWith(prefix));
     else if(?suffix)
-      toExport = every((key) => key.endsWith(suffix));
+      toExport = _every((key) => key.endsWith(suffix));
     
     return JSON.stringify(toExport);
   }
@@ -435,6 +484,11 @@ class AddEvent extends PropertiesEvent {
    * Getter for the added [value].
    */
   String get value => _value;
+  
+
+  String toString(){
+    return "${Properties.ADD_PROPERTY_EVENTNAME} on ${this._key}: ${this._value}";
+  }
 }
 
 /**
@@ -465,4 +519,8 @@ class UpdateEvent extends PropertiesEvent {
    * Getter for the updated [newValue].
    */
   String get newValue => _newvalue;
+  
+  String toString(){
+    return "${Properties.UPDATE_PROPERTY_EVENTNAME} on ${this._key}";
+  }
 }

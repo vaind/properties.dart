@@ -59,6 +59,11 @@ class AddEvent extends PropertiesEvent {
   * Getter for the added [value].
   */
  String get value =&gt; _value;
+ 
+
+ String toString(){
+   return "${Properties.ADD_PROPERTY_EVENTNAME} on ${this._key}: ${this._value}";
+ }
 }
 </pre>
 </div>
@@ -121,11 +126,29 @@ String get value =&gt; _value;
 </div>
 </div>
 </div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="toString">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html">String</a> <strong>toString</strong>() <a class="anchor-link" href="#toString"
+              title="Permalink to AddEvent.toString">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>Returns a string representation of this object.</p>
+<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Object.html">Object</a> </div></div>
+<pre class="source">
+String toString(){
+ return "${Properties.ADD_PROPERTY_EVENTNAME} on ${this._key}: ${this._value}";
+}
+</pre>
+</div>
+</div>
+</div>
         </div>
         <div class="clear"></div>
         </div>
         <div class="footer">
-          <div>This page was generated at 2013-03-12 22:30:24.149</div>
+          <div>This page was generated at 2013-03-16 12:34:21.975</div>
         </div>
         <script async src="../client-static.js"></script>
         </body></html>
