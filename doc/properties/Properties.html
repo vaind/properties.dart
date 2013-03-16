@@ -26,6 +26,7 @@
         
 <h2><div class="icon-library"></div><a href="../properties.html">properties</a></h2><ul class="icon">
 <li><a href="../properties/AddEvent.html"><div class="icon-class"></div>AddEvent</a></li>
+<li><a href="../properties/BoolEvaluator.html"><div class="icon-class"></div>BoolEvaluator</a></li>
 <li><div class="icon-class"></div><strong>Properties</strong></li>
 <li><a href="../properties/PropertiesEvent.html"><div class="icon-class"></div>PropertiesEvent&lt;T&gt;</a></li>
 <li><a href="../properties/UpdateEvent.html"><div class="icon-class"></div>UpdateEvent</a></li>
@@ -41,10 +42,14 @@
 <p>The Properties class implementing all tools to load key-values from file both by name and
 path.</p>
 <pre class="source">
-class Properties{
+class Properties {
  
- /// The encoding used to read the file
- Encoding _encoding;
+ static final int SLASH = '\\'.charCodes[0];
+ static final int SPACE = ' '.charCodes[0];
+ static final int NEWLINE = '\n'.charCodes[0];
+ static final int EQUAL = '='.charCodes[0];
+ static final int HASH = '#'.charCodes[0];
+ static final int ESCLMARK = '!'.charCodes[0];
  
  /// The content of the properties file in terms of key - value couples
  Map&lt;String,String&gt; _content;
@@ -55,22 +60,21 @@ class Properties{
  /// Events are enabled by default
  bool _enableEvents = true;
  
+ /// Default bool evaluator instance
+ BoolEvaluator _be = new BoolEvaluator();
+ 
  /// The property added event name
  static const String ADD_PROPERTY_EVENTNAME = 'add';
  static const String UPDATE_PROPERTY_EVENTNAME = 'update';
  
  StreamController eventController;
  
- 
- 
  /**
-  * Create a new properties instance by naming the source file using [name]
-  * and, optionally, setting the desired [encoding].
+  * Create a new properties instance by naming the source file using [name].
   */
- Properties(String name, [Encoding encoding = Encoding.UTF_8]){
+ Properties(String name){
    
    this._sourceFile = name;
-   this._encoding = encoding;
    
    _init();
    
@@ -79,13 +83,11 @@ class Properties{
  }
  
  /**
-  * Create a new properties instance from file [path]
-  * and, optionally, setting the desired [encoding].
+  * Create a new properties instance from file [path].
   */
- Properties.fromFile(String path, [Encoding encoding = Encoding.UTF_8]){
+ Properties.fromFile(String path){
    
    this._sourceFile = path;
-   this._encoding = encoding;
    
    _init();
    
@@ -120,62 +122,175 @@ class Properties{
    eventController = new StreamController&lt;PropertiesEvent&gt;.broadcast();
  }
  
- void _initFromFile() =&gt; _load(_read(_sourceFile, _encoding));
+ void _initFromFile() =&gt; _load(_read(_sourceFile));
 
  /**
   * Create the file object and read its content in lines.
   */
- List&lt;String&gt; _read(String path, Encoding encoding) {
+ List&lt;List&lt;int&gt;&gt; _read(String path) {
    
    var f = _getFile(path);
    
    if(f == null || !f.existsSync())
      return null;
    
-   return f.readAsLinesSync(this._encoding);
+   // read file as bytes
+   List&lt;int&gt; bytes = f.readAsBytesSync();
+   
+   // get line of bytes, managing multi-line properties
+   return _manageMultiLine(_getLines(bytes));
  }
+ 
+ /**
+  * Get an array of lines of bytes out of the plain bytes.
+  */
+ List&lt;List&lt;int&gt;&gt; _getLines(List&lt;int&gt; bytes){
+   List&lt;List&lt;int&gt;&gt; result = [];
+   List&lt;int&gt; line = [];
+   
+   for(var i = 0; i &lt; bytes.length; i++){
+     
+     if(bytes[i] != Properties.NEWLINE){
+       line.add(bytes[i]);
+     } else {
+       result.add(line);
+       line = [];
+     }
+     
+     if(i == bytes.length -1)
+       result.add(line);
+     
+   }
+   
+   return result;
+ }
+
+ /**
+  * Merge multi-line values into a single line value.
+  */
+ List&lt;List&lt;int&gt;&gt; _manageMultiLine(List&lt;List&lt;int&gt;&gt; lines) {
+   var result = [];
+   var app = [];
+   bool isMultiLine = false;
+   bool added = false;
+   
+   for(List&lt;int&gt; l in lines){
+     
+     if(isMultiLine){
+       app.addAll(_replaceLastOccurrence(l, Properties.SLASH, Properties.SPACE));
+       added = true;
+     }
+     
+     if(_endsWith(l, Properties.SLASH))
+       isMultiLine = true;
+     else {
+       isMultiLine = false;
+     }
+     
+     
+     if(!isMultiLine){
+       if(!app.isEmpty){
+         result.add(app);
+         app = [];
+       } else {
+         result.add(l);
+       }
+     }
+     
+     if(isMultiLine &amp;&amp; !added){
+       app.addAll(_replaceLastOccurrence(l, Properties.SLASH, Properties.SPACE));
+     }
+     
+     added = false;
+     
+   }
+   
+   return result;
+ }
+ 
+ /**
+  * Test if a [line] of bytes ends with the input [char] or not.
+  */
+ bool _endsWith(List&lt;int&gt; line, int char){
+   return line.lastIndexOf(char) == (line.length -1);
+ }
+
+ /**
+  * Replace the last occurrence of the input char [toReplace] into the input [line] of bytes
+  * with the input char [replacer].
+  */
+ List&lt;int&gt; _replaceLastOccurrence(List&lt;int&gt; line, int toReplace, int replacer){
+   List&lt;int&gt; result = [];
+   bool replace = false;
+   int limit = line.length;
+   
+   if(line.lastIndexOf(toReplace) == (line.length -1)){
+     replace = true;
+   }
+   
+   for(int i = 0; i &lt; limit; i++){
+     if(replace &amp;&amp; (i == limit-1)){
+       result.add(replacer);  
+     } else {
+       result.add(line[i]);
+     }
+   }
+   
+   return result;
+ }
+ 
 
  /**
   * Load properties from lines.
   */
- _load(List&lt;String&gt; lines) {
+ _load(List&lt;List&lt;int&gt;&gt; lines) {
    if(lines == null || lines.isEmpty)
      return null;
    
    _content = new Map&lt;String,String&gt;();
    
-   for(String line in lines){
-     
-     line = line.trim();
-     
-     if(_isProperty(line)){
-       List&lt;String&gt; keyvalue = line.split('=');
-       
-       if(keyvalue.length == 2 &amp;&amp; keyvalue[0] != null)
-         _content[keyvalue[0].trim()] = keyvalue[1].trim();
+   for(List&lt;int&gt; l in lines){
+     if(_isProperty(l)){
+       List&lt;List&lt;int&gt;&gt; splitted = _splitKeyValue(l);
+       _content[new String.fromCharCodes(splitted[0]).trim()] = new String.fromCharCodes(splitted[1]).trim();
      }
    }
  }
  
  /**
-  * Determine if input line is a comment line.
+  * Given a [line] of bytes split it into key and value.
   */
- _isComment(String line){
-   // comment
-   if(line.startsWith('#'))
-     return true;
+ List&lt;List&lt;int&gt;&gt; _splitKeyValue(List&lt;int&gt; line){
    
-   // comment
-   if(line.startsWith('!'))
-     return true;
+   List&lt;List&lt;int&gt;&gt; result = [];
+   List&lt;int&gt; key = [];
+   List&lt;int&gt; value = [];
    
-   return false;
+   bool isKey = true;
+   
+   for(var i = 0; i &lt; line.length; i++){
+     
+     if(line[i] == Properties.EQUAL &amp;&amp; isKey){
+       isKey = false;
+     } else {
+       if(isKey){
+         key.add(line[i]);
+       } else {
+         value.add(line[i]);
+       }
+     }
+   }
+   
+   result.add(key);
+   result.add(value);
+   
+   return result;
  }
 
  /**
   * Determine if input line is a property or not.
   */
- _isProperty(String line) {
+ _isProperty(List&lt;int&gt; line) {
    
    if(line.isEmpty || line == null)
      return false;
@@ -183,9 +298,31 @@ class Properties{
    if(_isComment(line))
      return false;
    
-   if(line.contains('='))
-     return true;
+   // contains a non escaped =
+   for(var i = 0; i &lt; line.length; i++){
+     if(line[i] == Properties.EQUAL &amp;&amp; line[i-1] != Properties.SLASH){
+       return true;
+     }
+   }
      
+   return false;
+ }
+ 
+ /**
+  * Determine if input line is a comment line.
+  */
+ _isComment(List&lt;int&gt; line){
+   
+   String lineStr = new String.fromCharCodes(line);
+   
+   // comment
+   if(lineStr.startsWith('#'))
+     return true;
+   
+   // comment
+   if(lineStr.startsWith('!'))
+     return true;
+   
    return false;
  }
  
@@ -231,6 +368,27 @@ class Properties{
    }
    
    return _content[key];
+ }
+ 
+ /** 
+  * Loads the value of a property as a bool given its [key].
+  * Boolean value evaluation can be customized using by setting 
+  * a new BoolEvaluator instance.
+  * Use [defval] to set a default value in case of missing property.
+  * Use [defkey] to set a default key in case of missing property.
+  */
+ bool getBool(String key, {bool throwException:false, int defval, String defkey}) {
+   var value = get(key, defval:defval, defkey:defkey);
+   if(value == null)
+     return null;
+   
+   try {
+     return _be.evaluate(value);
+   } on FormatException catch (e) {
+     if(throwException)
+       throw e;
+     return null;
+   }
  }
  
  /** 
@@ -473,6 +631,16 @@ class Properties{
   * Get the stream instance for the "property updated" event.
   */
  Stream get onUpdate =&gt; eventController.stream;
+ 
+ /**
+  * Getter for [boolEvaluator] instance.
+  */
+ BoolEvaluator get boolEvaluator =&gt; this._be;
+ 
+ /**
+  * Set an [evaluator] instance.
+  */
+ set boolEvaluator(BoolEvaluator evaluator) =&gt; this._be = evaluator;
 }
 </pre>
 </div>
@@ -487,6 +655,78 @@ const <a href="http://api.dartlang.org/dart_core/String.html">String</a>        
         <div class="doc">
 <pre class="source">
 ADD_PROPERTY_EVENTNAME = 'add'
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="EQUAL">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>EQUAL</strong> <a class="anchor-link"
+            href="#EQUAL"
+            title="Permalink to Properties.EQUAL">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+EQUAL = '='.charCodes[0]
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="ESCLMARK">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>ESCLMARK</strong> <a class="anchor-link"
+            href="#ESCLMARK"
+            title="Permalink to Properties.ESCLMARK">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+ESCLMARK = '!'.charCodes[0]
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="HASH">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>HASH</strong> <a class="anchor-link"
+            href="#HASH"
+            title="Permalink to Properties.HASH">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+HASH = '#'.charCodes[0]
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="NEWLINE">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>NEWLINE</strong> <a class="anchor-link"
+            href="#NEWLINE"
+            title="Permalink to Properties.NEWLINE">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+NEWLINE = '\n'.charCodes[0]
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="SLASH">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>SLASH</strong> <a class="anchor-link"
+            href="#SLASH"
+            title="Permalink to Properties.SLASH">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+SLASH = '\\'.charCodes[0]
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="SPACE">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/int.html">int</a>         <strong>SPACE</strong> <a class="anchor-link"
+            href="#SPACE"
+            title="Permalink to Properties.SPACE">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+SPACE = ' '.charCodes[0]
 </pre>
 </div>
 </div>
@@ -507,18 +747,15 @@ UPDATE_PROPERTY_EVENTNAME = 'update'
 <h3>Constructors</h3>
 <div class="method"><h4 id="Properties">
 <button class="show-code">Code</button>
-new <strong>Properties</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> name, [<a href="http://api.dartlang.org/dart_io/Encoding.html">Encoding</a> encoding = Encoding.UTF_8]) <a class="anchor-link" href="#Properties"
+new <strong>Properties</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> name) <a class="anchor-link" href="#Properties"
               title="Permalink to Properties.Properties">#</a></h4>
 <div class="doc">
 <p>Create a new properties instance by naming the source file using 
-<span class="param">name</span>
-and, optionally, setting the desired 
-<span class="param">encoding</span>.</p>
+<span class="param">name</span>.</p>
 <pre class="source">
-Properties(String name, [Encoding encoding = Encoding.UTF_8]){
+Properties(String name){
  
  this._sourceFile = name;
- this._encoding = encoding;
  
  _init();
  
@@ -530,18 +767,15 @@ Properties(String name, [Encoding encoding = Encoding.UTF_8]){
 </div>
 <div class="method"><h4 id="Properties.fromFile">
 <button class="show-code">Code</button>
-new <strong>Properties.fromFile</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> path, [<a href="http://api.dartlang.org/dart_io/Encoding.html">Encoding</a> encoding = Encoding.UTF_8]) <a class="anchor-link" href="#Properties.fromFile"
+new <strong>Properties.fromFile</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> path) <a class="anchor-link" href="#Properties.fromFile"
               title="Permalink to Properties.Properties.fromFile">#</a></h4>
 <div class="doc">
 <p>Create a new properties instance from file 
-<span class="param">path</span>
-and, optionally, setting the desired 
-<span class="param">encoding</span>.</p>
+<span class="param">path</span>.</p>
 <pre class="source">
-Properties.fromFile(String path, [Encoding encoding = Encoding.UTF_8]){
+Properties.fromFile(String path){
  
  this._sourceFile = path;
- this._encoding = encoding;
  
  _init();
  
@@ -588,6 +822,29 @@ Properties.fromMap(Map&lt;String,String&gt; map){
 </div>
 <div>
 <h3>Properties</h3>
+<div class="method"><h4 id="boolEvaluator">
+<button class="show-code">Code</button>
+<a href="../properties/BoolEvaluator.html">BoolEvaluator</a> <strong>get boolEvaluator</strong> <a class="anchor-link" href="#boolEvaluator"
+              title="Permalink to Properties.get boolEvaluator">#</a></h4>
+<div class="doc">
+<p>Getter for <a class="crossref" href="../properties/Properties.html#boolEvaluator">boolEvaluator</a> instance.</p>
+<pre class="source">
+BoolEvaluator get boolEvaluator =&gt; this._be;
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="boolEvaluator=">
+<button class="show-code">Code</button>
+<strong>set boolEvaluator</strong>(<a href="../properties/BoolEvaluator.html">BoolEvaluator</a> evaluator) <a class="anchor-link" href="#boolEvaluator="
+              title="Permalink to Properties.set boolEvaluator">#</a></h4>
+<div class="doc">
+<p>Set an 
+<span class="param">evaluator</span> instance.</p>
+<pre class="source">
+set boolEvaluator(BoolEvaluator evaluator) =&gt; this._be = evaluator;
+</pre>
+</div>
+</div>
 <div class="method"><h4 id="enableEvents">
 <button class="show-code">Code</button>
 <a href="http://api.dartlang.org/dart_core/bool.html">bool</a> <strong>get enableEvents</strong> <a class="anchor-link" href="#enableEvents"
@@ -789,6 +1046,36 @@ String get(String key, {Object defval, String defkey}) {
  }
  
  return _content[key];
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="getBool">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> <strong>getBool</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> key, {<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> throwException: false, <a href="http://api.dartlang.org/dart_core/int.html">int</a> defval, <a href="http://api.dartlang.org/dart_core/String.html">String</a> defkey}) <a class="anchor-link" href="#getBool"
+              title="Permalink to Properties.getBool">#</a></h4>
+<div class="doc">
+<p>Loads the value of a property as a bool given its 
+<span class="param">key</span>.
+Boolean value evaluation can be customized using by setting 
+a new BoolEvaluator instance.
+Use 
+<span class="param">defval</span> to set a default value in case of missing property.
+Use 
+<span class="param">defkey</span> to set a default key in case of missing property.</p>
+<pre class="source">
+bool getBool(String key, {bool throwException:false, int defval, String defkey}) {
+ var value = get(key, defval:defval, defkey:defkey);
+ if(value == null)
+   return null;
+ 
+ try {
+   return _be.evaluate(value);
+ } on FormatException catch (e) {
+   if(throwException)
+     throw e;
+   return null;
+ }
 }
 </pre>
 </div>
@@ -1000,7 +1287,7 @@ String toString() =&gt; _content.toString();
         <div class="clear"></div>
         </div>
         <div class="footer">
-          <div>This page was generated at 2013-03-16 12:34:22.005</div>
+          <div>This page was generated at 2013-03-16 17:53:06.975</div>
         </div>
         <script async src="../client-static.js"></script>
         </body></html>

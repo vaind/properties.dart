@@ -11,10 +11,14 @@ import 'dart:async';
  * The Properties class implementing all tools to load key-values from file both by name and
  * path.
  */
-class Properties{
+class Properties {
   
-  /// The encoding used to read the file
-  Encoding _encoding;
+  static final int SLASH = '\\'.charCodes[0];
+  static final int SPACE = ' '.charCodes[0];
+  static final int NEWLINE = '\n'.charCodes[0];
+  static final int EQUAL = '='.charCodes[0];
+  static final int HASH = '#'.charCodes[0];
+  static final int ESCLMARK = '!'.charCodes[0];
   
   /// The content of the properties file in terms of key - value couples
   Map<String,String> _content;
@@ -25,22 +29,21 @@ class Properties{
   /// Events are enabled by default
   bool _enableEvents = true;
   
+  /// Default bool evaluator instance
+  BoolEvaluator _be = new BoolEvaluator();
+  
   /// The property added event name
   static const String ADD_PROPERTY_EVENTNAME = 'add';
   static const String UPDATE_PROPERTY_EVENTNAME = 'update';
   
   StreamController eventController;
   
-  
-  
   /**
-   * Create a new properties instance by naming the source file using [name]
-   * and, optionally, setting the desired [encoding].
+   * Create a new properties instance by naming the source file using [name].
    */
-  Properties(String name, [Encoding encoding = Encoding.UTF_8]){
+  Properties(String name){
     
     this._sourceFile = name;
-    this._encoding = encoding;
     
     _init();
     
@@ -49,13 +52,11 @@ class Properties{
   }
   
   /**
-   * Create a new properties instance from file [path]
-   * and, optionally, setting the desired [encoding].
+   * Create a new properties instance from file [path].
    */
-  Properties.fromFile(String path, [Encoding encoding = Encoding.UTF_8]){
+  Properties.fromFile(String path){
     
     this._sourceFile = path;
-    this._encoding = encoding;
     
     _init();
     
@@ -90,62 +91,175 @@ class Properties{
     eventController = new StreamController<PropertiesEvent>.broadcast();
   }
   
-  void _initFromFile() => _load(_read(_sourceFile, _encoding));
+  void _initFromFile() => _load(_read(_sourceFile));
 
   /**
    * Create the file object and read its content in lines.
    */
-  List<String> _read(String path, Encoding encoding) {
+  List<List<int>> _read(String path) {
     
     var f = _getFile(path);
     
     if(f == null || !f.existsSync())
       return null;
     
-    return f.readAsLinesSync(this._encoding);
+    // read file as bytes
+    List<int> bytes = f.readAsBytesSync();
+    
+    // get line of bytes, managing multi-line properties
+    return _manageMultiLine(_getLines(bytes));
   }
+  
+  /**
+   * Get an array of lines of bytes out of the plain bytes.
+   */
+  List<List<int>> _getLines(List<int> bytes){
+    List<List<int>> result = [];
+    List<int> line = [];
+    
+    for(var i = 0; i < bytes.length; i++){
+      
+      if(bytes[i] != Properties.NEWLINE){
+        line.add(bytes[i]);
+      } else {
+        result.add(line);
+        line = [];
+      }
+      
+      if(i == bytes.length -1)
+        result.add(line);
+      
+    }
+    
+    return result;
+  }
+
+  /**
+   * Merge multi-line values into a single line value.
+   */
+  List<List<int>> _manageMultiLine(List<List<int>> lines) {
+    var result = [];
+    var app = [];
+    bool isMultiLine = false;
+    bool added = false;
+    
+    for(List<int> l in lines){
+      
+      if(isMultiLine){
+        app.addAll(_replaceLastOccurrence(l, Properties.SLASH, Properties.SPACE));
+        added = true;
+      }
+      
+      if(_endsWith(l, Properties.SLASH))
+        isMultiLine = true;
+      else {
+        isMultiLine = false;
+      }
+      
+      
+      if(!isMultiLine){
+        if(!app.isEmpty){
+          result.add(app);
+          app = [];
+        } else {
+          result.add(l);
+        }
+      }
+      
+      if(isMultiLine && !added){
+        app.addAll(_replaceLastOccurrence(l, Properties.SLASH, Properties.SPACE));
+      }
+      
+      added = false;
+      
+    }
+    
+    return result;
+  }
+  
+  /**
+   * Test if a [line] of bytes ends with the input [char] or not.
+   */
+  bool _endsWith(List<int> line, int char){
+    return line.lastIndexOf(char) == (line.length -1);
+  }
+
+  /**
+   * Replace the last occurrence of the input char [toReplace] into the input [line] of bytes
+   * with the input char [replacer].
+   */
+  List<int> _replaceLastOccurrence(List<int> line, int toReplace, int replacer){
+    List<int> result = [];
+    bool replace = false;
+    int limit = line.length;
+    
+    if(line.lastIndexOf(toReplace) == (line.length -1)){
+      replace = true;
+    }
+    
+    for(int i = 0; i < limit; i++){
+      if(replace && (i == limit-1)){
+        result.add(replacer);  
+      } else {
+        result.add(line[i]);
+      }
+    }
+    
+    return result;
+  }
+  
 
   /**
    * Load properties from lines.
    */
-  _load(List<String> lines) {
+  _load(List<List<int>> lines) {
     if(lines == null || lines.isEmpty)
       return null;
     
     _content = new Map<String,String>();
     
-    for(String line in lines){
-      
-      line = line.trim();
-      
-      if(_isProperty(line)){
-        List<String> keyvalue = line.split('=');
-        
-        if(keyvalue.length == 2 && keyvalue[0] != null)
-          _content[keyvalue[0].trim()] = keyvalue[1].trim();
+    for(List<int> l in lines){
+      if(_isProperty(l)){
+        List<List<int>> splitted = _splitKeyValue(l);
+        _content[new String.fromCharCodes(splitted[0]).trim()] = new String.fromCharCodes(splitted[1]).trim();
       }
     }
   }
   
   /**
-   * Determine if input line is a comment line.
+   * Given a [line] of bytes split it into key and value.
    */
-  _isComment(String line){
-    // comment
-    if(line.startsWith('#'))
-      return true;
+  List<List<int>> _splitKeyValue(List<int> line){
     
-    // comment
-    if(line.startsWith('!'))
-      return true;
+    List<List<int>> result = [];
+    List<int> key = [];
+    List<int> value = [];
     
-    return false;
+    bool isKey = true;
+    
+    for(var i = 0; i < line.length; i++){
+      
+      if(line[i] == Properties.EQUAL && isKey){
+        isKey = false;
+      } else {
+        if(isKey){
+          key.add(line[i]);
+        } else {
+          value.add(line[i]);
+        }
+      }
+    }
+    
+    result.add(key);
+    result.add(value);
+    
+    return result;
   }
 
   /**
    * Determine if input line is a property or not.
    */
-  _isProperty(String line) {
+  _isProperty(List<int> line) {
     
     if(line.isEmpty || line == null)
       return false;
@@ -153,9 +267,31 @@ class Properties{
     if(_isComment(line))
       return false;
     
-    if(line.contains('='))
-      return true;
+    // contains a non escaped =
+    for(var i = 0; i < line.length; i++){
+      if(line[i] == Properties.EQUAL && line[i-1] != Properties.SLASH){
+        return true;
+      }
+    }
       
+    return false;
+  }
+  
+  /**
+   * Determine if input line is a comment line.
+   */
+  _isComment(List<int> line){
+    
+    String lineStr = new String.fromCharCodes(line);
+    
+    // comment
+    if(lineStr.startsWith('#'))
+      return true;
+    
+    // comment
+    if(lineStr.startsWith('!'))
+      return true;
+    
     return false;
   }
   
@@ -201,6 +337,27 @@ class Properties{
     }
     
     return _content[key];
+  }
+  
+  /** 
+   * Loads the value of a property as a bool given its [key].
+   * Boolean value evaluation can be customized using by setting 
+   * a new BoolEvaluator instance.
+   * Use [defval] to set a default value in case of missing property.
+   * Use [defkey] to set a default key in case of missing property.
+   */
+  bool getBool(String key, {bool throwException:false, int defval, String defkey}) {
+    var value = get(key, defval:defval, defkey:defkey);
+    if(value == null)
+      return null;
+    
+    try {
+      return _be.evaluate(value);
+    } on FormatException catch (e) {
+      if(throwException)
+        throw e;
+      return null;
+    }
   }
   
   /** 
@@ -443,6 +600,16 @@ class Properties{
    * Get the stream instance for the "property updated" event.
    */
   Stream get onUpdate => eventController.stream;
+  
+  /**
+   * Getter for [boolEvaluator] instance.
+   */
+  BoolEvaluator get boolEvaluator => this._be;
+  
+  /**
+   * Set an [evaluator] instance.
+   */
+  set boolEvaluator(BoolEvaluator evaluator) => this._be = evaluator;
 }
 
 /**
@@ -523,4 +690,28 @@ class UpdateEvent extends PropertiesEvent {
   String toString(){
     return "${Properties.UPDATE_PROPERTY_EVENTNAME} on ${this._key}";
   }
+}
+
+/**
+ * A default evaluator for bool values. Use evaluate method
+ * to determine if the input value is true or false according to
+ * the provided values.
+ */
+class BoolEvaluator {
+  
+  List<String> trues = ['true', 'TRUE', 'True', "1"];
+  List<String> falses = ['false', 'FALSE', 'False', "0"];
+  
+  bool evaluate(String value){
+    if(trues.contains(value)){
+      return true;
+    }
+    
+    if(falses.contains(value)){
+      return false;
+    }
+    
+    throw new FormatException("Input value is not a bool value.");
+  }
+  
 }

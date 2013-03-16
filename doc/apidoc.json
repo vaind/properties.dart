@@ -6,6 +6,68 @@
     "children": [
       {
         "superclass": {
+          "name": "Object",
+          "refId": "Object"
+        },
+        "kind": "class",
+        "comment": "\nA default evaluator for bool values. Use evaluate method\nto determine if the input value is true or false according to\nthe provided values.\n",
+        "name": "BoolEvaluator",
+        "children": [
+          {
+            "returnType": {
+              "name": "bool",
+              "refId": "bool"
+            },
+            "kind": "method",
+            "name": "evaluate",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "value",
+                "id": "value"
+              }
+            ],
+            "id": "evaluate1()"
+          },
+          {
+            "ref": {
+              "name": "List",
+              "refId": "List",
+              "arguments": [
+                {
+                  "name": "String",
+                  "refId": "String"
+                }
+              ]
+            },
+            "kind": "property",
+            "name": "trues",
+            "id": "trues"
+          },
+          {
+            "ref": {
+              "name": "List",
+              "refId": "List",
+              "arguments": [
+                {
+                  "name": "String",
+                  "refId": "String"
+                }
+              ]
+            },
+            "kind": "property",
+            "name": "falses",
+            "id": "falses"
+          }
+        ],
+        "id": "BoolEvaluator"
+      },
+      {
+        "superclass": {
           "name": "PropertiesEvent",
           "refId": "PropertiesEvent"
         },
@@ -427,7 +489,7 @@
               "refId": "dynamic"
             },
             "kind": "method",
-            "comment": "\nCreate a new properties instance by naming the source file using [name]\nand, optionally, setting the desired [encoding].\n",
+            "comment": "\nCreate a new properties instance by naming the source file using [name].\n",
             "name": "Properties",
             "children": [
               {
@@ -438,19 +500,9 @@
                 "kind": "param",
                 "name": "name",
                 "id": "name"
-              },
-              {
-                "ref": {
-                  "name": "Encoding",
-                  "refId": "Encoding"
-                },
-                "isOptional": true,
-                "kind": "param",
-                "name": "encoding",
-                "id": "encoding"
               }
             ],
-            "id": "Properties2()"
+            "id": "Properties1()"
           },
           {
             "returnType": {
@@ -458,7 +510,7 @@
               "refId": "dynamic"
             },
             "kind": "method",
-            "comment": "\nCreate a new properties instance from file [path]\nand, optionally, setting the desired [encoding].\n",
+            "comment": "\nCreate a new properties instance from file [path].\n",
             "name": "Properties.fromFile",
             "children": [
               {
@@ -469,19 +521,9 @@
                 "kind": "param",
                 "name": "path",
                 "id": "path"
-              },
-              {
-                "ref": {
-                  "name": "Encoding",
-                  "refId": "Encoding"
-                },
-                "isOptional": true,
-                "kind": "param",
-                "name": "encoding",
-                "id": "encoding"
               }
             ],
-            "id": "Properties.fromFile2()"
+            "id": "Properties.fromFile1()"
           },
           {
             "returnType": {
@@ -560,8 +602,14 @@
               "refId": "List",
               "arguments": [
                 {
-                  "name": "String",
-                  "refId": "String"
+                  "name": "List",
+                  "refId": "List",
+                  "arguments": [
+                    {
+                      "name": "int",
+                      "refId": "int"
+                    }
+                  ]
                 }
               ]
             },
@@ -577,18 +625,180 @@
                 "kind": "param",
                 "name": "path",
                 "id": "path"
+              }
+            ],
+            "id": "_read1()"
+          },
+          {
+            "returnType": {
+              "name": "List",
+              "refId": "List",
+              "arguments": [
+                {
+                  "name": "List",
+                  "refId": "List",
+                  "arguments": [
+                    {
+                      "name": "int",
+                      "refId": "int"
+                    }
+                  ]
+                }
+              ]
+            },
+            "kind": "method",
+            "comment": "\nGet an array of lines of bytes out of the plain bytes.\n",
+            "name": "_getLines",
+            "children": [
+              {
+                "ref": {
+                  "name": "List",
+                  "refId": "List",
+                  "arguments": [
+                    {
+                      "name": "int",
+                      "refId": "int"
+                    }
+                  ]
+                },
+                "kind": "param",
+                "name": "bytes",
+                "id": "bytes"
+              }
+            ],
+            "id": "_getLines1()"
+          },
+          {
+            "returnType": {
+              "name": "List",
+              "refId": "List",
+              "arguments": [
+                {
+                  "name": "List",
+                  "refId": "List",
+                  "arguments": [
+                    {
+                      "name": "int",
+                      "refId": "int"
+                    }
+                  ]
+                }
+              ]
+            },
+            "kind": "method",
+            "comment": "\nMerge multi-line values into a single line value.\n",
+            "name": "_manageMultiLine",
+            "children": [
+              {
+                "ref": {
+                  "name": "List",
+                  "refId": "List",
+                  "arguments": [
+                    {
+                      "name": "List",
+                      "refId": "List",
+                      "arguments": [
+                        {
+                          "name": "int",
+                          "refId": "int"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "kind": "param",
+                "name": "lines",
+                "id": "lines"
+              }
+            ],
+            "id": "_manageMultiLine1()"
+          },
+          {
+            "returnType": {
+              "name": "bool",
+              "refId": "bool"
+            },
+            "kind": "method",
+            "comment": "\nTest if a [line] of bytes ends with the input [char] or not.\n",
+            "name": "_endsWith",
+            "children": [
+              {
+                "ref": {
+                  "name": "List",
+                  "refId": "List",
+                  "arguments": [
+                    {
+                      "name": "int",
+                      "refId": "int"
+                    }
+                  ]
+                },
+                "kind": "param",
+                "name": "line",
+                "id": "line"
               },
               {
                 "ref": {
-                  "name": "Encoding",
-                  "refId": "Encoding"
+                  "name": "int",
+                  "refId": "int"
                 },
                 "kind": "param",
-                "name": "encoding",
-                "id": "encoding"
+                "name": "char",
+                "id": "char"
               }
             ],
-            "id": "_read2()"
+            "id": "_endsWith2()"
+          },
+          {
+            "returnType": {
+              "name": "List",
+              "refId": "List",
+              "arguments": [
+                {
+                  "name": "int",
+                  "refId": "int"
+                }
+              ]
+            },
+            "kind": "method",
+            "comment": "\nReplace the last occurrence of the input char [toReplace] into the input [line] of bytes\nwith the input char [replacer].\n",
+            "name": "_replaceLastOccurrence",
+            "children": [
+              {
+                "ref": {
+                  "name": "List",
+                  "refId": "List",
+                  "arguments": [
+                    {
+                      "name": "int",
+                      "refId": "int"
+                    }
+                  ]
+                },
+                "kind": "param",
+                "name": "line",
+                "id": "line"
+              },
+              {
+                "ref": {
+                  "name": "int",
+                  "refId": "int"
+                },
+                "kind": "param",
+                "name": "toReplace",
+                "id": "toReplace"
+              },
+              {
+                "ref": {
+                  "name": "int",
+                  "refId": "int"
+                },
+                "kind": "param",
+                "name": "replacer",
+                "id": "replacer"
+              }
+            ],
+            "id": "_replaceLastOccurrence3()"
           },
           {
             "returnType": {
@@ -605,8 +815,14 @@
                   "refId": "List",
                   "arguments": [
                     {
-                      "name": "String",
-                      "refId": "String"
+                      "name": "List",
+                      "refId": "List",
+                      "arguments": [
+                        {
+                          "name": "int",
+                          "refId": "int"
+                        }
+                      ]
                     }
                   ]
                 },
@@ -619,24 +835,42 @@
           },
           {
             "returnType": {
-              "name": "dynamic",
-              "refId": "dynamic"
+              "name": "List",
+              "refId": "List",
+              "arguments": [
+                {
+                  "name": "List",
+                  "refId": "List",
+                  "arguments": [
+                    {
+                      "name": "int",
+                      "refId": "int"
+                    }
+                  ]
+                }
+              ]
             },
             "kind": "method",
-            "comment": "\nDetermine if input line is a comment line.\n",
-            "name": "_isComment",
+            "comment": "\nGiven a [line] of bytes split it into key and value.\n",
+            "name": "_splitKeyValue",
             "children": [
               {
                 "ref": {
-                  "name": "String",
-                  "refId": "String"
+                  "name": "List",
+                  "refId": "List",
+                  "arguments": [
+                    {
+                      "name": "int",
+                      "refId": "int"
+                    }
+                  ]
                 },
                 "kind": "param",
                 "name": "line",
                 "id": "line"
               }
             ],
-            "id": "_isComment1()"
+            "id": "_splitKeyValue1()"
           },
           {
             "returnType": {
@@ -649,8 +883,14 @@
             "children": [
               {
                 "ref": {
-                  "name": "String",
-                  "refId": "String"
+                  "name": "List",
+                  "refId": "List",
+                  "arguments": [
+                    {
+                      "name": "int",
+                      "refId": "int"
+                    }
+                  ]
                 },
                 "kind": "param",
                 "name": "line",
@@ -658,6 +898,33 @@
               }
             ],
             "id": "_isProperty1()"
+          },
+          {
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nDetermine if input line is a comment line.\n",
+            "name": "_isComment",
+            "children": [
+              {
+                "ref": {
+                  "name": "List",
+                  "refId": "List",
+                  "arguments": [
+                    {
+                      "name": "int",
+                      "refId": "int"
+                    }
+                  ]
+                },
+                "kind": "param",
+                "name": "line",
+                "id": "line"
+              }
+            ],
+            "id": "_isComment1()"
           },
           {
             "returnType": {
@@ -720,6 +987,57 @@
               }
             ],
             "id": "get3()"
+          },
+          {
+            "returnType": {
+              "name": "bool",
+              "refId": "bool"
+            },
+            "kind": "method",
+            "comment": "\nLoads the value of a property as a bool given its [key].\nBoolean value evaluation can be customized using by setting \na new BoolEvaluator instance.\nUse [defval] to set a default value in case of missing property.\nUse [defkey] to set a default key in case of missing property.\n",
+            "name": "getBool",
+            "children": [
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "kind": "param",
+                "name": "key",
+                "id": "key"
+              },
+              {
+                "ref": {
+                  "name": "bool",
+                  "refId": "bool"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "throwException",
+                "id": "throwException"
+              },
+              {
+                "ref": {
+                  "name": "int",
+                  "refId": "int"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "defval",
+                "id": "defval"
+              },
+              {
+                "ref": {
+                  "name": "String",
+                  "refId": "String"
+                },
+                "isOptional": true,
+                "kind": "param",
+                "name": "defkey",
+                "id": "defkey"
+              }
+            ],
+            "id": "getBool4()"
           },
           {
             "returnType": {
@@ -1292,6 +1610,38 @@
             "id": "onUpdate0()"
           },
           {
+            "returnType": {
+              "name": "BoolEvaluator",
+              "refId": "BoolEvaluator"
+            },
+            "kind": "method",
+            "comment": "\nGetter for [boolEvaluator] instance.\n",
+            "name": "boolEvaluator",
+            "id": "boolEvaluator0()"
+          },
+          {
+            "isSetter": true,
+            "returnType": {
+              "name": "dynamic",
+              "refId": "dynamic"
+            },
+            "kind": "method",
+            "comment": "\nSet an [evaluator] instance.\n",
+            "name": "boolEvaluator=",
+            "children": [
+              {
+                "ref": {
+                  "name": "BoolEvaluator",
+                  "refId": "BoolEvaluator"
+                },
+                "kind": "param",
+                "name": "evaluator",
+                "id": "evaluator"
+              }
+            ],
+            "id": "boolEvaluator=1()"
+          },
+          {
             "ref": {
               "name": "Iterable",
               "refId": "Iterable",
@@ -1365,12 +1715,73 @@
           },
           {
             "ref": {
-              "name": "Encoding",
-              "refId": "Encoding"
+              "name": "BoolEvaluator",
+              "refId": "BoolEvaluator"
             },
             "kind": "property",
-            "name": "_encoding",
-            "id": "_encoding"
+            "comment": "\nGetter for [boolEvaluator] instance.\n",
+            "name": "boolEvaluator",
+            "id": "boolEvaluator"
+          },
+          {
+            "ref": {
+              "name": "int",
+              "refId": "int"
+            },
+            "isStatic": true,
+            "kind": "property",
+            "name": "SLASH",
+            "id": "SLASH"
+          },
+          {
+            "ref": {
+              "name": "int",
+              "refId": "int"
+            },
+            "isStatic": true,
+            "kind": "property",
+            "name": "SPACE",
+            "id": "SPACE"
+          },
+          {
+            "ref": {
+              "name": "int",
+              "refId": "int"
+            },
+            "isStatic": true,
+            "kind": "property",
+            "name": "NEWLINE",
+            "id": "NEWLINE"
+          },
+          {
+            "ref": {
+              "name": "int",
+              "refId": "int"
+            },
+            "isStatic": true,
+            "kind": "property",
+            "name": "EQUAL",
+            "id": "EQUAL"
+          },
+          {
+            "ref": {
+              "name": "int",
+              "refId": "int"
+            },
+            "isStatic": true,
+            "kind": "property",
+            "name": "HASH",
+            "id": "HASH"
+          },
+          {
+            "ref": {
+              "name": "int",
+              "refId": "int"
+            },
+            "isStatic": true,
+            "kind": "property",
+            "name": "ESCLMARK",
+            "id": "ESCLMARK"
           },
           {
             "ref": {
@@ -1411,6 +1822,15 @@
           },
           {
             "ref": {
+              "name": "BoolEvaluator",
+              "refId": "BoolEvaluator"
+            },
+            "kind": "property",
+            "name": "_be",
+            "id": "_be"
+          },
+          {
+            "ref": {
               "name": "String",
               "refId": "String"
             },
@@ -1444,7 +1864,7 @@
               "refId": "dynamic"
             },
             "kind": "constructor",
-            "comment": "\nCreate a new properties instance by naming the source file using [name]\nand, optionally, setting the desired [encoding].\n",
+            "comment": "\nCreate a new properties instance by naming the source file using [name].\n",
             "name": "Properties",
             "children": [
               {
@@ -1455,19 +1875,9 @@
                 "kind": "param",
                 "name": "name",
                 "id": "name"
-              },
-              {
-                "ref": {
-                  "name": "Encoding",
-                  "refId": "Encoding"
-                },
-                "isOptional": true,
-                "kind": "param",
-                "name": "encoding",
-                "id": "encoding"
               }
             ],
-            "id": "Properties2()"
+            "id": "Properties1()"
           },
           {
             "returnType": {
@@ -1475,7 +1885,7 @@
               "refId": "dynamic"
             },
             "kind": "constructor",
-            "comment": "\nCreate a new properties instance from file [path]\nand, optionally, setting the desired [encoding].\n",
+            "comment": "\nCreate a new properties instance from file [path].\n",
             "name": "Properties.fromFile",
             "children": [
               {
@@ -1486,19 +1896,9 @@
                 "kind": "param",
                 "name": "path",
                 "id": "path"
-              },
-              {
-                "ref": {
-                  "name": "Encoding",
-                  "refId": "Encoding"
-                },
-                "isOptional": true,
-                "kind": "param",
-                "name": "encoding",
-                "id": "encoding"
               }
             ],
-            "id": "Properties.fromFile2()"
+            "id": "Properties.fromFile1()"
           },
           {
             "returnType": {

@@ -1,18 +1,16 @@
 import '../lib/properties.dart';
 import '../packages/unittest/unittest.dart';
+import 'dart:io';
 
 void main(){
-  
-  // ATTENTION: change paths
-  String path = '/Users/kevin/Documents/workspace/properties/resources/sample.properties';
-  String path2 = '/Users/kevin/Documents/workspace/properties/resources/sample-conversion.properties';
+ 
+  String baseFile = 'resources/sample.properties';
+  String advancedFile = 'resources/sample-adv.properties';
   String jsonSource = '{"key.1" : "value 1", "key.2" : "value 2", "another.key" : "another value"}';
   
   group('Creation - from properties file', () {
-    test('Existing by path', () => expect(new Properties.fromFile(path), isNotNull));
-    test('Existing by name', () => expect(new Properties(path), isNotNull));
-    //test('Not existing by name', () => expect(new Properties('notexisting'), throwsException));
-    //test('Not existing by name', () => expect(new Properties.fromFile('notexisting'), throwsException));
+    test('Existing by path', () => expect(new Properties.fromFile(baseFile), isNotNull));
+    test('Existing by name', () => expect(new Properties(baseFile), isNotNull));
   });
   
   group('Creation - from JSON string', () {
@@ -21,7 +19,7 @@ void main(){
   
   group('Getters - from file source', () {
     Properties p;
-    setUp(() {p = new Properties.fromFile(path);});
+    setUp(() {p = new Properties.fromFile(baseFile);});
     test('Existing key - not null', () => expect(p.get('test.key.1'), isNotNull));
     test('Existing key - equals', () => expect(p.get('test.key.1'), equals('value 1')));
     test('Not existing key', () => expect(p.get('not.existing'), isNull));
@@ -31,9 +29,9 @@ void main(){
     });
   });
   
-  group('Getters - with default', () {
+  group('Getters with default', () {
     Properties p;
-    setUp(() {p = new Properties.fromFile(path);});
+    setUp(() {p = new Properties.fromFile(baseFile);});
     
     test('Not existing key - default value', () => expect(p.get('test.key.X', defval:'value X'), isNotNull));
     test('Not existing key - default value', () => expect(p.get('test.key.X', defval:'value X'), equals('value X')));
@@ -58,25 +56,51 @@ void main(){
     });
   });
   
-  group('Getters - conversion', () {
+  group('Advanced features', () {
     Properties p;
-    setUp(() {p = new Properties.fromFile(path2);});
-    test('Existing key - not null', () => expect(p.get('test.key.integer'), isNotNull));
-    test('Existing key - not null', () => expect(p.getInt('test.key.integer'), isNotNull));
-    test('Existing key - not null', () => expect(p.getInt('test.key.integer'), equals(1)));
+    setUp(() {p = new Properties.fromFile(advancedFile);});
+    test('Property with int value existing', () => expect(p.get('test.key.integer'), isNotNull));
+    test('Load int value', () => expect(p.getInt('test.key.integer'), isNotNull));
+    test('Loaded int value parsed successfully', () => expect(p.getInt('test.key.integer'), equals(1)));
     
-    test('Existing key - not integer', () => expect(p.getInt('test.key.notinteger'), isNull));
+    test('Property with double value existing', () => expect(p.get('test.key.double'), isNotNull));
+    test('Load double value', () => expect(p.getDouble('test.key.double'), isNotNull));
+    test('Loaded double value parsed successfully', () => expect(p.getDouble('test.key.double'), equals(2.1)));
     
-    test('Existing key - not null - default value', () => expect(p.getInt('test.key.integer.X', defval:1), equals(1)));
-    test('Existing key - not null - default key', () => expect(p.getInt('test.key.integer.X', defkey:'test.key.integer'), equals(1)));
+    test('Load a non int value as an int', () => expect(p.getInt('test.key.notinteger'), isNull));
     
-    test('Existing key - list', () => expect(p.getList('test.key.list'), isNotNull));
-    test('Existing key - list', () => expect(p.getList('test.key.list').length, equals(4)));
+    test('Load an int with default value', () => expect(p.getInt('test.key.integer.X', defval:1), equals(1)));
+    test('Load an int with default key', () => expect(p.getInt('test.key.integer.X', defkey:'test.key.integer'), equals(1)));
+    
+    test('Load a list', () => expect(p.getList('test.key.list'), isNotNull));
+    test('Load a list', () => expect(p.getList('test.key.list').length, equals(4)));
+    
+    test('Load a multiline property value', () => expect(p.get('test.key.multiline'), equals("this is a multi line property value")));
+    
+    test('Load true bool from true', () => expect(p.getBool('test.key.boolean.true'), equals(true)));
+    test('Load false bool from false', () => expect(p.getBool('test.key.boolean.false'), equals(false)));
+    
+    test('Load true bool from TRUE', () => expect(p.getBool('test.key.boolean.TRUE'), equals(true)));
+    test('Load false bool from FALSE', () => expect(p.getBool('test.key.boolean.FALSE'), equals(false)));
+    
+    test('Load true bool from 1', () => expect(p.getBool('test.key.boolean.1'), equals(true)));
+    test('Load false bool from 0', () => expect(p.getBool('test.key.boolean.0'), equals(false)));
+    
+    test('Custom bool evaluator', (){
+      BoolEvaluator myBE = new MyBoolEvaluator();
+      p.boolEvaluator = myBE;
+      
+      expect(p.get('test.key.boolean.yes'), equals("yes"));
+      expect(p.get('test.key.boolean.no'), equals("no"));
+      
+      expect(p.getBool('test.key.boolean.yes'), equals(true));
+      expect(p.getBool('test.key.boolean.no'), equals(false));
+    });
   });
   
   group('Adding properties', () {
     Properties p;
-    setUp(() {p = new Properties.fromFile(path);});
+    setUp(() {p = new Properties.fromFile(baseFile);});
     
     test('Add a property - not valid', (){
       var singleAdd = p.add(null, 'value 3');
@@ -131,7 +155,7 @@ void main(){
   group('Events', () {
     
     Properties p;
-    setUp(() {p = new Properties.fromFile(path);});
+    setUp(() {p = new Properties.fromFile(baseFile);});
     
     test('Add a property and listen to the event', () {
       
@@ -204,7 +228,7 @@ void main(){
   
   group('Export', () {
     Properties p;
-    setUp(() {p = new Properties.fromFile(path);});
+    setUp(() {p = new Properties.fromFile(baseFile);});
     test('To JSON', () => expect(p.toJSON(), '{"test.key.1":"value 1","test.key.2":"value 2","another.key":"another value"}'));
     test('To JSON - prefix', () => expect(p.toJSON(prefix:"test"), '{"test.key.1":"value 1","test.key.2":"value 2"}'));
     test('To JSON - suffix', () => expect(p.toJSON(suffix:"1"), '{"test.key.1":"value 1"}'));
@@ -213,7 +237,7 @@ void main(){
   
   group('Other', () {
     Properties p;
-    setUp(() {p = new Properties.fromFile(path);});
+    setUp(() {p = new Properties.fromFile(baseFile);});
     test('Contains - matching', () => expect(p.contains('test.key.2'), isTrue));
     test('Contains - not matching', () => expect(p.contains('test.key.3'), isFalse));
     test('Every key - matching', () => expect(p.every((s) => s.startsWith('test')), isNotNull));
@@ -230,4 +254,17 @@ void main(){
       expect(m.size, equals(1));
     });
   });
+}
+
+class MyBoolEvaluator extends BoolEvaluator {
+
+  MyBoolEvaluator(){
+    super.trues.add("yes");
+    super.falses.add("no");
+  }
+  
+  bool evaluate(String value){
+    return super.evaluate(value);
+  }
+  
 }

@@ -1,0 +1,124 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>BoolEvaluator class / properties Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="properties" data-type="BoolEvaluator">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../properties.html">properties</a> &rsaquo; <a href="../properties/BoolEvaluator.html">BoolEvaluator</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+<h2><div class="icon-library"></div><a href="../properties.html">properties</a></h2><ul class="icon">
+<li><a href="../properties/AddEvent.html"><div class="icon-class"></div>AddEvent</a></li>
+<li><div class="icon-class"></div><strong>BoolEvaluator</strong></li>
+<li><a href="../properties/Properties.html"><div class="icon-class"></div>Properties</a></li>
+<li><a href="../properties/PropertiesEvent.html"><div class="icon-class"></div>PropertiesEvent&lt;T&gt;</a></li>
+<li><a href="../properties/UpdateEvent.html"><div class="icon-class"></div>UpdateEvent</a></li>
+</ul>
+</div>
+<div class="content">
+        <h2><strong>BoolEvaluator</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<p>A default evaluator for bool values. Use evaluate method
+to determine if the input value is true or false according to
+the provided values.</p>
+<pre class="source">
+class BoolEvaluator {
+ 
+ List&lt;String&gt; trues = ['true', 'TRUE', 'True', "1"];
+ List&lt;String&gt; falses = ['false', 'FALSE', 'False', "0"];
+ 
+ bool evaluate(String value){
+   if(trues.contains(value)){
+     return true;
+   }
+   
+   if(falses.contains(value)){
+     return false;
+   }
+   
+   throw new FormatException("Input value is not a bool value.");
+ }
+ 
+}
+</pre>
+</div>
+<div>
+<h3>Properties</h3>
+<div class="field"><h4 id="falses">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/List.html">List</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt;         <strong>falses</strong> <a class="anchor-link"
+            href="#falses"
+            title="Permalink to BoolEvaluator.falses">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+falses = ['false', 'FALSE', 'False', "0"]
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="trues">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/List.html">List</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html">String</a>&gt;         <strong>trues</strong> <a class="anchor-link"
+            href="#trues"
+            title="Permalink to BoolEvaluator.trues">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+trues = ['true', 'TRUE', 'True', "1"]
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="evaluate">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html">bool</a> <strong>evaluate</strong>(<a href="http://api.dartlang.org/dart_core/String.html">String</a> value) <a class="anchor-link" href="#evaluate"
+              title="Permalink to BoolEvaluator.evaluate">#</a></h4>
+<div class="doc">
+<pre class="source">
+bool evaluate(String value){
+ if(trues.contains(value)){
+   return true;
+ }
+ 
+ if(falses.contains(value)){
+   return false;
+ }
+ 
+ throw new FormatException("Input value is not a bool value.");
+}
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        <div class="footer">
+          <div>This page was generated at 2013-03-16 17:53:06.921</div>
+        </div>
+        <script async src="../client-static.js"></script>
+        </body></html>
+        

@@ -1,3 +1,11 @@
+0.5 - 16-03-2013
+Now files are read as bytes enabling deeper property management features.
+Added multi-line value support.
+Now the first non-escaped equal is parsed as key-value separator.
+Added getBool method with customizable evaluator.
+Minor doc improvements.
+Unit tests improvements.
+
 0.4.4 - 16-03-2013
 Added new named constructor fromMap.
 Added getList method to get a list out of a property's value.
