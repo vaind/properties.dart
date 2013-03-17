@@ -22,6 +22,8 @@ class Properties {
   /// The content of the properties file in terms of key - value couples
   Map<String,String> _content;
   
+  PropertiesLayout _layout;
+  
   /// An internal reference to the source file.
   String _sourceFile;
   
@@ -189,6 +191,11 @@ class Properties {
         _content[line.keyString] = line.valueString;
       }
     }
+    
+    // init layout
+    _layout = new PropertiesLayout(linesList);
+    onAdd.listen(_layout.append);
+    onUpdate.listen(_layout.update);
   }
   
   /**
@@ -475,6 +482,15 @@ class Properties {
       toExport = _every((key) => key.endsWith(suffix));
     
     return JSON.stringify(toExport);
+  }
+  
+  void toFile(String path){
+    var result = new File(path);
+    
+    if(!result.existsSync())
+      result.createSync();
+    
+    result.openSync(FileMode.WRITE).writeListSync(this._layout.getLayout(), 0, this._layout.getLayout().length);
   }
   
   /**
@@ -847,5 +863,58 @@ class Line {
       return "${this.keyString}";
     else
       return "${this.keyString} = ${this.valueString}";
+  }
+}
+
+class PropertiesLayout {
+  
+  List<Line> _lines;
+  
+  PropertiesLayout(this._lines);
+  
+  void append(AddEvent event){
+    
+    _lines.add(new Line.fromKeyValue(event.key, event.value));
+    
+  }
+  
+  void update(UpdateEvent event){
+    
+  }
+  
+  List<int> getLayout(){
+    List<int> result = [];
+    for(Line l in _lines){
+      
+      if(l.isMultiLineProperty()){
+        
+        result.addAll(l.key);
+        result.add(Properties.SPACE);
+        result.add(Properties.EQUAL);
+        result.add(Properties.SPACE);
+        
+        for(List<int> ml in l.valueLines){
+          result.addAll(ml);
+          result.add(Properties.NEWLINE);
+        }
+        
+      } else if(l.isProperty()) {
+        
+        result.addAll(l.key);
+        result.add(Properties.SPACE);
+        result.add(Properties.EQUAL);
+        result.add(Properties.SPACE);
+        result.addAll(l.value);
+        result.add(Properties.NEWLINE);
+        
+      } else {
+        result.addAll(l.key);
+        result.add(Properties.NEWLINE);
+      }
+    }
+    
+    result.add(Properties.NEWLINE);
+    
+    return result;
   }
 }
