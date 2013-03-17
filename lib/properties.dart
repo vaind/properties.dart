@@ -13,7 +13,8 @@ import 'dart:async';
  */
 class Properties {
   
-  static final int SLASH = '\\'.charCodes[0];
+  static final int BACKSLASH = r'\'.charCodes[0];
+  static final int SLASH = '/'.charCodes[0];
   static final int SPACE = ' '.charCodes[0];
   static final int NEWLINE = '\n'.charCodes[0];
   static final int EQUAL = '='.charCodes[0];
@@ -107,13 +108,13 @@ class Properties {
     List<int> bytes = f.readAsBytesSync();
     
     // get line of bytes, managing multi-line properties
-    return _manageMultiLine(_getLines(bytes));
+    return _getByteLines(bytes);
   }
   
   /**
    * Get an array of lines of bytes out of the plain bytes.
    */
-  List<List<int>> _getLines(List<int> bytes){
+  List<List<int>> _getByteLines(List<int> bytes){
     List<List<int>> result = [];
     List<int> line = [];
     
@@ -134,81 +135,34 @@ class Properties {
     return result;
   }
 
-  /**
-   * Merge multi-line values into a single line value.
-   */
-  List<List<int>> _manageMultiLine(List<List<int>> lines) {
-    var result = [];
-    var app = [];
-    bool isMultiLine = false;
-    bool added = false;
+  List<Line> _getLines(List<List<int>> byteLines) {
     
-    for(List<int> l in lines){
+    List<Line> result = [];
+    bool multi = false;
+    
+    for(List<int> byteLine in byteLines){
       
-      if(isMultiLine){
-        app.addAll(_replaceLastOccurrence(l, Properties.SLASH, Properties.SPACE));
-        added = true;
-      }
-      
-      if(_endsWith(l, Properties.SLASH))
-        isMultiLine = true;
-      else {
-        isMultiLine = false;
-      }
-      
-      
-      if(!isMultiLine){
-        if(!app.isEmpty){
-          result.add(app);
-          app = [];
+      if(!multi){
+        result.add(new Line(byteLine));
+        
+        // current line is a multiline property
+        // having its value split on more than one line
+        if(result.last.isMultiLineProperty()){
+          multi = true;
         } else {
-          result.add(l);
+          multi = false;
         }
-      }
-      
-      if(isMultiLine && !added){
-        app.addAll(_replaceLastOccurrence(l, Properties.SLASH, Properties.SPACE));
-      }
-      
-      added = false;
-      
-    }
-    
-    return result;
-  }
-  
-  /**
-   * Test if a [line] of bytes ends with the input [char] or not.
-   */
-  bool _endsWith(List<int> line, int char){
-    return line.lastIndexOf(char) == (line.length -1);
-  }
-
-  /**
-   * Replace the last occurrence of the input char [toReplace] into the input [line] of bytes
-   * with the input char [replacer].
-   */
-  List<int> _replaceLastOccurrence(List<int> line, int toReplace, int replacer){
-    List<int> result = [];
-    bool replace = false;
-    int limit = line.length;
-    
-    if(line.lastIndexOf(toReplace) == (line.length -1)){
-      replace = true;
-    }
-    
-    for(int i = 0; i < limit; i++){
-      if(replace && (i == limit-1)){
-        result.add(replacer);  
+        
       } else {
-        result.add(line[i]);
+        
+        multi = result.last.addValueLine(byteLine);
+        
       }
     }
     
     return result;
   }
   
-
   /**
    * Load properties from lines.
    */
@@ -216,83 +170,15 @@ class Properties {
     if(lines == null || lines.isEmpty)
       return null;
     
+    List<Line> linesList = this._getLines(lines);
+    
     _content = new Map<String,String>();
     
-    for(List<int> l in lines){
-      if(_isProperty(l)){
-        List<List<int>> splitted = _splitKeyValue(l);
-        _content[new String.fromCharCodes(splitted[0]).trim()] = new String.fromCharCodes(splitted[1]).trim();
+    for(Line line in linesList){
+      if(line.isProperty()){
+        _content[line.keyString] = line.valueString;
       }
     }
-  }
-  
-  /**
-   * Given a [line] of bytes split it into key and value.
-   */
-  List<List<int>> _splitKeyValue(List<int> line){
-    
-    List<List<int>> result = [];
-    List<int> key = [];
-    List<int> value = [];
-    
-    bool isKey = true;
-    
-    for(var i = 0; i < line.length; i++){
-      
-      if(line[i] == Properties.EQUAL && isKey){
-        isKey = false;
-      } else {
-        if(isKey){
-          key.add(line[i]);
-        } else {
-          value.add(line[i]);
-        }
-      }
-    }
-    
-    result.add(key);
-    result.add(value);
-    
-    return result;
-  }
-
-  /**
-   * Determine if input line is a property or not.
-   */
-  _isProperty(List<int> line) {
-    
-    if(line.isEmpty || line == null)
-      return false;
-    
-    if(_isComment(line))
-      return false;
-    
-    // contains a non escaped =
-    for(var i = 0; i < line.length; i++){
-      if(line[i] == Properties.EQUAL && line[i-1] != Properties.SLASH){
-        return true;
-      }
-    }
-      
-    return false;
-  }
-  
-  /**
-   * Determine if input line is a comment line.
-   */
-  _isComment(List<int> line){
-    
-    String lineStr = new String.fromCharCodes(line);
-    
-    // comment
-    if(lineStr.startsWith('#'))
-      return true;
-    
-    // comment
-    if(lineStr.startsWith('!'))
-      return true;
-    
-    return false;
   }
   
   /**
@@ -576,6 +462,15 @@ class Properties {
     return JSON.stringify(toExport);
   }
   
+  void toFile(String path){
+    var result = new File(path);
+    
+    if(!result.existsSync())
+      result.createSync();
+    
+    //result.openSync(FileMode.WRITE).writeListSync(this._layout.getLayout(), 0, this._layout.getLayout().length);
+  }
+  
   /**
    * Returns the whole content as a String.
    */
@@ -702,6 +597,10 @@ class BoolEvaluator {
   List<String> trues = ['true', 'TRUE', 'True', "1"];
   List<String> falses = ['false', 'FALSE', 'False', "0"];
   
+  /**
+   * Evaluate the input [value] String trying to determine
+   * whether it is true or false. Throws an exception otherwise.
+   */
   bool evaluate(String value){
     if(trues.contains(value)){
       return true;
@@ -714,4 +613,177 @@ class BoolEvaluator {
     throw new FormatException("Input value is not a bool value.");
   }
   
+}
+
+class Line {
+  
+  List<int> _bytes = [];
+  List<int> _key = [], _value = [];
+  List<List<int>> _valuelines = [];
+  
+  Line(List<int> bytes){
+    
+    this._bytes = bytes;
+    
+    _init();
+  }
+  
+  void _init(){
+    
+    if(_isProperty(_bytes)){
+        List<List<int>> keyvalue = _splitKeyValue(_bytes);
+
+        _key = keyvalue[0];
+                
+        if(_isMultiLineProperty(_bytes)){
+          _valuelines = [];
+          _valuelines.add(keyvalue[1]);
+          _value.addAll(_removeMultiLine(keyvalue[1]));
+        } else {
+          _value = keyvalue[1];
+        }
+
+    } else {
+      _key = _value = _bytes;
+    }
+  }
+  
+  bool isProperty(){
+    return _isProperty(_bytes);
+  }
+  
+  bool isMultiLineProperty(){
+    return _isMultiLineProperty(_bytes);
+  }
+  
+  bool isComment(){
+    return _isComment(_bytes);
+  }
+  
+  List<int> get key => _key;
+  
+  List<int> get value => _value;
+  
+  List<List<int>> get valueLines => _valuelines;
+  
+  String get keyString => new String.fromCharCodes(_key).trim();
+  
+  String get valueString => new String.fromCharCodes(_value).trim();
+  
+  bool addValueLine(List<int> valueline){
+      _valuelines.add(valueline);
+      _value.addAll(this._removeMultiLine(valueline));
+      
+      // has next?
+      return _endsWith(valueline, Properties.BACKSLASH);
+  }
+  
+  /**
+   * Test if a [line] of bytes ends with the input [char] or not.
+   */
+  bool _endsWith(List<int> line, int char){
+    return line.lastIndexOf(char) == (line.length -1) && (line[line.length-2] != Properties.SLASH);
+  }
+  
+  /**
+   * Given a [line] of bytes split it into key and value.
+   */
+  List<List<int>> _splitKeyValue(List<int> line){
+    
+    var result = new List<List<int>>(2);
+    List<int> key = [];
+    List<int> value = [];
+    
+    bool isKey = true;
+    
+    for(var i = 0; i < line.length; i++){
+      
+      if(line[i] == Properties.EQUAL && isKey){
+        isKey = false;
+      } else {
+        if(isKey){
+          key.add(line[i]);
+        } else {
+          value.add(line[i]);
+        }
+      }
+    }
+    
+    result[0] = key;
+    result[1] = value;
+    
+    return result;
+  }
+
+  /**
+   * Determine if input line is a property or not.
+   */
+  _isProperty(List<int> line) {
+    
+    if(line.isEmpty || line == null)
+      return false;
+    
+    if(_isComment(line))
+      return false;
+    
+    // contains a non escaped =
+    for(var i = 0; i < line.length; i++){
+      if(line[i] == Properties.EQUAL && line[i-1] != Properties.BACKSLASH){
+        return true;
+      }
+    }
+      
+    return false;
+  }
+  
+  /**
+   * Determine if input line is a comment line.
+   */
+  _isComment(List<int> line){
+    
+    String lineStr = new String.fromCharCodes(line);
+    
+    // comment
+    if(lineStr.startsWith('#'))
+      return true;
+    
+    // comment
+    if(lineStr.startsWith('!'))
+      return true;
+    
+    return false;
+  }
+  
+  bool _isMultiLineProperty(List<int> _bytes) {
+    return _isProperty(_bytes) && _endsWith(_bytes, Properties.BACKSLASH);
+  }
+  
+  /**
+   * Replace the last occurrence of the input char [toReplace] into the input [line] of bytes
+   * with the input char [replacer].
+   */
+  List<int> _removeMultiLine(List<int> line){
+    List<int> result = [];
+    bool replace = false;
+    int limit = line.length;
+    
+    replace = _endsWith(line, Properties.BACKSLASH);
+    
+    for(int i = 0; i < limit; i++){
+      if(replace && (i == limit-1)){
+        result.add(Properties.SPACE);  
+      } else {
+        result.add(line[i]);
+      }
+    }
+    
+    return result;
+  }
+  
+  String toString(){
+    if(this.isComment())
+      return "${this.keyString}";
+    else
+      return "${this.keyString} = ${this.valueString}";
+  }
 }
