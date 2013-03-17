@@ -47,8 +47,8 @@ String defkey = p.get('test.key.X', defkey:'test.key.1');
 
 ```dart
 int anInt = p.getInt('test.key.integer');
-int aDouble = p.getDouble('test.key.double');
-int aBool = p.getBool('test.key.bool');
+double aDouble = p.getDouble('test.key.double');
+bool aBool = p.getBool('test.key.bool');
 ```
 
 - get a list

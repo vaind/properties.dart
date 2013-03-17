@@ -18,8 +18,6 @@ class Properties {
   static final int SPACE = ' '.charCodes[0];
   static final int NEWLINE = '\n'.charCodes[0];
   static final int EQUAL = '='.charCodes[0];
-  static final int HASH = '#'.charCodes[0];
-  static final int ESCLMARK = '!'.charCodes[0];
   
   /// The content of the properties file in terms of key - value couples
   Map<String,String> _content;
@@ -37,7 +35,12 @@ class Properties {
   static const String ADD_PROPERTY_EVENTNAME = 'add';
   static const String UPDATE_PROPERTY_EVENTNAME = 'update';
   
-  StreamController eventController;
+  
+  /// Controller for Add events
+  StreamController _addEventController;
+  
+  /// Controller for Update events
+  StreamController _updateEventController;
   
   /**
    * Create a new properties instance by naming the source file using [name].
@@ -89,9 +92,13 @@ class Properties {
    * Initialize common internal tools such as event controllers.
    */
   _init() {
-    eventController = new StreamController<PropertiesEvent>.broadcast();
+    _addEventController = new StreamController<PropertiesEvent>.broadcast();
+    _updateEventController = new StreamController<PropertiesEvent>.broadcast();
   }
   
+  /**
+   * Read from file and load the content.
+   */
   void _initFromFile() => _load(_read(_sourceFile));
 
   /**
@@ -101,8 +108,9 @@ class Properties {
     
     var f = _getFile(path);
     
-    if(f == null || !f.existsSync())
+    if(f == null || !f.existsSync()){
       return null;
+    }
     
     // read file as bytes
     List<int> bytes = f.readAsBytesSync();
@@ -127,14 +135,19 @@ class Properties {
         line = [];
       }
       
-      if(i == bytes.length -1)
+      if(i == bytes.length -1){
         result.add(line);
+      }
       
     }
     
     return result;
   }
 
+  /**
+   * Get a list of Line objects out of a List of 
+   * [byteLines].
+   */
   List<Line> _getLines(List<List<int>> byteLines) {
     
     List<Line> result = [];
@@ -347,7 +360,7 @@ class Properties {
     _content[key] = value;
     
     if(this._enableEvents)
-      eventController.add(new AddEvent(key, value));
+      _addEventController.add(new AddEvent(key, value));
   }
 
   /**
@@ -361,7 +374,7 @@ class Properties {
     _content[key] = newvalue;
     
     if(this._enableEvents)
-      eventController.add(new UpdateEvent(key, newvalue, oldvalue));
+      _updateEventController.add(new UpdateEvent(key, newvalue, oldvalue));
   }
   
   /**
@@ -464,15 +477,6 @@ class Properties {
     return JSON.stringify(toExport);
   }
   
-  void toFile(String path){
-    var result = new File(path);
-    
-    if(!result.existsSync())
-      result.createSync();
-    
-    //result.openSync(FileMode.WRITE).writeListSync(this._layout.getLayout(), 0, this._layout.getLayout().length);
-  }
-  
   /**
    * Returns the whole content as a String.
    */
@@ -491,12 +495,12 @@ class Properties {
   /**
    * Get the stream instance for the "property added" event.
    */
-  Stream get onAdd => eventController.stream;
+  Stream get onAdd => _addEventController.stream;
   
   /**
    * Get the stream instance for the "property updated" event.
    */
-  Stream get onUpdate => eventController.stream;
+  Stream get onUpdate => _updateEventController.stream;
   
   /**
    * Getter for [boolEvaluator] instance.
@@ -624,61 +628,74 @@ class BoolEvaluator {
  */
 class Line {
   
-  List<int> _bytes = [];
+  
   List<int> _key = [], _value = [];
   List<List<int>> _valuelines = [];
+  
+  bool _property, _multiline, _comment = false;
   
   /**
    * Create a new line from an input list of bytes representing
    * a line from the file (without NL).
    */
   Line(List<int> bytes){
-    
-    this._bytes = bytes;
-    
-    _init();
+    _init(bytes);
   }
   
-  void _init(){
+  Line.fromString(String line){
+    _init(line.charCodes);
+  }
+  
+  Line.fromKeyValue(String key, String value){
     
-    if(_isProperty(_bytes)){
-        List<List<int>> keyvalue = _splitKeyValue(_bytes);
+    this._key = key.charCodes;
+    this._value = value.charCodes;
+    this._valuelines = [[value.charCodes]];
+    
+    this._property = true;
+    this._comment = false;
+    this._multiline = false;
+    
+  }
+  
+  void _init(List<int> bytes){
+    
+    this._property = _isProperty(bytes);
+    this._comment = _isComment(bytes);
+    this._multiline = _isMultiLineProperty(bytes);
+    
+    if(_property){
+        List<List<int>> keyvalue = _splitKeyValue(bytes);
 
         _key = keyvalue[0];
                 
-        if(_isMultiLineProperty(_bytes)){
-          _valuelines = [];
+        if(_isMultiLineProperty(bytes)){
           _valuelines.add(keyvalue[1]);
           _value.addAll(_removeMultiLine(keyvalue[1]));
         } else {
+          _valuelines.add(keyvalue[1]);
           _value = keyvalue[1];
         }
 
     } else {
-      _key = _value = _bytes;
+      _key = _value = bytes;
     }
   }
   
   /**
    * This line is a property line?
    */
-  bool isProperty(){
-    return _isProperty(_bytes);
-  }
+  bool isProperty() => _property;
   
   /**
    * This line is a property line having a multi line value?
    */
-  bool isMultiLineProperty(){
-    return _isMultiLineProperty(_bytes);
-  }
+  bool isMultiLineProperty() => _multiline;
   
   /**
    * This line is a comment line?
    */
-  bool isComment(){
-    return _isComment(_bytes);
-  }
+  bool isComment() => _comment;
   
   /**
    * Getter for the key contained in this property, if any.
