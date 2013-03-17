@@ -147,11 +147,7 @@ class Properties {
         
         // current line is a multiline property
         // having its value split on more than one line
-        if(result.last.isMultiLineProperty()){
-          multi = true;
-        } else {
-          multi = false;
-        }
+        result.last.isMultiLineProperty() ? multi = true : multi = false;
         
       } else {
         
@@ -167,8 +163,9 @@ class Properties {
    * Load properties from lines.
    */
   _load(List<List<int>> lines) {
-    if(lines == null || lines.isEmpty)
+    if(lines == null || lines.isEmpty){
       return null;
+    }
     
     List<Line> linesList = this._getLines(lines);
     
@@ -188,13 +185,15 @@ class Properties {
     
     var result = new File(file);
     
-    if(result.existsSync())
+    if(result.existsSync()){
       return result;
+    }
     
     result = new File.fromPath(new Path(file));
     
-    if(result.existsSync())
+    if(result.existsSync()){
       return result;
+    }
     
     throw new FileIOException('It\'s impossible to load properties from input file ${file}. File does not exist.');
   }
@@ -205,14 +204,17 @@ class Properties {
    * Use [defkey] to set a default key in case of missing property.
    */
   String get(String key, {Object defval, String defkey}) {
-    if(!?key)
+    if(!?key){
       return null;
+    }
     
-    if(_content == null)
+    if(_content == null){
       return null;
+    }
     
-    if(defval == null && defkey == null)
+    if(defval == null && defkey == null){
       return _content[key];
+    }
     
     if(_content[key] == null){
       if(defval != null)
@@ -615,12 +617,21 @@ class BoolEvaluator {
   
 }
 
+/**
+ * This helper class models a line as it has been read from
+ * the source file, providing and hiding some useful tools needed
+ * to manage properties parsing.
+ */
 class Line {
   
   List<int> _bytes = [];
   List<int> _key = [], _value = [];
   List<List<int>> _valuelines = [];
   
+  /**
+   * Create a new line from an input list of bytes representing
+   * a line from the file (without NL).
+   */
   Line(List<int> bytes){
     
     this._bytes = bytes;
@@ -648,28 +659,55 @@ class Line {
     }
   }
   
+  /**
+   * This line is a property line?
+   */
   bool isProperty(){
     return _isProperty(_bytes);
   }
   
+  /**
+   * This line is a property line having a multi line value?
+   */
   bool isMultiLineProperty(){
     return _isMultiLineProperty(_bytes);
   }
   
+  /**
+   * This line is a comment line?
+   */
   bool isComment(){
     return _isComment(_bytes);
   }
   
+  /**
+   * Getter for the key contained in this property, if any.
+   */
   List<int> get key => _key;
   
+  /**
+   * Getter for the value contained in this property, if any.
+   */
   List<int> get value => _value;
   
+  /**
+   * Getter for the lines composing the value of this property, if any.
+   */
   List<List<int>> get valueLines => _valuelines;
   
+  /**
+   * Get the key as a String.
+   */
   String get keyString => new String.fromCharCodes(_key).trim();
   
+  /**
+   * Get the value as a String.
+   */
   String get valueString => new String.fromCharCodes(_value).trim();
   
+  /**
+   * Add a value line to the value of this property.
+   */
   bool addValueLine(List<int> valueline){
       _valuelines.add(valueline);
       _value.addAll(this._removeMultiLine(valueline));
@@ -754,6 +792,10 @@ class Line {
     return false;
   }
   
+  /**
+   * Test if this is a multi line property. This means it has to be a property
+   * whos value ends with backslash (not escaped).
+   */
   bool _isMultiLineProperty(List<int> _bytes) {
     return _isProperty(_bytes) && _endsWith(_bytes, Properties.BACKSLASH);
   }
@@ -780,6 +822,9 @@ class Line {
     return result;
   }
   
+  /**
+   * The line to string.
+   */
   String toString(){
     if(this.isComment())
       return "${this.keyString}";
