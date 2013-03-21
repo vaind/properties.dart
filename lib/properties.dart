@@ -6,6 +6,7 @@ library properties;
 import 'dart:io';
 import 'dart:json' as JSON;
 import 'dart:async';
+import 'dart:utf';
 
 /**
  * The Properties class implementing all tools to load key-values from file both by name and
@@ -391,8 +392,10 @@ class Properties {
    */
   void merge(Properties properties, [bool overwriteExisting = true]){
     for(String key in properties.keys){
-      if(overwriteExisting || _content[key] == null){
+      if(overwriteExisting){
         _content[key] = properties.get(key);
+      } else {
+        _content.putIfAbsent(key, () => properties.get(key));
       }
     }
   }
@@ -404,8 +407,10 @@ class Properties {
    */
   void mergeMap(Map<String,String> map, [bool overwriteExisting = true]){
     for(String key in map.keys){
-      if(overwriteExisting || _content[key] == null){
+      if(overwriteExisting){
         _content[key] = map[key];
+      } else {
+        _content.putIfAbsent(key, () => map[key]);
       }
     }
   }
@@ -420,8 +425,10 @@ class Properties {
     var parsed = JSON.parse(jsonMap) as Map<String,String>;
     
     for(String key in parsed.keys){
-      if(overwriteExisting || _content[key] == null){
+      if(overwriteExisting){
         _content[key] = parsed[key];
+      } else {
+        _content.putIfAbsent(key, () => parsed[key]);
       }
     }
   }
@@ -482,15 +489,6 @@ class Properties {
       toExport = _every((key) => key.endsWith(suffix));
     
     return JSON.stringify(toExport);
-  }
-  
-  void toFile(String path){
-    var result = new File(path);
-    
-    if(!result.existsSync())
-      result.createSync();
-    
-    result.openSync(FileMode.WRITE).writeListSync(this._layout.getLayout(), 0, this._layout.getLayout().length);
   }
   
   /**
@@ -736,7 +734,7 @@ class Line {
   /**
    * Get the value as a String.
    */
-  String get valueString => new String.fromCharCodes(_value).trim();
+  String get valueString => decodeUtf8(_value).trim();
   
   /**
    * Add a value line to the value of this property.

@@ -1,3 +1,8 @@
+0.5.2 - 21-03-2013
+Fixed a bug on merge methods, now managing existing empty properties without overwriting them in any case.
+Improved testing on merge methods.
+Now managing special characters for values decoding as UTF-8 the bytes read from file.
+
 0.5.1 - 17-03-2013
 Fixed a bug on event triggering and management.
 Code refactoring to improve properties management.

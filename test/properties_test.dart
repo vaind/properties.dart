@@ -59,6 +59,9 @@ void main(){
   group('Advanced features', () {
     Properties p;
     setUp(() {p = new Properties.fromFile(advancedFile);});
+    
+    test('Load value with escaped backslash', () => expect(p.get('test.key.slash'), equals(r"C:\\test\\slash")));
+    
     test('Property with int value existing', () => expect(p.get('test.key.integer'), isNotNull));
     test('Load int value', () => expect(p.getInt('test.key.integer'), isNotNull));
     test('Loaded int value parsed successfully', () => expect(p.getInt('test.key.integer'), equals(1)));
@@ -233,6 +236,34 @@ void main(){
     test('To JSON - prefix', () => expect(p.toJSON(prefix:"test"), '{"test.key.1":"value 1","test.key.2":"value 2"}'));
     test('To JSON - suffix', () => expect(p.toJSON(suffix:"1"), '{"test.key.1":"value 1"}'));
     test('To JSON - prefix & suffix', () => expect(p.toJSON(prefix:"test", suffix:"2"), '{"test.key.2":"value 2"}'));
+  });
+  
+  group('Merge', () {
+    Properties p;
+    setUp(() {p = new Properties.fromFile(baseFile);});
+    test('Add brand new keys from map', () {
+      p.mergeMap({"test.key.merge1" : "merge value 1", "test.key.merge2" : "merge value 2"});
+      
+      expect(p.size, equals(5));
+      expect(p.get("test.key.merge1"), isNotNull);
+      expect(p.get("test.key.merge1"), equals("merge value 1"));
+      expect(p.get("test.key.merge2"), isNotNull);
+      expect(p.get("test.key.merge2"), equals("merge value 2"));
+    });
+    
+    test('Add an existing key from map', () {
+      p.mergeMap({"test.key.1" : "a new value for 1"});
+      
+      expect(p.get("test.key.1"), isNotNull);
+      expect(p.get("test.key.1"), equals("a new value for 1"));
+    });
+    
+    test('Add an existing key from map, do not overwrite', () {
+      p.mergeMap({"test.key.1" : "a new value for 1"}, false);
+      
+      expect(p.get("test.key.1"), isNotNull);
+      expect(p.get("test.key.1"), equals("value 1"));
+    });
   });
   
   group('Other', () {
