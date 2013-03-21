@@ -1,3 +1,6 @@
+0.5.2+1 - 21-03-2013
+Compatibility update for SDK 0.4.2
+
 0.5.2 - 21-03-2013
 Fixed a bug on merge methods, now managing existing empty properties without overwriting them in any case.
 Improved testing on merge methods.
