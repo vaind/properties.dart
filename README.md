@@ -99,6 +99,6 @@ Any comment?
 -------------
 You're welcome! Just visit the [Google Code page][gcp] and open a new issue or mail me.
 
-[changelog]: http://code.google.com/p/dart-properties/source/browse/tags/0.5.2/CHANGELOG
+[changelog]: http://code.google.com/p/dart-properties/source/browse/tags/0.5.3/CHANGELOG
 [gcp]: http://code.google.com/p/dart-properties/
-[dartdoc]: http://code.google.com/p/dart-properties/source/browse/tags/0.5.2/#0.5.2%2Fdoc
+[dartdoc]: http://code.google.com/p/dart-properties/source/browse/tags/0.5.3/#0.5.3%2Fdoc
