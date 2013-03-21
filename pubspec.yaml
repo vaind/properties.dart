@@ -7,7 +7,7 @@ documentation: http://code.google.com/p/dart-properties/source/browse/tags/0.5.2
 environment:
   sdk: 0.4.2
 dependencies:
-  unittest: any
+  unittest: 0.4.2
 
 #0.5.2%2Fdoc
 #0.5.2%2Fdoc
