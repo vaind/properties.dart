@@ -418,13 +418,7 @@ class Properties {
    * may decide how to manage existing thanks to the optional parameter [overwriteExisting].
    */
   void mergeMap(Map<String,String> map, [bool overwriteExisting = true]){
-    for(String key in map.keys){
-      if(overwriteExisting){
-        _content[key] = map[key];
-      } else {
-        _content.putIfAbsent(key, () => map[key]);
-      }
-    }
+    _merge(map, overwriteExisting);
   }
 
   /**
@@ -436,11 +430,15 @@ class Properties {
 
     var parsed = JSON.parse(jsonMap) as Map<String,String>;
 
-    for(String key in parsed.keys){
+    _merge(parsed, overwriteExisting);
+  }
+  
+  _merge(Map<String,String> map, [bool overwriteExisting = true]){
+    for(String key in map.keys){
       if(overwriteExisting){
-        _content[key] = parsed[key];
+        _content[key] = map[key];
       } else {
-        _content.putIfAbsent(key, () => parsed[key]);
+        _content.putIfAbsent(key, () => map[key]);
       }
     }
   }
@@ -545,7 +543,7 @@ class Properties {
 /**
  * A factory to create simple Properties' related events.
  */
-class PropertiesEvent<T extends Event> {
+class PropertiesEvent {
   final String _eventType;
 
   /**
@@ -689,16 +687,16 @@ class Line {
 
   void _init(List<int> bytes){
 
-    this._property = _isProperty(bytes);
-    this._comment = _isComment(bytes);
-    this._multiline = _isMultiLineProperty(bytes);
+    _property = _isProperty(bytes);
+    _comment = _isComment(bytes);
+    _multiline = _isMultiLineProperty(bytes);
 
     if(_property){
         List<List<int>> keyvalue = _splitKeyValue(bytes);
 
         _key = keyvalue[0];
 
-        if(_isMultiLineProperty(bytes)){
+        if(_multiline){
           _valuelines.add(keyvalue[1]);
           _value.addAll(_removeMultiLine(keyvalue[1]));
         } else {
