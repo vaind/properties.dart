@@ -1,3 +1,9 @@
+0.5.3
+Fixed error on Event.
+Fixed carriage return problem on line parsing.
+Minor code improvements on merge and other.
+Deprecated enable/disable events triggering.
+
 0.5.2+1 - 21-03-2013
 Compatibility update for SDK 0.4.2
 
