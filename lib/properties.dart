@@ -18,6 +18,7 @@ class Properties {
   static final int SLASH = '/'.codeUnits[0];
   static final int SPACE = ' '.codeUnits[0];
   static final int NEWLINE = '\n'.codeUnits[0];
+  static final int CR = '\r'.codeUnits[0];
   static final int EQUAL = '='.codeUnits[0];
 
   /// The content of the properties file in terms of key - value couples
@@ -131,7 +132,7 @@ class Properties {
 
     for(var i = 0; i < bytes.length; i++){
 
-      if(bytes[i] != Properties.NEWLINE){
+      if(bytes[i] != Properties.NEWLINE && bytes[i] != Properties.CR){
         line.add(bytes[i]);
       } else {
         result.add(line);
@@ -433,6 +434,9 @@ class Properties {
     _merge(parsed, overwriteExisting);
   }
   
+  /**
+   * Internal merge implementation.
+   */
   _merge(Map<String,String> map, [bool overwriteExisting = true]){
     for(String key in map.keys){
       if(overwriteExisting){
@@ -458,6 +462,9 @@ class Properties {
     return new Properties.fromMap(result);
   }
 
+  /**
+   * Internal every implementation.
+   */
   Map<String,String> _every(bool k(String str), [bool v(String val)]) {
 
     if(v == null) v = (String s) => true;
