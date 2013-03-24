@@ -519,11 +519,13 @@ class Properties {
   /**
    * Getter for [enableEvents] flag.
    */
+  @deprecated
   bool get enableEvents => this._enableEvents;
 
   /**
    * Enable / disable events triggering on this instance.
    */
+  @deprecated
   set enableEvents(bool enable) => this._enableEvents = enable;
 
   /**
