@@ -8,9 +8,13 @@ import 'dart:json' as JSON;
 import 'dart:async';
 import 'dart:utf';
 
+part 'src/properties_events.dart';
+part 'src/properties_parsing.dart';
+part 'src/properties_layout_management.dart';
+
 /**
  * The Properties class implementing all tools to load key-values from file both by name and
- * path.
+ * path. Input files are supposed to be in UTF-8 format.
  */
 class Properties {
 
@@ -24,6 +28,7 @@ class Properties {
   /// The content of the properties file in terms of key - value couples
   Map<String,String> _content;
 
+  /// Layout manager
   PropertiesLayout _layout;
 
   /// An internal reference to the source file.
@@ -37,6 +42,8 @@ class Properties {
 
   /// The property added event name
   static const String ADD_PROPERTY_EVENTNAME = 'add';
+  
+  /// The property updated event name
   static const String UPDATE_PROPERTY_EVENTNAME = 'update';
 
 
@@ -103,103 +110,16 @@ class Properties {
   /**
    * Read from file and load the content.
    */
-  void _initFromFile() => _load(_read(_sourceFile));
-
-  /**
-   * Create the file object and read its content in lines.
-   */
-  List<List<int>> _read(String path) {
-
-    var f = _getFile(path);
-
-    if(f == null || !f.existsSync()){
-      return null;
-    }
-
-    // read file as bytes
-    List<int> bytes = f.readAsBytesSync();
-
-    // get line of bytes, managing multi-line properties
-    return _getByteLines(bytes);
-  }
-
-  /**
-   * Get an array of lines of bytes out of the plain bytes.
-   */
-  List<List<int>> _getByteLines(List<int> bytes){
-    List<List<int>> result = [];
-    List<int> line = [];
-
-    for(var i = 0; i < bytes.length; i++){
-
-      if(bytes[i] != Properties.NEWLINE && bytes[i] != Properties.CR){
-        line.add(bytes[i]);
-      } else {
-        result.add(line);
-        line = [];
-      }
-
-      if(i == bytes.length -1){
-        result.add(line);
-      }
-
-    }
-
-    return result;
-  }
-
-  /**
-   * Get a list of Line objects out of a List of
-   * [byteLines].
-   */
-  List<Line> _getLines(List<List<int>> byteLines) {
-
-    List<Line> result = [];
-    bool multi = false;
-
-    for(List<int> byteLine in byteLines){
-
-      if(!multi){
-        result.add(new Line(byteLine));
-
-        // current line is a multiline property
-        // having its value split on more than one line
-        result.last.isMultiLineProperty() ? multi = true : multi = false;
-
-      } else {
-
-        multi = result.last.addValueLine(byteLine);
-
-      }
-    }
-
-    return result;
-  }
-
-  /**
-   * Load properties from lines.
-   */
-  _load(List<List<int>> lines) {
-    if(lines == null || lines.isEmpty){
-      return null;
-    }
-
-    List<Line> linesList = this._getLines(lines);
-
-    _content = new Map<String,String>();
-
-    for(Line line in linesList){
-      if(line.isProperty()){
-        _content[line.keyString] = line.valueString;
-      }
-    }
+  void _initFromFile(){
+    var parser = new PropertiesFileParser(_getFile(_sourceFile));
+    _content = parser.parse();
 
     // init layout
-    _layout = new PropertiesLayout(linesList);
+    _layout = new PropertiesLayout(parser.lines);
     onAdd.listen(_layout.append);
     onUpdate.listen(_layout.update);
   }
-
+    
   /**
    * Get a file instance from the input string [file].
    */
@@ -249,6 +169,25 @@ class Properties {
     }
 
     return _content[key];
+  }
+  
+  /**
+   * Returns the value for the given [key] or null if [key] is not
+   * in the map. No default will be applied.
+   */
+  String operator [](String key) {
+    return get(key);
+  }
+
+  /**
+   * Associates the [key] with the given [value]. This method
+   * adds a new property if the input one does not exists or
+   * updates the existing one.
+   * 
+   * Events are triggered as for the add method.
+   */
+  void operator []=(String key, String value) {
+    add(key, value);
   }
 
   /**
@@ -351,6 +290,9 @@ class Properties {
    *
    * If and only if a new property is added an ADD event is
    * triggered.
+   * 
+   * If and only if an existing property is overwritten an UPDATE
+   * event is triggered.
    */
   bool add(String key, String value, [bool overwriteExisting = true]){
     if(key == null || value == null) {
@@ -510,6 +452,18 @@ class Properties {
 
     return JSON.stringify(toExport);
   }
+  
+  /**
+   * Write the content to the input file.
+   */
+  void toFile(String path){
+    var result = new File(path);
+    
+    if(!result.existsSync())
+      result.createSync();
+    
+    result.openWrite().writeBytes(this._layout.layoutAsBytes);
+  }
 
   /**
    * Returns the whole content as a String.
@@ -547,86 +501,7 @@ class Properties {
    * Set an [evaluator] instance.
    */
   set boolEvaluator(BoolEvaluator evaluator) => this._be = evaluator;
-}
-
-/**
- * A factory to create simple Properties' related events.
- */
-class PropertiesEvent {
-  final String _eventType;
-
-  /**
-   * Create a new event instance by name the [eventType] only.
-   */
-  const PropertiesEvent(this._eventType);
-
-  /**
-   * Getter fro the [eventType] of this event.
-   */
-  String get type => _eventType;
-}
-
-/**
- * A factory to create simple property added event.
- */
-class AddEvent extends PropertiesEvent {
-
-  final String _key;
-  final String _value;
-
-  /**
-   * Create a new property added event instance by name the [eventType] and the property's [key] and [value].
-   */
-  const AddEvent(this._key, this._value):super(Properties.ADD_PROPERTY_EVENTNAME);
-
-  /**
-   * Getter for the added [key].
-   */
-  String get key => _key;
-
-  /**
-   * Getter for the added [value].
-   */
-  String get value => _value;
-
-
-  String toString(){
-    return "${Properties.ADD_PROPERTY_EVENTNAME} on ${this._key}: ${this._value}";
-  }
-}
-
-/**
- * A factory to create simple property added event.
- */
-class UpdateEvent extends PropertiesEvent {
-
-  final String _key;
-  final String _oldvalue;
-  final String _newvalue;
-
-  /**
-   * Create a new property updated event instance by name the [eventType] and the property's [key] and [value].
-   */
-  const UpdateEvent(this._key, this._newvalue, this._oldvalue):super(Properties.UPDATE_PROPERTY_EVENTNAME);
-
-  /**
-   * Getter for the updated [key].
-   */
-  String get key => _key;
-
-  /**
-   * Getter for the updated [oldValue].
-   */
-  String get oldValue => _oldvalue;
-
-  /**
-   * Getter for the updated [newValue].
-   */
-  String get newValue => _newvalue;
-
-  String toString(){
-    return "${Properties.UPDATE_PROPERTY_EVENTNAME} on ${this._key}";
-  }
+  
 }
 
 /**
@@ -655,291 +530,4 @@ class BoolEvaluator {
     throw new FormatException("Input value is not a bool value.");
   }
 
-}
-
-/**
- * This helper class models a line as it has been read from
- * the source file, providing and hiding some useful tools needed
- * to manage properties parsing.
- */
-class Line {
-
-
-  List<int> _key = [], _value = [];
-  List<List<int>> _valuelines = [];
-
-  bool _property, _multiline, _comment = false;
-
-  /**
-   * Create a new line from an input list of bytes representing
-   * a line from the file (without NL).
-   */
-  Line(List<int> bytes){
-    _init(bytes);
-  }
-
-  Line.fromString(String line){
-    _init(line.codeUnits);
-  }
-
-  Line.fromKeyValue(String key, String value){
-
-    this._key = key.codeUnits;
-    this._value = value.codeUnits;
-    this._valuelines = [[value.codeUnits]];
-
-    this._property = true;
-    this._comment = false;
-    this._multiline = false;
-
-  }
-
-  void _init(List<int> bytes){
-
-    _property = _isProperty(bytes);
-    _comment = _isComment(bytes);
-    _multiline = _isMultiLineProperty(bytes);
-
-    if(_property){
-        List<List<int>> keyvalue = _splitKeyValue(bytes);
-
-        _key = keyvalue[0];
-
-        if(_multiline){
-          _valuelines.add(keyvalue[1]);
-          _value.addAll(_removeMultiLine(keyvalue[1]));
-        } else {
-          _valuelines.add(keyvalue[1]);
-          _value = keyvalue[1];
-        }
-
-    } else {
-      _key = _value = bytes;
-    }
-  }
-
-  /**
-   * This line is a property line?
-   */
-  bool isProperty() => _property;
-
-  /**
-   * This line is a property line having a multi line value?
-   */
-  bool isMultiLineProperty() => _multiline;
-
-  /**
-   * This line is a comment line?
-   */
-  bool isComment() => _comment;
-
-  /**
-   * Getter for the key contained in this property, if any.
-   */
-  List<int> get key => _key;
-
-  /**
-   * Getter for the value contained in this property, if any.
-   */
-  List<int> get value => _value;
-
-  /**
-   * Getter for the lines composing the value of this property, if any.
-   */
-  List<List<int>> get valueLines => _valuelines;
-
-  /**
-   * Get the key as a String.
-   */
-  String get keyString => new String.fromCharCodes(_key).trim();
-
-  /**
-   * Get the value as a String.
-   */
-  String get valueString => decodeUtf8(_value).trim();
-
-  /**
-   * Add a value line to the value of this property.
-   */
-  bool addValueLine(List<int> valueline){
-      _valuelines.add(valueline);
-      _value.addAll(this._removeMultiLine(valueline));
-
-      // has next?
-      return _endsWith(valueline, Properties.BACKSLASH);
-  }
-
-  /**
-   * Test if a [line] of bytes ends with the input [char] or not.
-   */
-  bool _endsWith(List<int> line, int char){
-    return line.lastIndexOf(char) == (line.length -1) && (line[line.length-2] != Properties.SLASH);
-  }
-
-  /**
-   * Given a [line] of bytes split it into key and value.
-   */
-  List<List<int>> _splitKeyValue(List<int> line){
-
-    var result = new List<List<int>>(2);
-    List<int> key = [];
-    List<int> value = [];
-
-    bool isKey = true;
-
-    for(var i = 0; i < line.length; i++){
-
-      if(line[i] == Properties.EQUAL && isKey){
-        isKey = false;
-      } else {
-        if(isKey){
-          key.add(line[i]);
-        } else {
-          value.add(line[i]);
-        }
-      }
-    }
-
-    result[0] = key;
-    result[1] = value;
-
-    return result;
-  }
-
-  /**
-   * Determine if input line is a property or not.
-   */
-  _isProperty(List<int> line) {
-
-    if(line.isEmpty || line == null) {
-      return false;
-    }
-
-    if(_isComment(line)) {
-      return false;
-    }
-
-    // contains a non escaped =
-    for(var i = 0; i < line.length; i++){
-      if(line[i] == Properties.EQUAL && line[i-1] != Properties.BACKSLASH){
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  /**
-   * Determine if input line is a comment line.
-   */
-  _isComment(List<int> line){
-
-    String lineStr = new String.fromCharCodes(line);
-
-    // comment
-    if(lineStr.startsWith('#')) {
-      return true;
-    }
-
-    // comment
-    if(lineStr.startsWith('!')) {
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * Test if this is a multi line property. This means it has to be a property
-   * whos value ends with backslash (not escaped).
-   */
-  bool _isMultiLineProperty(List<int> _bytes) {
-    return _isProperty(_bytes) && _endsWith(_bytes, Properties.BACKSLASH);
-  }
-
-  /**
-   * Replace the last occurrence of the input char [toReplace] into the input [line] of bytes
-   * with the input char [replacer].
-   */
-  List<int> _removeMultiLine(List<int> line){
-    List<int> result = [];
-    bool replace = false;
-    int limit = line.length;
-
-    replace = _endsWith(line, Properties.BACKSLASH);
-
-    for(int i = 0; i < limit; i++){
-      if(replace && (i == limit-1)){
-        result.add(Properties.SPACE);
-      } else {
-        result.add(line[i]);
-      }
-    }
-
-    return result;
-  }
-
-  /**
-   * The line to string.
-   */
-  String toString(){
-    if(this.isComment()) {
-      return "${this.keyString}";
-    } else {
-      return "${this.keyString} = ${this.valueString}";
-    }
-  }
-}
-
-class PropertiesLayout {
-
-  List<Line> _lines;
-
-  PropertiesLayout(this._lines);
-
-  void append(AddEvent event){
-
-    _lines.add(new Line.fromKeyValue(event.key, event.value));
-
-  }
-
-  void update(UpdateEvent event){
-
-  }
-
-  List<int> getLayout(){
-    List<int> result = [];
-    for(Line l in _lines){
-
-      if(l.isMultiLineProperty()){
-
-        result.addAll(l.key);
-        result.add(Properties.SPACE);
-        result.add(Properties.EQUAL);
-        result.add(Properties.SPACE);
-
-        for(List<int> ml in l.valueLines){
-          result.addAll(ml);
-          result.add(Properties.NEWLINE);
-        }
-
-      } else if(l.isProperty()) {
-
-        result.addAll(l.key);
-        result.add(Properties.SPACE);
-        result.add(Properties.EQUAL);
-        result.add(Properties.SPACE);
-        result.addAll(l.value);
-        result.add(Properties.NEWLINE);
-
-      } else {
-        result.addAll(l.key);
-        result.add(Properties.NEWLINE);
-      }
-    }
-
-    result.add(Properties.NEWLINE);
-
-    return result;
-  }
 }
