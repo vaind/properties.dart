@@ -23,6 +23,12 @@ void main(){
     test('Existing key - not null', () => expect(p.get('test.key.1'), isNotNull));
     test('Existing key - equals', () => expect(p.get('test.key.1'), equals('value 1')));
     test('Not existing key', () => expect(p.get('not.existing'), isNull));
+    test('Null input key', () => expect(p.get(null), isNull));
+    
+    test('Existing key using []', () => expect(p['test.key.1'], equals('value 1')));
+    test('Not existing key using []', () => expect(p['not.existing'], isNull));
+    test('Null input key using []', () => expect(p[null], isNull));
+    
     test('Get keys', (){
       Iterable<String> i = p.keys;
       expect(i.length, 3);
