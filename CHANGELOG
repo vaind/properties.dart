@@ -1,3 +1,8 @@
+0.5.4 - beta
+Compatibility update for SDK 0.5.13+1.r23552
+Getters and setters using [].
+Write to file method.
+
 0.5.3
 Fixed error on Event.
 Fixed carriage return problem on line parsing.

@@ -5,10 +5,11 @@ description: A simple library to manage properties file (and something more) in 
 homepage: http://code.google.com/p/dart-properties/
 documentation: http://code.google.com/p/dart-properties/source/browse/tags/0.5.2/#0.5.2%2Fdoc
 environment:
-  sdk: 0.4.2
+  sdk: 0.5.13+1.r23552
 dependencies:
-  unittest: 0.4.2
+  unittest: any
 
+#0.5.2%2Fdoc
 #0.5.2%2Fdoc
 #0.5.2%2Fdoc
 #0.5.2%2Fdoc
