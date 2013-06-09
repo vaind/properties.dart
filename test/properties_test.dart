@@ -4,8 +4,8 @@ import 'dart:io';
 
 void main(){
 
-  String baseFile = '../resources/sample.properties';
-  String advancedFile = '../resources/sample-adv.properties';
+  String baseFile = 'resources/sample.properties';
+  String advancedFile = 'resources/sample-adv.properties';
   String jsonSource = '{"key.1" : "value 1", "key.2" : "value 2", "another.key" : "another value"}';
 
   group('Creation - from properties file', () {
