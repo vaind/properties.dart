@@ -4,6 +4,7 @@ import 'dart:io';
 
 void main(){
 
+  // in order for tests to run on your machine you may have to add ../ before file paths
   String baseFile = 'resources/sample.properties';
   String advancedFile = 'resources/sample-adv.properties';
   String jsonSource = '{"key.1" : "value 1", "key.2" : "value 2", "another.key" : "another value"}';
