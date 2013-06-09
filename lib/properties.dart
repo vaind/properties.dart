@@ -7,6 +7,7 @@ import 'dart:io';
 import 'dart:json' as JSON;
 import 'dart:async';
 import 'dart:utf';
+import 'package:meta/meta.dart';
 
 part 'src/properties_events.dart';
 part 'src/properties_parsing.dart';
@@ -277,7 +278,7 @@ class Properties {
   Iterable<String> get keys => _content.keys;
 
   /** Returns the whole set of values */
-  Collection<String> get values => _content.values;
+  List<String> get values => _content.values;
 
   /** Returns the current number of properties */
   int get size => _content.length;
@@ -462,7 +463,7 @@ class Properties {
     if(!result.existsSync())
       result.createSync();
     
-    result.openWrite().writeBytes(this._layout.layoutAsBytes);
+    result.openWrite().writeAll(this._layout.layoutAsBytes);
   }
 
   /**
