@@ -7,8 +7,8 @@ documentation: http://code.google.com/p/dart-properties/source/browse/tags/0.5.2
 environment:
   sdk: 0.5.13+1.r23552
 dependencies:
-  meta: any
-  unittest: any
+  meta: 0.5.13
+  unittest: 0.5.13
 
 #0.5.2%2Fdoc
 #0.5.2%2Fdoc
