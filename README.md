@@ -3,8 +3,8 @@ Properties
 
 Properties is a simple library to manage properties files (and something more) in Dart.
 
-The project aim is to provide a simple and lightweight implementation of properties 
-file management for Dart adding some useful but not so common features. 
+The project aim is to provide a simple and lightweight implementation of properties
+file management for Dart adding some useful but not so common features.
 Code and usage are very straightforward, just have a look at the Getting Started section below.
 
 To know something more about the released version have a look at the
@@ -12,7 +12,7 @@ To know something more about the released version have a look at the
 
 Getting started
 -----------
-The best way to get immediately started is to have 
+The best way to get immediately started is to have
 a look at the unit tests provided along with the source code.
 
 Anyway you can go on reading this quick intro.
@@ -22,7 +22,7 @@ Using Properties you can:
 - create a new properties instance from file
 
 ```dart
-Properties p = new Properties.fromFile(filepath);
+Properties p = Properties.fromFile(filepath);
 ```
 
 - get a property out of it
@@ -85,7 +85,6 @@ String jsonexport = p.toJSON([prefix, suffix]);
 ```dart
 Map<String,String> filtered = p.every((s) => s.startsWith('test'));
 ```
-If you need some more details you may want to have a look to the [Properties Dartdoc here][dartdoc].
 
 Running Tests
 -------------
@@ -94,11 +93,3 @@ To run the tests just run the test/properties_test.dart file.
 Some Limits
 -------------
 Output on file is not supported (yet!).
-
-Any comment?
--------------
-You're welcome! Just visit the [Google Code page][gcp] and open a new issue or mail me.
-
-[changelog]: http://code.google.com/p/dart-properties/source/browse/tags/0.5.3/CHANGELOG
-[gcp]: http://code.google.com/p/dart-properties/
-[dartdoc]: http://code.google.com/p/dart-properties/source/browse/tags/0.5.3/#0.5.3%2Fdoc
