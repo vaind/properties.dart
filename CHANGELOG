@@ -1,3 +1,6 @@
+## 1.0.0
+* Update to Dart SDK 2.0+
+
 0.5.4 - beta
 Compatibility update for SDK 0.5.13+1.r23552
 Getters and setters using [].
@@ -64,11 +67,11 @@ Project structure refactoring in order to be published with PUB.
 
 - addFromXXX methods have been renamed into mergeXXX, giving the user the capability to choose whether to overwrite or keep existing matching properties:
 
-// dinamically merge properties from input Properties object into the 
+// dinamically merge properties from input Properties object into the
 // current instance's properties, without overwriting eventually existing properties
 p.merge(anotherPropertiesInstance, false);
 
-// dinamically merge properties from input JSON object into the 
+// dinamically merge properties from input JSON object into the
 // current instance's properties, overwriting existing ones
 p.mergeJSON('{"test.key.3":"value 3","test.key.4":"value 4"}', true);
 
@@ -93,4 +96,4 @@ p.addFromJSON('{"test.key.3":"value 3","test.key.4":"value 4"}');
 
 0.1.0 - 16-02-2013
 
-First release: basic tools, support for plain old properties files. 
+First release: basic tools, support for plain old properties files.
