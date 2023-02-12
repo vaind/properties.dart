@@ -183,7 +183,7 @@ class Line {
   String get keyString => String.fromCharCodes(_key).trim();
 
   /// Get the value as a String.
-  String get valueString => utf8.decode(_value).trim();
+  String get valueString => utf8.decode(_value, allowMalformed: true).trim();
 
   /// Add a value line to the value of this property.
   bool addValueLine(List<int> valueline) {
