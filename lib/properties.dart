@@ -5,8 +5,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
 
-import 'package:meta/meta.dart';
-
 part 'src/properties_events.dart';
 part 'src/properties_parser.dart';
 part 'src/properties_layout_management.dart';

@@ -7,12 +7,11 @@ abstract class PropertiesParser {
 
   Map<String, String> parse() {
     // get line of bytes, managing multi-line properties
-    _lines = _getLines(_getByteLines(readAsByte()));
+    _lines = _getLines(_getByteLines(_readAsByte()));
     return _load(_lines) ?? {};
   }
 
-  @protected
-  List<int> readAsByte();
+  List<int> _readAsByte();
 
   /// Get an array of lines of bytes out of the plain bytes.
   List<List<int>> _getByteLines(List<int> bytes) {
@@ -83,7 +82,7 @@ class PropertiesFileParser extends PropertiesParser {
   final File _file;
 
   @override
-  List<int> readAsByte() {
+  List<int> _readAsByte() {
     if (!_file.existsSync()) {
       throw Exception('File ${_file}, does not exist.');
     }
@@ -100,7 +99,7 @@ class PropertiesStringParser extends PropertiesParser {
   final String _string;
 
   @override
-  List<int> readAsByte() => _string.codeUnits;
+  List<int> _readAsByte() => _string.codeUnits;
 }
 
 /// This helper class models a line as it has been read from
