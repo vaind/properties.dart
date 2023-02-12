@@ -2,7 +2,7 @@ part of properties;
 
 /// Layout manager for properties files.
 class PropertiesLayout {
-  List<Line> _lines;
+  final List<Line> _lines;
 
   PropertiesLayout(this._lines);
 
@@ -15,7 +15,7 @@ class PropertiesLayout {
   void update(UpdateEvent event) {
     for (Line l in _lines) {
       if (l.keyString == event.key) {
-        l.value = event.newValue.codeUnits;
+        l.value = event.newValue?.codeUnits ?? ''.codeUnits;
       }
     }
   }

@@ -20,13 +20,13 @@ class Properties {
   static final int EQUAL = '='.codeUnits[0];
 
   /// The content of the properties file in terms of key - value couples
-  Map<String, String> _content;
+  late Map<String, String?> _content;
 
   /// Layout manager
-  PropertiesLayout _layout;
+  PropertiesLayout? _layout;
 
   /// An internal reference to the source file.
-  String _sourceFile;
+  String? _sourceFile;
 
   /// Events are enabled by default
   bool _enableEvents = true;
@@ -41,16 +41,14 @@ class Properties {
   static const String UPDATE_PROPERTY_EVENTNAME = 'update';
 
   /// Controller for Add events
-  StreamController<AddEvent> _addEventController;
+  late final _addEventController = StreamController<AddEvent>.broadcast();
 
   /// Controller for Update events
-  StreamController<UpdateEvent> _updateEventController;
+  late final _updateEventController = StreamController<UpdateEvent>.broadcast();
 
   /// Create a new properties instance by naming the source file using [name].
   Properties(String name) {
     this._sourceFile = name;
-
-    _init();
 
     _initFromFile();
   }
@@ -59,50 +57,38 @@ class Properties {
   Properties.fromFile(String path) {
     this._sourceFile = path;
 
-    _init();
-
     _initFromFile();
   }
 
   /// Create a new properties instance from the input [map].
-  Properties.fromMap(Map<String, String> map) {
+  Properties.fromMap(Map<String, String?> map) {
     this._content = map;
   }
 
   /// Create a new properties instance using the input [jsonMap]
   /// to load the data from.
   Properties.fromJSON(String jsonMap) {
-    _init();
-
     _content = Map.from(json.decode(jsonMap));
-  }
-
-  /// Initialize common internal tools such as event controllers.
-  _init() {
-    _addEventController = StreamController.broadcast();
-    _updateEventController = StreamController.broadcast();
   }
 
   /// Read from file and load the content.
   void _initFromFile() {
-    var parser = PropertiesFileParser(_getFile(_sourceFile));
+    final parser = PropertiesFileParser(_getFile(_sourceFile!));
     _content = parser.parse();
 
     // init layout
     _layout = PropertiesLayout(parser.lines);
-    onAdd.listen(_layout.append);
-    onUpdate.listen(_layout.update);
+    onAdd.listen(_layout!.append);
+    onUpdate.listen(_layout!.update);
   }
 
   /// Get a file instance from the input string [file].
   File _getFile(String file) {
-    var result = File(file);
+    final result = File(file);
 
     if (result.existsSync()) {
       return result;
     }
-
-    result = File(file);
 
     if (result.existsSync()) {
       return result;
@@ -115,15 +101,7 @@ class Properties {
   /// Loads the value of a property given its [key].
   /// Use [defval] to set a default value in case of missing property.
   /// Use [defkey] to set a default key in case of missing property.
-  String get(String key, {Object defval, String defkey}) {
-    if (key == null) {
-      return null;
-    }
-
-    if (_content == null) {
-      return null;
-    }
-
+  String? get(String key, {Object? defval, String? defkey}) {
     if (defval == null && defkey == null) {
       return _content[key];
     }
@@ -143,7 +121,7 @@ class Properties {
 
   /// Returns the value for the given [key] or null if [key] is not
   /// in the map. No default will be applied.
-  String operator [](String key) {
+  String? operator [](String key) {
     return get(key);
   }
 
@@ -161,8 +139,12 @@ class Properties {
   /// a new BoolEvaluator instance.
   /// Use [defval] to set a default value in case of missing property.
   /// Use [defkey] to set a default key in case of missing property.
-  bool getBool(String key,
-      {bool throwException = false, int defval, String defkey}) {
+  bool? getBool(
+    String key, {
+    bool throwException = false,
+    int? defval,
+    String? defkey,
+  }) {
     var value = get(key, defval: defval, defkey: defkey);
     if (value == null) {
       return null;
@@ -181,8 +163,12 @@ class Properties {
   /// Loads the value of a property as an integer given its [key].
   /// Use [defval] to set a default value in case of missing property.
   /// Use [defkey] to set a default key in case of missing property.
-  int getInt(String key,
-      {bool throwException = false, int defval, String defkey}) {
+  int? getInt(
+    String key, {
+    bool throwException = false,
+    int? defval,
+    String? defkey,
+  }) {
     var value = get(key, defval: defval, defkey: defkey);
     if (value == null) {
       return null;
@@ -201,9 +187,13 @@ class Properties {
   /// Loads the value of a property as a double given its [key].
   /// Use [defval] to set a default value in case of missing property.
   /// Use [defkey] to set a default key in case of missing property.
-  double getDouble(String key,
-      {bool throwException = false, double defval, String defkey}) {
-    String value = get(key, defval: defval, defkey: defkey);
+  double? getDouble(
+    String key, {
+    bool throwException = false,
+    double? defval,
+    String? defkey,
+  }) {
+    final value = get(key, defval: defval, defkey: defkey);
     if (value == null) {
       return null;
     }
@@ -221,26 +211,24 @@ class Properties {
   /// Loads a list of strings for the input [key]. List elements must be
   /// comma separated.
   List<String> getList(String key) {
-    String value = get(key);
+    final value = get(key);
     if (value == null) {
-      return null;
+      return [];
     }
 
     return value.split(",");
   }
 
   /// Check whether the properties contains a property given its [key]
-  bool contains(String key) => key != null
-      ? _content != null
-          ? _content.containsKey(key)
-          : null
-      : null;
+  bool contains(String key) {
+    return _content.containsKey(key);
+  }
 
   /// Rerturns the whole set of keys
-  Iterable<String> get keys => _content.keys;
+  List<String> get keys => _content.keys.toList();
 
   /// Returns the whole set of values
-  List<String> get values => _content.values;
+  List<String?> get values => _content.values.toList();
 
   /// Returns the current number of properties
   int get size => _content.length;
@@ -256,10 +244,6 @@ class Properties {
   /// If and only if an existing property is overwritten an UPDATE
   /// event is triggered.
   bool add(String key, String value, [bool overwriteExisting = true]) {
-    if (key == null || value == null) {
-      return false;
-    }
-
     if (contains(key) && overwriteExisting) {
       _update(key, value);
       return true;
@@ -285,8 +269,8 @@ class Properties {
 
   /// Internal update implementation, managing property storage and
   /// event triggering.
-  _update(String key, String newvalue) {
-    String oldvalue = _content[key];
+  _update(String key, String? newvalue) {
+    String? oldvalue = _content[key];
 
     _content[key] = newvalue;
 
@@ -300,10 +284,11 @@ class Properties {
   /// may decide how to manage existing thanks to the optional parameter [overwriteExisting].
   void merge(Properties properties, [bool overwriteExisting = true]) {
     for (String key in properties.keys) {
+      final value = properties.get(key);
       if (overwriteExisting) {
-        _content[key] = properties.get(key);
+        _content[key] = value;
       } else {
-        _content.putIfAbsent(key, () => properties.get(key));
+        _content.putIfAbsent(key, () => value);
       }
     }
   }
@@ -311,7 +296,7 @@ class Properties {
   /// Merge properties from the input [map] with the current instance's properties.
   /// By defatult already existing properties will be overwritten. Anyway user
   /// may decide how to manage existing thanks to the optional parameter [overwriteExisting].
-  void mergeMap(Map<String, String> map, [bool overwriteExisting = true]) {
+  void mergeMap(Map<String, String?> map, [bool overwriteExisting = true]) {
     _merge(map, overwriteExisting);
   }
 
@@ -325,20 +310,20 @@ class Properties {
   }
 
   /// Internal merge implementation.
-  void _merge(Map<String, String> map, [bool overwriteExisting = true]) {
+  void _merge(Map<String, String?> map, [bool overwriteExisting = true]) {
     for (String key in map.keys) {
       if (overwriteExisting) {
         _content[key] = map[key];
       } else {
-        _content.putIfAbsent(key, () => map[key]);
+        _content.putIfAbsent(key, () => map[key] ?? '');
       }
     }
   }
 
-  /// Returns a Properties instance containg every property whos key satisifies the predicate [k] on the property key, and
+  /// Returns a Properties instance containg every property whose key satisifies the predicate [k] on the property key, and
   /// optionally the predicate [v] on the corresponding value. Returns null otherwise.
-  Properties every(bool k(String str), [bool v(String val)]) {
-    Map<String, String> result = _every(k, v);
+  Properties? every(bool k(String str), [bool v(String? val)?]) {
+    Map<String, String?> result = _every(k, v);
 
     if (result.isEmpty) {
       return null;
@@ -348,10 +333,11 @@ class Properties {
   }
 
   /// Internal every implementation.
-  Map<String, String> _every(bool k(String str), [bool v(String val)]) {
-    if (v == null) v = (String s) => true;
+  Map<String, String?> _every(bool k(String str), [bool v(String? val)?]) {
+    if (v == null) v = (String? s) => true;
 
-    var result = Map<String, String>();
+    final result = Map<String, String?>();
+
     for (String key in _content.keys)
       if (k(key) && v(get(key))) result[key] = get(key);
 
@@ -373,7 +359,7 @@ class Properties {
   /// then only the keys starting with [prefix] will be exported. If the [suffix] parameter is set,
   /// then only the keys starting with [suffix] will be exported. If both are set, then only the
   /// keys matching both will be exported.
-  String toJSON({String prefix, String suffix}) {
+  String toJSON({String? prefix, String? suffix}) {
     var toExport = _content;
 
     if (prefix != null && suffix != null) {
@@ -390,11 +376,12 @@ class Properties {
 
   /// Write the content to the input file.
   void toFile(String path) {
-    var result = File(path);
+    final result = File(path);
 
     if (!result.existsSync()) result.createSync();
 
-    result.openWrite().writeAll(this._layout.layoutAsBytes);
+    // It may throw error since _layout can be null if file is not used.
+    result.openWrite().writeAll(this._layout!.layoutAsBytes);
   }
 
   /// Returns the whole content as a String.

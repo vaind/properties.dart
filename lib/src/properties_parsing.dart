@@ -3,21 +3,21 @@ part of properties;
 /// Parser for properties files. Input files are supposed to be UTF-8 encoded.
 class PropertiesFileParser {
   File _file;
-  List<Line> _lines;
+  List<Line> _lines = [];
 
   PropertiesFileParser(this._file);
 
   Map<String, String> parse() {
     _lines = _getLines(_read(_file));
-    return _load(_lines);
+    return _load(_lines) ?? {};
   }
 
   List<Line> get lines => _lines;
 
   /// Create the file object and read its content in lines.
   List<List<int>> _read(File f) {
-    if (f == null || !f.existsSync()) {
-      return null;
+    if (!f.existsSync()) {
+      throw Exception('File ${f}, does not exist.');
     }
 
     // read file as bytes
@@ -72,12 +72,12 @@ class PropertiesFileParser {
   }
 
   /// Load properties from lines.
-  Map<String, String> _load(List<Line> lines) {
-    if (lines == null || lines.isEmpty) {
+  Map<String, String>? _load(List<Line> lines) {
+    if (lines.isEmpty) {
       return null;
     }
 
-    var content = Map<String, String>();
+    final content = Map<String, String>();
 
     for (Line line in lines) {
       if (line.isProperty()) {
@@ -96,7 +96,9 @@ class Line {
   List<int> _key = [], _value = [];
   List<List<int>> _valuelines = [];
 
-  bool _property, _multiline, _comment = false;
+  bool _property = false;
+  bool _multiline = false;
+  bool _comment = false;
 
   /// Create a new line from an input list of bytes representing
   /// a line from the file (without NL).
@@ -209,7 +211,7 @@ class Line {
 
   /// Determine if input line is a property or not.
   _isProperty(List<int> line) {
-    if (line.isEmpty || line == null) {
+    if (line.isEmpty) {
       return false;
     }
 
