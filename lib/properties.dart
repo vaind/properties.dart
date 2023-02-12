@@ -28,9 +28,6 @@ class Properties {
   /// An internal reference to the source file.
   String? _sourceFile;
 
-  /// An internal reference to the String value.
-  String? _stringValue;
-
   /// Events are enabled by default
   bool _enableEvents = true;
 
@@ -65,8 +62,7 @@ class Properties {
 
   /// Create a new properties instance from String.
   Properties.fromString(String value) {
-    this._stringValue = value;
-    _initFromString();
+    _initFromString(value);
   }
 
   /// Create a new properties instance from the input [map].
@@ -92,8 +88,8 @@ class Properties {
   }
 
   /// Load the contents from string.
-  void _initFromString() {
-    final parser = PropertiesStringParser(_stringValue!);
+  void _initFromString(String value) {
+    final parser = PropertiesStringParser(value);
     _content = parser.parse();
 
     // init layout
