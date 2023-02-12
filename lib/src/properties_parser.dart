@@ -1,31 +1,18 @@
 part of properties;
 
-/// Parser for properties files. Input files are supposed to be UTF-8 encoded.
-class PropertiesFileParser {
-  File _file;
+abstract class PropertiesParser {
   List<Line> _lines = [];
-
-  PropertiesFileParser(this._file);
-
-  Map<String, String> parse() {
-    _lines = _getLines(_read(_file));
-    return _load(_lines) ?? {};
-  }
 
   List<Line> get lines => _lines;
 
-  /// Create the file object and read its content in lines.
-  List<List<int>> _read(File f) {
-    if (!f.existsSync()) {
-      throw Exception('File ${f}, does not exist.');
-    }
-
-    // read file as bytes
-    List<int> bytes = f.readAsBytesSync();
-
+  Map<String, String> parse() {
     // get line of bytes, managing multi-line properties
-    return _getByteLines(bytes);
+    _lines = _getLines(_getByteLines(readAsByte()));
+    return _load(_lines) ?? {};
   }
+
+  @protected
+  List<int> readAsByte();
 
   /// Get an array of lines of bytes out of the plain bytes.
   List<List<int>> _getByteLines(List<int> bytes) {
@@ -87,6 +74,33 @@ class PropertiesFileParser {
 
     return content;
   }
+}
+
+/// Parser for properties files. Input files are supposed to be UTF-8 encoded.
+class PropertiesFileParser extends PropertiesParser {
+  PropertiesFileParser(this._file);
+
+  final File _file;
+
+  @override
+  List<int> readAsByte() {
+    if (!_file.existsSync()) {
+      throw Exception('File ${_file}, does not exist.');
+    }
+
+    // read file as bytes
+    return _file.readAsBytesSync();
+  }
+}
+
+/// Parser for properties String.
+class PropertiesStringParser extends PropertiesParser {
+  PropertiesStringParser(this._string);
+
+  final String _string;
+
+  @override
+  List<int> readAsByte() => _string.codeUnits;
 }
 
 /// This helper class models a line as it has been read from

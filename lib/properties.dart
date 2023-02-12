@@ -5,8 +5,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
 
+import 'package:meta/meta.dart';
+
 part 'src/properties_events.dart';
-part 'src/properties_parsing.dart';
+part 'src/properties_parser.dart';
 part 'src/properties_layout_management.dart';
 
 /// The Properties class implementing all tools to load key-values from file both by name and
@@ -27,6 +29,9 @@ class Properties {
 
   /// An internal reference to the source file.
   String? _sourceFile;
+
+  /// An internal reference to the String value.
+  String? _stringValue;
 
   /// Events are enabled by default
   bool _enableEvents = true;
@@ -60,6 +65,12 @@ class Properties {
     _initFromFile();
   }
 
+  /// Create a new properties instance from String.
+  Properties.fromString(String value) {
+    this._stringValue = value;
+    _initFromString();
+  }
+
   /// Create a new properties instance from the input [map].
   Properties.fromMap(Map<String, String?> map) {
     this._content = map;
@@ -74,6 +85,17 @@ class Properties {
   /// Read from file and load the content.
   void _initFromFile() {
     final parser = PropertiesFileParser(_getFile(_sourceFile!));
+    _content = parser.parse();
+
+    // init layout
+    _layout = PropertiesLayout(parser.lines);
+    onAdd.listen(_layout!.append);
+    onUpdate.listen(_layout!.update);
+  }
+
+  /// Load the contents from string.
+  void _initFromString() {
+    final parser = PropertiesStringParser(_stringValue!);
     _content = parser.parse();
 
     // init layout
