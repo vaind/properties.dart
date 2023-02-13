@@ -264,6 +264,7 @@ void main() {
     });
 
     test('Events disabled', () {
+      // ignore: deprecated_member_use_from_same_package
       p.enableEvents = false;
 
       String eventType = '';

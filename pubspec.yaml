@@ -1,5 +1,5 @@
 name: properties
-version: 1.0.0
+version: 2.0.0
 description: A simple library to manage properties file (and something more) in Dart
 repository: https://github.com/vaind/properties.dart
 
