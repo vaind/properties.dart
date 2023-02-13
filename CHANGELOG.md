@@ -3,6 +3,7 @@
 ## Unreleased
 
 * Add null-safety. ([#1](https://github.com/vaind/properties.dart/pull/1))
+* Switch values to UTF-16 ([#3](https://github.com/vaind/properties.dart/pull/3))
 
 ## 1.0.0 - 2022-01-30
 
