@@ -23,7 +23,7 @@ void main() {
   });
 
   group('Getters - from file source', () {
-    Properties p;
+    late Properties p;
     setUp(() {
       p = Properties.fromFile(baseFile);
     });
@@ -32,12 +32,10 @@ void main() {
     test('Existing key - equals',
         () => expect(p.get('test.key.1'), equals('value 1')));
     test('Not existing key', () => expect(p.get('not.existing'), isNull));
-    test('Null input key', () => expect(p.get(null), isNull));
 
     test('Existing key using []',
         () => expect(p['test.key.1'], equals('value 1')));
     test('Not existing key using []', () => expect(p['not.existing'], isNull));
-    test('Null input key using []', () => expect(p[null], isNull));
 
     test('Get keys', () {
       Iterable<String> i = p.keys;
@@ -46,7 +44,7 @@ void main() {
   });
 
   group('Getters with default', () {
-    Properties p;
+    late Properties p;
     setUp(() {
       p = Properties.fromFile(baseFile);
     });
@@ -75,7 +73,7 @@ void main() {
   });
 
   group('Getters - from JSON source', () {
-    Properties p;
+    late Properties p;
     setUp(() {
       p = Properties.fromJSON(jsonSource);
     });
@@ -91,8 +89,29 @@ void main() {
     });
   });
 
+  group('Getters - from String source', () {
+    late Properties p;
+    setUp(() {
+      p = Properties.fromString(File(baseFile).readAsStringSync());
+    });
+    test('Existing key - not null',
+        () => expect(p.get('test.key.1'), isNotNull));
+    test('Existing key - equals',
+        () => expect(p.get('test.key.1'), equals('value 1')));
+    test('Not existing key', () => expect(p.get('not.existing'), isNull));
+
+    test('Existing key using []',
+        () => expect(p['test.key.1'], equals('value 1')));
+    test('Not existing key using []', () => expect(p['not.existing'], isNull));
+
+    test('Get keys', () {
+      Iterable<String> i = p.keys;
+      expect(i.length, 3);
+    });
+  });
+
   group('Advanced features', () {
-    Properties p;
+    late Properties p;
     setUp(() {
       p = Properties.fromFile(advancedFile);
     });
@@ -161,14 +180,9 @@ void main() {
   });
 
   group('Adding properties', () {
-    Properties p;
+    late Properties p;
     setUp(() {
       p = Properties.fromFile(baseFile);
-    });
-
-    test('Add a property - not valid', () {
-      var singleAdd = p.add(null, 'value 3');
-      expect(singleAdd, isFalse);
     });
 
     test('Add a property - valid, not existing', () {
@@ -215,66 +229,46 @@ void main() {
   });
 
   group('Events', () {
-    Properties p;
+    late Properties p;
     setUp(() {
       p = Properties.fromFile(baseFile);
     });
 
-    test('Add a property and listen to the event', () {
-      String eventType = "";
-      String key = "";
-      String value = "";
+    test('Add a property and listen to the event', () async {
+      p.onAdd.listen(
+        expectAsync1((AddEvent e) {
+          expect(e.type, equals(Properties.ADD_PROPERTY_EVENTNAME));
+          expect(e.key, equals("test.key.3"));
+          expect(e.value, equals("value 3"));
+        }),
+      );
 
-      p.onAdd.listen((AddEvent e) {
-        eventType = e.type;
-        key = e.key;
-        value = e.value;
-      });
-
-      var singleAdd = p.add('test.key.3', 'value 3');
+      final singleAdd = p.add('test.key.3', 'value 3');
 
       expect(singleAdd, isTrue);
       expect(p.get('test.key.3'), equals('value 3'));
-
-      // tests has been disabled since the functionality seems to work
-      // outside unit testing...
-      //expect(eventType, equals(Properties.ADD_PROPERTY_EVENTNAME));
-      //expect(key, equals("test.key.3"));
-      //expect(value, equals("value 3"));
     });
 
     test('Update a property and listen to the event', () {
-      String eventType = "";
-      String key = "";
-      String oldvalue = "";
-      String newvalue = "";
-
-      p.onUpdate.listen((UpdateEvent e) {
-        eventType = e.type;
-        key = e.key;
-        oldvalue = e.oldValue;
-        newvalue = e.newValue;
-      });
+      p.onUpdate.listen(expectAsync1((e) {
+        expect(e.type, equals(Properties.UPDATE_PROPERTY_EVENTNAME));
+        expect(e.key, equals("test.key.1"));
+        expect(e.oldValue, equals("value 1"));
+        expect(e.newValue, equals("value new 1"));
+      }));
 
       var singleUpdate = p.add('test.key.1', 'value new 1');
 
       expect(singleUpdate, isTrue);
       expect(p.get('test.key.1'), equals('value new 1'));
-
-      // tests has been disabled since the functionality seems to work
-      // outside unit testing...
-      //expect(eventType, equals(Properties.UPDATE_PROPERTY_EVENTNAME));
-      //expect(key, equals("test.key.1"));
-      //expect(oldvalue, equals("value 1"));
-      //expect(newvalue, equals("value new 1"));
     });
 
     test('Events disabled', () {
       p.enableEvents = false;
 
-      String eventType;
-      String key;
-      String value;
+      String eventType = '';
+      String key = '';
+      String value = '';
 
       p.onAdd.listen((AddEvent e) {
         eventType = e.type;
@@ -282,18 +276,18 @@ void main() {
         value = e.value;
       });
 
-      var singleAdd = p.add('test.key.3', 'value 3');
+      final singleAdd = p.add('test.key.3', 'value 3');
 
       expect(singleAdd, isTrue);
       expect(p.get('test.key.3'), equals('value 3'));
-      expect(eventType, isNull);
-      expect(key, isNull);
-      expect(value, isNull);
+      expect(eventType, '');
+      expect(key, '');
+      expect(value, '');
     });
   });
 
   group('Export', () {
-    Properties p;
+    late Properties p;
     setUp(() {
       p = Properties.fromFile(baseFile);
     });
@@ -314,7 +308,7 @@ void main() {
   });
 
   group('Merge', () {
-    Properties p;
+    late Properties p;
     setUp(() {
       p = Properties.fromFile(baseFile);
     });
@@ -347,7 +341,7 @@ void main() {
   });
 
   group('Other', () {
-    Properties p;
+    late Properties p;
     setUp(() {
       p = Properties.fromFile(baseFile);
     });
@@ -359,15 +353,15 @@ void main() {
     test('Every key - matching',
         () => expect(p.every((s) => s.startsWith('test')), isNotEmpty));
     test('Every key - not matching', () {
-      Properties result = p.every((s) => s.startsWith('toast'));
+      Properties? result = p.every((s) => s.startsWith('toast'));
       expect(result, isNull);
     });
     test('Every key & value - matching', () {
-      Properties m =
+      Properties? m =
           p.every((s) => s.startsWith('test'), (v) => v == "value 1");
 
       expect(m, isNot(isEmpty));
-      expect(m.size, equals(1));
+      expect(m!.size, equals(1));
     });
   });
 }

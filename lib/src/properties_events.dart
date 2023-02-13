@@ -34,8 +34,8 @@ class AddEvent extends PropertiesEvent {
 /// A factory to create simple property added event.
 class UpdateEvent extends PropertiesEvent {
   final String _key;
-  final String _oldvalue;
-  final String _newvalue;
+  final String? _oldvalue;
+  final String? _newvalue;
 
   /// Create a new property updated event instance by name the [eventType] and the property's [key] and [value].
   const UpdateEvent(this._key, this._newvalue, this._oldvalue)
@@ -45,10 +45,10 @@ class UpdateEvent extends PropertiesEvent {
   String get key => _key;
 
   /// Getter for the updated [oldValue].
-  String get oldValue => _oldvalue;
+  String? get oldValue => _oldvalue;
 
   /// Getter for the updated [newValue].
-  String get newValue => _newvalue;
+  String? get newValue => _newvalue;
 
   String toString() {
     return "${Properties.UPDATE_PROPERTY_EVENTNAME} on ${this._key}";
