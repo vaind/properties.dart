@@ -68,6 +68,23 @@ class Properties {
     _initFromFile();
   }
 
+  /// Synchronously dumps all properties to the specified file.
+  ///
+  /// If the file does not exist, it will be created.
+  void saveToFile(String path) {
+    final file = File(path);
+    if (!file.existsSync()) {
+      file.createSync(recursive: true);
+    }
+
+    final buff = StringBuffer();
+    _content.forEach((k, v) {
+      buff.write("$k = $v");
+      buff.write('\n');
+    });
+    file.writeAsStringSync(buff.toString(), flush: true);
+  }
+
   /// Create a new properties instance from String.
   Properties.fromString(String value) {
     _initFromString(value);

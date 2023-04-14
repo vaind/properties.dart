@@ -8,6 +8,8 @@ void main() {
   // in order for tests to run on your machine you may have to add ../ before file paths
   String baseFile = 'resources/sample.properties';
   String advancedFile = 'resources/sample-adv.properties';
+  String saveFile = 'resources/save.properties';
+
   String jsonSource =
       '{"key.1" : "value 1", "key.2" : "value 2", "another.key" : "another value"}';
 
@@ -15,6 +17,26 @@ void main() {
     test('Existing by path',
         () => expect(Properties.fromFile(baseFile), isNotNull));
     test('Existing by name', () => expect(Properties(baseFile), isNotNull));
+  });
+
+  group('Save to file', () {
+    late Properties p;
+    late Properties sp;
+    setUp(() {
+      p = Properties.fromFile(baseFile);
+      p.saveToFile(saveFile);
+      sp = Properties.fromFile(saveFile);
+    });
+
+    test('key1', () => expect(sp.get('test.key.1'), equals('value 1')));
+    test('key2', () => expect(sp.get('test.key.2'), equals('value 2')));
+    test('key3', () => expect(sp.get('another.key'), equals('another value')));
+    test('Not existing key', () => expect(sp.get('not.existing'), isNull));
+
+    test('Get keys', () {
+      Iterable<String> i = sp.keys;
+      expect(i.length, 3);
+    });
   });
 
   group('Creation - from JSON string', () {
