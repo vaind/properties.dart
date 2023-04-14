@@ -1,7 +1,10 @@
 part of properties;
 
 /// A factory to create simple Properties' related events.
+///
+/// NB: please consider renaming to "ChangeEvent".
 class PropertiesEvent {
+  // NB: consider enums instead of strings
   final String _eventType;
 
   /// Create a new event instance by name the [eventType] only.
@@ -52,5 +55,20 @@ class UpdateEvent extends PropertiesEvent {
 
   String toString() {
     return "${Properties.UPDATE_PROPERTY_EVENTNAME} on ${this._key}";
+  }
+}
+
+/// A factory to create simple property deleted event.
+class DeleteEvent extends PropertiesEvent {
+  final String _key;
+
+  /// Creates a new property deleted event instance by name the [eventType] and the property's [key].
+  const DeleteEvent(this._key) : super(Properties.DELETE_PROPERTY_EVENTNAME);
+
+  /// Getter for the added [key].
+  String get key => _key;
+
+  String toString() {
+    return "${Properties.DELETE_PROPERTY_EVENTNAME} on ${this._key}";
   }
 }

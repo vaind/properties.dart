@@ -40,11 +40,19 @@ class Properties {
   /// The property updated event name
   static const String UPDATE_PROPERTY_EVENTNAME = 'update';
 
+  /// The property deleted event name
+  static const String DELETE_PROPERTY_EVENTNAME = 'delete';
+
   /// Controller for Add events
   late final _addEventController = StreamController<AddEvent>.broadcast();
 
   /// Controller for Update events
   late final _updateEventController = StreamController<UpdateEvent>.broadcast();
+
+  /// Controller for ALL change events (adds, updates and deletes).
+  ///
+  /// NB: it seems an overkill to have a stream for each type of event. Consider replacing adds and updates with this one.
+  late final _changeController = StreamController<PropertiesEvent>.broadcast();
 
   /// Create a new properties instance by naming the source file using [name].
   Properties(String name) {
@@ -273,13 +281,31 @@ class Properties {
     return false;
   }
 
+  /// Deletes the [key] property from the instance, if present.
+  ///
+  /// Returns true if the property was present (and deleted), false otherwise.
+  /// If the property was deleted, a DELETE event is triggered.
+  bool delete(String key) {
+    if (contains(key)) {
+      _content.remove(key);
+
+      if (this._enableEvents) {
+        _changeController.add(DeleteEvent(key));
+      }
+      return true;
+    }
+    return false;
+  }
+
   /// Internal add implementation, managing property storage and
   /// event triggering.
   _add(String key, String value) {
     _content[key] = value;
 
     if (this._enableEvents) {
-      _addEventController.add(AddEvent(key, value));
+      final event = AddEvent(key, value);
+      _addEventController.add(event);
+      _changeController.add(event);
     }
   }
 
@@ -291,7 +317,9 @@ class Properties {
     _content[key] = newvalue;
 
     if (this._enableEvents) {
-      _updateEventController.add(UpdateEvent(key, newvalue, oldvalue));
+      final event = UpdateEvent(key, newvalue, oldvalue);
+      _updateEventController.add(event);
+      _changeController.add(event);
     }
   }
 
@@ -416,6 +444,9 @@ class Properties {
 
   /// Get the stream instance for the "property updated" event.
   Stream<UpdateEvent> get onUpdate => _updateEventController.stream;
+
+  /// Get the stream instance for the change event stream.
+  Stream<PropertiesEvent> get onChange => _changeController.stream;
 
   /// Getter for [boolEvaluator] instance.
   BoolEvaluator get boolEvaluator => this._be;

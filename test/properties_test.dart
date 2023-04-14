@@ -228,6 +228,28 @@ void main() {
     });
   });
 
+  group('Delete properties:', () {
+    late Properties p;
+    setUp(() {
+      p = Properties.fromFile(baseFile);
+    });
+
+    test('Delete existing', () {
+      var key = 'test.key.1';
+      expect(p.contains(key), isTrue);
+      var success = p.delete(key);
+      expect(success, isTrue);
+      expect(p.contains(key), isFalse);
+    });
+
+    test('Delete non-existing', () {
+      var key = 'bogus.key';
+      expect(p.contains(key), isFalse);
+      var success = p.delete(key);
+      expect(success, isFalse);
+    });
+  });
+
   group('Events', () {
     late Properties p;
     setUp(() {
@@ -237,6 +259,14 @@ void main() {
     test('Add a property and listen to the event', () async {
       p.onAdd.listen(
         expectAsync1((AddEvent e) {
+          expect(e.type, equals(Properties.ADD_PROPERTY_EVENTNAME));
+          expect(e.key, equals("test.key.3"));
+          expect(e.value, equals("value 3"));
+        }),
+      );
+      p.onChange.listen(
+        expectAsync1((PropertiesEvent pe) {
+          final e = pe as AddEvent;
           expect(e.type, equals(Properties.ADD_PROPERTY_EVENTNAME));
           expect(e.key, equals("test.key.3"));
           expect(e.value, equals("value 3"));
@@ -256,11 +286,30 @@ void main() {
         expect(e.oldValue, equals("value 1"));
         expect(e.newValue, equals("value new 1"));
       }));
+      p.onChange.listen(expectAsync1((pe) {
+        final e = pe as UpdateEvent;
+        expect(e.type, equals(Properties.UPDATE_PROPERTY_EVENTNAME));
+        expect(e.key, equals("test.key.1"));
+        expect(e.oldValue, equals("value 1"));
+        expect(e.newValue, equals("value new 1"));
+      }));
 
       var singleUpdate = p.add('test.key.1', 'value new 1');
 
       expect(singleUpdate, isTrue);
       expect(p.get('test.key.1'), equals('value new 1'));
+    });
+
+    test('Delete a property and listen to the event', () {
+      p.onChange.listen(expectAsync1((pe) {
+        final e = pe as DeleteEvent;
+        expect(e.type, equals(Properties.DELETE_PROPERTY_EVENTNAME));
+        expect(e.key, equals("test.key.1"));
+      }));
+
+      var delete = p.delete('test.key.1');
+      expect(delete, isTrue);
+      expect(p.contains('test.key.1'), isFalse);
     });
 
     test('Events disabled', () {
