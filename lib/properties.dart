@@ -34,15 +34,6 @@ class Properties {
   /// Default bool evaluator instance
   BoolEvaluator _be = BoolEvaluator();
 
-  /// The property added event name
-  static const String ADD_PROPERTY_EVENTNAME = 'add';
-
-  /// The property updated event name
-  static const String UPDATE_PROPERTY_EVENTNAME = 'update';
-
-  /// The property deleted event name
-  static const String DELETE_PROPERTY_EVENTNAME = 'delete';
-
   /// Controller for Add events
   late final _addEventController = StreamController<AddEvent>.broadcast();
 
@@ -52,7 +43,7 @@ class Properties {
   /// Controller for ALL change events (adds, updates and deletes).
   ///
   /// NB: it seems an overkill to have a stream for each type of event. Consider replacing adds and updates with this one.
-  late final _changeController = StreamController<PropertiesEvent>.broadcast();
+  late final _changeController = StreamController<ChangeEvent>.broadcast();
 
   /// Create a new properties instance by naming the source file using [name].
   Properties(String name) {
@@ -463,7 +454,7 @@ class Properties {
   Stream<UpdateEvent> get onUpdate => _updateEventController.stream;
 
   /// Get the stream instance for the change event stream.
-  Stream<PropertiesEvent> get onChange => _changeController.stream;
+  Stream<ChangeEvent> get onChange => _changeController.stream;
 
   /// Getter for [boolEvaluator] instance.
   BoolEvaluator get boolEvaluator => this._be;
