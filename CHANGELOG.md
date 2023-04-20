@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+* Add delete(key) API ([#7](https://github.com/vaind/properties.dart/pull/7))
+* Add saveToFile(path) API ([#7](https://github.com/vaind/properties.dart/pull/7))
+
 ## 2.0.0
 
 * Add null-safety. ([#1](https://github.com/vaind/properties.dart/pull/1))
