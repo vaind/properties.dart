@@ -8,18 +8,44 @@ void main() {
   // in order for tests to run on your machine you may have to add ../ before file paths
   String baseFile = 'resources/sample.properties';
   String advancedFile = 'resources/sample-adv.properties';
-  String jsonSource =
-      '{"key.1" : "value 1", "key.2" : "value 2", "another.key" : "another value"}';
+  String saveFile = 'resources/save.properties';
+
+  String jsonSource = '{"key.1" : "value 1", "key.2" : "value 2", "another.key" : "another value"}';
 
   group('Creation - from properties file', () {
-    test('Existing by path',
-        () => expect(Properties.fromFile(baseFile), isNotNull));
+    test('Existing by path', () => expect(Properties.fromFile(baseFile), isNotNull));
     test('Existing by name', () => expect(Properties(baseFile), isNotNull));
   });
 
+  group('Save to file', () {
+    late Properties p;
+    late Properties sp;
+    late File file;
+    setUp(() {
+      file = File(saveFile);
+      if (file.existsSync()) file.deleteSync();
+      p = Properties.fromFile(baseFile);
+      p.saveToFile(saveFile);
+      sp = Properties.fromFile(saveFile);
+    });
+
+    test('key1', () => expect(sp.get('test.key.1'), equals('value 1')));
+    test('key2', () => expect(sp.get('test.key.2'), equals('value 2')));
+    test('key3', () => expect(sp.get('another.key'), equals('another value')));
+    test('Not existing key', () => expect(sp.get('not.existing'), isNull));
+
+    test('Get keys', () {
+      Iterable<String> i = sp.keys;
+      expect(i.length, 3);
+    });
+
+    tearDown(() {
+      file.deleteSync(); // if the file does not exist, test should fail
+    });
+  });
+
   group('Creation - from JSON string', () {
-    test('JSON map input',
-        () => expect(Properties.fromJSON(jsonSource), isNotNull));
+    test('JSON map input', () => expect(Properties.fromJSON(jsonSource), isNotNull));
   });
 
   group('Getters - from file source', () {
@@ -27,14 +53,11 @@ void main() {
     setUp(() {
       p = Properties.fromFile(baseFile);
     });
-    test('Existing key - not null',
-        () => expect(p.get('test.key.1'), isNotNull));
-    test('Existing key - equals',
-        () => expect(p.get('test.key.1'), equals('value 1')));
+    test('Existing key - not null', () => expect(p.get('test.key.1'), isNotNull));
+    test('Existing key - equals', () => expect(p.get('test.key.1'), equals('value 1')));
     test('Not existing key', () => expect(p.get('not.existing'), isNull));
 
-    test('Existing key using []',
-        () => expect(p['test.key.1'], equals('value 1')));
+    test('Existing key using []', () => expect(p['test.key.1'], equals('value 1')));
     test('Not existing key using []', () => expect(p['not.existing'], isNull));
 
     test('Get keys', () {
@@ -49,27 +72,16 @@ void main() {
       p = Properties.fromFile(baseFile);
     });
 
-    test('Not existing key - default value',
-        () => expect(p.get('test.key.X', defval: 'value X'), isNotNull));
-    test(
-        'Not existing key - default value',
-        () =>
-            expect(p.get('test.key.X', defval: 'value X'), equals('value X')));
+    test('Not existing key - default value', () => expect(p.get('test.key.X', defval: 'value X'), isNotNull));
+    test('Not existing key - default value', () => expect(p.get('test.key.X', defval: 'value X'), equals('value X')));
 
-    test('Not existing key - default key',
-        () => expect(p.get('test.key.X', defkey: 'test.key.1'), isNotNull));
-    test(
-        'Not existing key - default key',
-        () => expect(
-            p.get('test.key.X', defkey: 'test.key.1'), equals('value 1')));
+    test('Not existing key - default key', () => expect(p.get('test.key.X', defkey: 'test.key.1'), isNotNull));
+    test('Not existing key - default key', () => expect(p.get('test.key.X', defkey: 'test.key.1'), equals('value 1')));
     test('Not existing key - default key, not existing',
         () => expect(p.get('test.key.X', defkey: 'test.key.Y'), isNull));
 
-    test(
-        'Not existing key - default value & key',
-        () => expect(
-            p.get('test.key.X', defval: 'value X', defkey: 'test.key.1'),
-            equals('value X')));
+    test('Not existing key - default value & key',
+        () => expect(p.get('test.key.X', defval: 'value X', defkey: 'test.key.1'), equals('value X')));
   });
 
   group('Getters - from JSON source', () {
@@ -78,10 +90,8 @@ void main() {
       p = Properties.fromJSON(jsonSource);
     });
     test('Existing key - not null', () => expect(p.get('key.1'), isNotNull));
-    test('Existing key - equals',
-        () => expect(p.get('key.1'), equals('value 1')));
-    test('Existing key - equals',
-        () => expect(p.get('another.key'), equals('another value')));
+    test('Existing key - equals', () => expect(p.get('key.1'), equals('value 1')));
+    test('Existing key - equals', () => expect(p.get('another.key'), equals('another value')));
     test('Not existing key', () => expect(p.get('not.existing'), isNull));
     test('Get keys', () {
       Iterable<String> i = p.keys;
@@ -94,14 +104,11 @@ void main() {
     setUp(() {
       p = Properties.fromString(File(baseFile).readAsStringSync());
     });
-    test('Existing key - not null',
-        () => expect(p.get('test.key.1'), isNotNull));
-    test('Existing key - equals',
-        () => expect(p.get('test.key.1'), equals('value 1')));
+    test('Existing key - not null', () => expect(p.get('test.key.1'), isNotNull));
+    test('Existing key - equals', () => expect(p.get('test.key.1'), equals('value 1')));
     test('Not existing key', () => expect(p.get('not.existing'), isNull));
 
-    test('Existing key using []',
-        () => expect(p['test.key.1'], equals('value 1')));
+    test('Existing key using []', () => expect(p['test.key.1'], equals('value 1')));
     test('Not existing key using []', () => expect(p['not.existing'], isNull));
 
     test('Get keys', () {
@@ -116,56 +123,36 @@ void main() {
       p = Properties.fromFile(advancedFile);
     });
 
-    test('Load value with escaped backslash',
-        () => expect(p.get('test.key.slash'), equals(r"C:\\test\\slash")));
+    test('Load value with escaped backslash', () => expect(p.get('test.key.slash'), equals(r"C:\\test\\slash")));
 
-    test('Property with int value existing',
-        () => expect(p.get('test.key.integer'), isNotNull));
-    test('Load int value',
-        () => expect(p.getInt('test.key.integer'), isNotNull));
-    test('Loaded int value parsed successfully',
-        () => expect(p.getInt('test.key.integer'), equals(1)));
+    test('Property with int value existing', () => expect(p.get('test.key.integer'), isNotNull));
+    test('Load int value', () => expect(p.getInt('test.key.integer'), isNotNull));
+    test('Loaded int value parsed successfully', () => expect(p.getInt('test.key.integer'), equals(1)));
 
-    test('Property with double value existing',
-        () => expect(p.get('test.key.double'), isNotNull));
-    test('Load double value',
-        () => expect(p.getDouble('test.key.double'), isNotNull));
-    test('Loaded double value parsed successfully',
-        () => expect(p.getDouble('test.key.double'), equals(2.1)));
+    test('Property with double value existing', () => expect(p.get('test.key.double'), isNotNull));
+    test('Load double value', () => expect(p.getDouble('test.key.double'), isNotNull));
+    test('Loaded double value parsed successfully', () => expect(p.getDouble('test.key.double'), equals(2.1)));
 
-    test('Load a non int value as an int',
-        () => expect(p.getInt('test.key.notinteger'), isNull));
+    test('Load a non int value as an int', () => expect(p.getInt('test.key.notinteger'), isNull));
 
-    test('Load an int with default value',
-        () => expect(p.getInt('test.key.integer.X', defval: 1), equals(1)));
-    test(
-        'Load an int with default key',
-        () => expect(p.getInt('test.key.integer.X', defkey: 'test.key.integer'),
-            equals(1)));
+    test('Load an int with default value', () => expect(p.getInt('test.key.integer.X', defval: 1), equals(1)));
+    test('Load an int with default key',
+        () => expect(p.getInt('test.key.integer.X', defkey: 'test.key.integer'), equals(1)));
 
     test('Load a list', () => expect(p.getList('test.key.list'), isNotNull));
-    test('Load a list',
-        () => expect(p.getList('test.key.list').length, equals(4)));
+    test('Load a list', () => expect(p.getList('test.key.list').length, equals(4)));
 
-    test(
-        'Load a multiline property value',
-        () => expect(p.get('test.key.multiline'),
-            equals("this is a multi line property value")));
+    test('Load a multiline property value',
+        () => expect(p.get('test.key.multiline'), equals("this is a multi line property value")));
 
-    test('Load true bool from true',
-        () => expect(p.getBool('test.key.boolean.true'), equals(true)));
-    test('Load false bool from false',
-        () => expect(p.getBool('test.key.boolean.false'), equals(false)));
+    test('Load true bool from true', () => expect(p.getBool('test.key.boolean.true'), equals(true)));
+    test('Load false bool from false', () => expect(p.getBool('test.key.boolean.false'), equals(false)));
 
-    test('Load true bool from TRUE',
-        () => expect(p.getBool('test.key.boolean.TRUE'), equals(true)));
-    test('Load false bool from FALSE',
-        () => expect(p.getBool('test.key.boolean.FALSE'), equals(false)));
+    test('Load true bool from TRUE', () => expect(p.getBool('test.key.boolean.TRUE'), equals(true)));
+    test('Load false bool from FALSE', () => expect(p.getBool('test.key.boolean.FALSE'), equals(false)));
 
-    test('Load true bool from 1',
-        () => expect(p.getBool('test.key.boolean.1'), equals(true)));
-    test('Load false bool from 0',
-        () => expect(p.getBool('test.key.boolean.0'), equals(false)));
+    test('Load true bool from 1', () => expect(p.getBool('test.key.boolean.1'), equals(true)));
+    test('Load false bool from 0', () => expect(p.getBool('test.key.boolean.0'), equals(false)));
 
     test('Custom bool evaluator', () {
       BoolEvaluator myBE = MyBoolEvaluator();
@@ -211,11 +198,7 @@ void main() {
     });
 
     test('Add a property from Map', () {
-      var map = {
-        'first': 'partridge',
-        'second': 'turtledoves',
-        'fifth': 'golden rings'
-      };
+      var map = {'first': 'partridge', 'second': 'turtledoves', 'fifth': 'golden rings'};
       p.mergeMap(map);
       expect(p.get('second'), equals('turtledoves'));
       expect(p.get('test.key.1'), equals('value 1'));
@@ -228,6 +211,28 @@ void main() {
     });
   });
 
+  group('Delete properties:', () {
+    late Properties p;
+    setUp(() {
+      p = Properties.fromFile(baseFile);
+    });
+
+    test('Delete existing', () {
+      var key = 'test.key.1';
+      expect(p.contains(key), isTrue);
+      var success = p.delete(key);
+      expect(success, isTrue);
+      expect(p.contains(key), isFalse);
+    });
+
+    test('Delete non-existing', () {
+      var key = 'bogus.key';
+      expect(p.contains(key), isFalse);
+      var success = p.delete(key);
+      expect(success, isFalse);
+    });
+  });
+
   group('Events', () {
     late Properties p;
     setUp(() {
@@ -237,6 +242,14 @@ void main() {
     test('Add a property and listen to the event', () async {
       p.onAdd.listen(
         expectAsync1((AddEvent e) {
+          expect(e.type, equals(Properties.ADD_PROPERTY_EVENTNAME));
+          expect(e.key, equals("test.key.3"));
+          expect(e.value, equals("value 3"));
+        }),
+      );
+      p.onChange.listen(
+        expectAsync1((PropertiesEvent pe) {
+          final e = pe as AddEvent;
           expect(e.type, equals(Properties.ADD_PROPERTY_EVENTNAME));
           expect(e.key, equals("test.key.3"));
           expect(e.value, equals("value 3"));
@@ -256,11 +269,30 @@ void main() {
         expect(e.oldValue, equals("value 1"));
         expect(e.newValue, equals("value new 1"));
       }));
+      p.onChange.listen(expectAsync1((pe) {
+        final e = pe as UpdateEvent;
+        expect(e.type, equals(Properties.UPDATE_PROPERTY_EVENTNAME));
+        expect(e.key, equals("test.key.1"));
+        expect(e.oldValue, equals("value 1"));
+        expect(e.newValue, equals("value new 1"));
+      }));
 
       var singleUpdate = p.add('test.key.1', 'value new 1');
 
       expect(singleUpdate, isTrue);
       expect(p.get('test.key.1'), equals('value new 1'));
+    });
+
+    test('Delete a property and listen to the event', () {
+      p.onChange.listen(expectAsync1((pe) {
+        final e = pe as DeleteEvent;
+        expect(e.type, equals(Properties.DELETE_PROPERTY_EVENTNAME));
+        expect(e.key, equals("test.key.1"));
+      }));
+
+      var delete = p.delete('test.key.1');
+      expect(delete, isTrue);
+      expect(p.contains('test.key.1'), isFalse);
     });
 
     test('Events disabled', () {
@@ -292,20 +324,11 @@ void main() {
     setUp(() {
       p = Properties.fromFile(baseFile);
     });
-    test(
-        'To JSON',
-        () => expect(p.toJSON(),
-            '{"test.key.1":"value 1","test.key.2":"value 2","another.key":"another value"}'));
-    test(
-        'To JSON - prefix',
-        () => expect(p.toJSON(prefix: "test"),
-            '{"test.key.1":"value 1","test.key.2":"value 2"}'));
-    test('To JSON - suffix',
-        () => expect(p.toJSON(suffix: "1"), '{"test.key.1":"value 1"}'));
-    test(
-        'To JSON - prefix & suffix',
-        () => expect(
-            p.toJSON(prefix: "test", suffix: "2"), '{"test.key.2":"value 2"}'));
+    test('To JSON',
+        () => expect(p.toJSON(), '{"test.key.1":"value 1","test.key.2":"value 2","another.key":"another value"}'));
+    test('To JSON - prefix', () => expect(p.toJSON(prefix: "test"), '{"test.key.1":"value 1","test.key.2":"value 2"}'));
+    test('To JSON - suffix', () => expect(p.toJSON(suffix: "1"), '{"test.key.1":"value 1"}'));
+    test('To JSON - prefix & suffix', () => expect(p.toJSON(prefix: "test", suffix: "2"), '{"test.key.2":"value 2"}'));
   });
 
   group('Merge', () {
@@ -314,10 +337,7 @@ void main() {
       p = Properties.fromFile(baseFile);
     });
     test('Add brand new keys from map', () {
-      p.mergeMap({
-        "test.key.merge1": "merge value 1",
-        "test.key.merge2": "merge value 2"
-      });
+      p.mergeMap({"test.key.merge1": "merge value 1", "test.key.merge2": "merge value 2"});
 
       expect(p.size, equals(5));
       expect(p.get("test.key.merge1"), isNotNull);
@@ -347,19 +367,15 @@ void main() {
       p = Properties.fromFile(baseFile);
     });
     test('Contains - matching', () => expect(p.contains('test.key.2'), isTrue));
-    test('Contains - not matching',
-        () => expect(p.contains('test.key.3'), isFalse));
-    test('Every key - matching',
-        () => expect(p.every((s) => s.startsWith('test')), isNotNull));
-    test('Every key - matching',
-        () => expect(p.every((s) => s.startsWith('test')), isNotEmpty));
+    test('Contains - not matching', () => expect(p.contains('test.key.3'), isFalse));
+    test('Every key - matching', () => expect(p.every((s) => s.startsWith('test')), isNotNull));
+    test('Every key - matching', () => expect(p.every((s) => s.startsWith('test')), isNotEmpty));
     test('Every key - not matching', () {
       Properties? result = p.every((s) => s.startsWith('toast'));
       expect(result, isNull);
     });
     test('Every key & value - matching', () {
-      Properties? m =
-          p.every((s) => s.startsWith('test'), (v) => v == "value 1");
+      Properties? m = p.every((s) => s.startsWith('test'), (v) => v == "value 1");
 
       expect(m, isNot(isEmpty));
       expect(m!.size, equals(1));
