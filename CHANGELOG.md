@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.1.0
 
 * Add delete(key) API ([#7](https://github.com/vaind/properties.dart/pull/7))
 * Add saveToFile(path) API ([#7](https://github.com/vaind/properties.dart/pull/7))
