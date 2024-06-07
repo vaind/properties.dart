@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.1
+
+* Move the dependency on `test` package to `dev_dependencies` ([#10](https://github.com/vaind/properties.dart/pull/10))
+
 ## 2.1.0
 
 * Add delete(key) API ([#7](https://github.com/vaind/properties.dart/pull/7))
