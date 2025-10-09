@@ -8,7 +8,7 @@ file management for Dart adding some useful but not so common features.
 Code and usage are very straightforward, just have a look at the Getting Started section below.
 
 To know something more about the released version have a look at the
-[CHANGELOG][changelog] to find the version that works best for you.
+[CHANGELOG](CHANGELOG.md) to find the version that works best for you.
 
 Getting started
 -----------
