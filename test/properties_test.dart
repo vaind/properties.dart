@@ -384,25 +384,24 @@ void main() {
 
   group('Edge cases', () {
     test('Line starting with equals sign should not crash', () {
-      // This tests the fix for the out of bounds exception when a line starts with =
+      // Lines starting with = are invalid and should be ignored
       String edgeCaseContent = '=value_at_start\ntest.key=value';
       Properties p = Properties.fromString(edgeCaseContent);
       
-      // The line starting with = is treated as a property with empty key
+      // The line starting with = is ignored (invalid property format)
       expect(p.get('test.key'), equals('value'));
-      // Empty key property is also created
-      expect(p.get(''), equals('value_at_start'));
-      expect(p.size, equals(2));
+      expect(p.get(''), isNull);
+      expect(p.size, equals(1));
     });
 
     test('Empty line with just equals should not crash', () {
       String edgeCaseContent = '=\ntest.key=value';
       Properties p = Properties.fromString(edgeCaseContent);
       
+      // The line with just = is ignored (invalid property format)
       expect(p.get('test.key'), equals('value'));
-      // Empty key with empty value
-      expect(p.get(''), equals(''));
-      expect(p.size, equals(2));
+      expect(p.get(''), isNull);
+      expect(p.size, equals(1));
     });
 
     test('Multiline with single character line ending with backslash', () {

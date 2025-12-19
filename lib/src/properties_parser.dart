@@ -234,8 +234,15 @@ class Line {
 
     // contains a non escaped =
     for (var i = 0; i < line.length; i++) {
-      if (line[i] == Properties.EQUAL && (i == 0 || line[i - 1] != Properties.BACKSLASH)) {
-        return true;
+      if (line[i] == Properties.EQUAL) {
+        // Line starting with = is not a valid property
+        if (i == 0) {
+          return false;
+        }
+        // Check if the = is escaped
+        if (line[i - 1] != Properties.BACKSLASH) {
+          return true;
+        }
       }
     }
 
