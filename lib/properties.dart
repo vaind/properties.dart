@@ -257,7 +257,7 @@ class Properties {
       return [];
     }
 
-    return value.split(",");
+    return value.split(",").map((String listItem) => listItem.trim()).toList();
   }
 
   /// Check whether the properties contains a property given its [key]
