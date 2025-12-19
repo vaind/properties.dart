@@ -197,7 +197,7 @@ class Line {
   /// Test if a [line] of bytes ends with the input [char] or not.
   bool _endsWith(List<int> line, int char) {
     return line.lastIndexOf(char) == (line.length - 1) &&
-        (line[line.length - 2] != Properties.SLASH);
+        (line.length < 2 || line[line.length - 2] != Properties.SLASH);
   }
 
   /// Given a [line] of bytes split it into key and value.
@@ -234,7 +234,7 @@ class Line {
 
     // contains a non escaped =
     for (var i = 0; i < line.length; i++) {
-      if (line[i] == Properties.EQUAL && line[i - 1] != Properties.BACKSLASH) {
+      if (line[i] == Properties.EQUAL && (i == 0 || line[i - 1] != Properties.BACKSLASH)) {
         return true;
       }
     }

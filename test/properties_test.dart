@@ -381,6 +381,38 @@ void main() {
       expect(m!.size, equals(1));
     });
   });
+
+  group('Edge cases', () {
+    test('Line starting with equals sign should not crash', () {
+      // This tests the fix for the out of bounds exception when a line starts with =
+      String edgeCaseContent = '=value_at_start\ntest.key=value';
+      Properties p = Properties.fromString(edgeCaseContent);
+      
+      // The line starting with = is treated as a property with empty key
+      expect(p.get('test.key'), equals('value'));
+      // Empty key property is also created
+      expect(p.get(''), equals('value_at_start'));
+      expect(p.size, equals(2));
+    });
+
+    test('Empty line with just equals should not crash', () {
+      String edgeCaseContent = '=\ntest.key=value';
+      Properties p = Properties.fromString(edgeCaseContent);
+      
+      expect(p.get('test.key'), equals('value'));
+      // Empty key with empty value
+      expect(p.get(''), equals(''));
+      expect(p.size, equals(2));
+    });
+
+    test('Multiline with single character line ending with backslash', () {
+      // This tests the fix for _endsWith when line.length is 1
+      String edgeCaseContent = 'key=\\\nvalue';
+      Properties p = Properties.fromString(edgeCaseContent);
+      
+      expect(p.get('key'), equals('value'));
+    });
+  });
 }
 
 class MyBoolEvaluator extends BoolEvaluator {
