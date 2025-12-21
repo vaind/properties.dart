@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.2
+
+* Fix RangeError when parsing properties files with lines starting with `=` or single-character lines ending with `\`
+* Add support for empty keys per Java Properties specification (lines starting with `=` now create properties with empty string keys)
+
 ## 2.1.1
 
 * Move the dependency on `test` package to `dev_dependencies` ([#10](https://github.com/vaind/properties.dart/pull/10))
