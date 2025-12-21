@@ -235,9 +235,9 @@ class Line {
     // contains a non escaped =
     for (var i = 0; i < line.length; i++) {
       if (line[i] == Properties.EQUAL) {
-        // Line starting with = is not a valid property
+        // Empty key is valid (line starting with =) per Java Properties spec
         if (i == 0) {
-          return false;
+          return true;
         }
         // Check if the = is escaped
         if (line[i - 1] != Properties.BACKSLASH) {

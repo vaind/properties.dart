@@ -383,25 +383,23 @@ void main() {
   });
 
   group('Edge cases', () {
-    test('Line starting with equals sign should not crash', () {
-      // Lines starting with = are invalid and should be ignored
+    test('Line starting with equals sign creates empty key property', () {
+      // Per Java spec: =value creates property with empty key
       String edgeCaseContent = '=value_at_start\ntest.key=value';
       Properties p = Properties.fromString(edgeCaseContent);
       
-      // The line starting with = is ignored (invalid property format)
+      expect(p.get(''), equals('value_at_start'));  // Empty key
       expect(p.get('test.key'), equals('value'));
-      expect(p.get(''), isNull);
-      expect(p.size, equals(1));
+      expect(p.size, equals(2));
     });
 
-    test('Empty line with just equals should not crash', () {
+    test('Empty line with just equals creates empty key and value', () {
       String edgeCaseContent = '=\ntest.key=value';
       Properties p = Properties.fromString(edgeCaseContent);
       
-      // The line with just = is ignored (invalid property format)
+      expect(p.get(''), equals(''));  // Empty key, empty value
       expect(p.get('test.key'), equals('value'));
-      expect(p.get(''), isNull);
-      expect(p.size, equals(1));
+      expect(p.size, equals(2));
     });
 
     test('Multiline with single character line ending with backslash', () {
