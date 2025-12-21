@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Remove whitespace around list items ([#13](https://github.com/vaind/properties.dart/pull/13))
+
 ## 2.1.1
 
 * Move the dependency on `test` package to `dev_dependencies` ([#10](https://github.com/vaind/properties.dart/pull/10))
