@@ -141,6 +141,10 @@ void main() {
 
     test('Load a list', () => expect(p.getList('test.key.list'), isNotNull));
     test('Load a list', () => expect(p.getList('test.key.list').length, equals(4)));
+    test('First list item should have whitespace trimmed',
+        () => expect(p.getList('test.key.list')[0], equals('this')));
+    test('Second list item should have whitespace trimmed',
+        () => expect(p.getList('test.key.list')[1], equals('is')));
 
     test('Load a multiline property value',
         () => expect(p.get('test.key.multiline'), equals("this is a multi line property value")));

@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Remove whitespace around list items ([#13](https://github.com/vaind/properties.dart/pull/13))
+
 ## 2.1.2
 
 * Fix RangeError when parsing properties files with lines starting with `=` or single-character lines ending with `\`
